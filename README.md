@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Q&A Tracker
 
-## Getting Started
+Ứng dụng quản lý nhóm, chuyến đi và chia sẻ chi phí một cách minh bạch và dễ dàng.
 
-First, run the development server:
+## Tính năng chính
+
+- **Quản lý nhóm**: Tạo nhóm Public, Close hoặc Secret
+- **Quản lý chuyến đi**: Tạo chuyến đi cá nhân hoặc thuộc nhóm
+- **Chia sẻ chi phí**: Ghi nhận chi phí và chia sẻ minh bạch giữa các thành viên
+- **Tạm ứng & quyết toán**: Quản lý tạm ứng và tính toán công nợ tự động
+- **Xuất báo cáo**: Xuất báo cáo CSV/PDF chi tiết
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, TypeScript, TailwindCSS, shadcn/ui
+- **Backend**: Firebase (Auth + Firestore)
+- **Deploy**: Vercel
+
+## Cài đặt
+
+### 1. Clone repository
+
+```bash
+git clone <repository-url>
+cd qa-tracker
+```
+
+### 2. Cài đặt dependencies
+
+```bash
+npm install
+```
+
+### 3. Cấu hình Firebase
+
+1. Tạo project Firebase tại [Firebase Console](https://console.firebase.google.com/)
+2. Bật Authentication với Google Sign-in
+3. Tạo Firestore database
+4. Copy file `env.example` thành `.env.local`:
+
+```bash
+cp env.example .env.local
+```
+
+5. Điền thông tin Firebase vào `.env.local`:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+### 4. Chạy ứng dụng
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) để xem ứng dụng.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Test ứng dụng
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Truy cập [http://localhost:3000/test](http://localhost:3000/test) để kiểm tra trạng thái ứng dụng và các tính năng đã hoàn thành.
 
-## Learn More
+### 6. Trợ giúp
 
-To learn more about Next.js, take a look at the following resources:
+Nếu gặp vấn đề, truy cập [http://localhost:3000/help](http://localhost:3000/help) để xem hướng dẫn và giải đáp các vấn đề thường gặp.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Cấu trúc dự án
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── login/             # Trang đăng nhập
+│   ├── onboarding/        # Trang tạo tài khoản
+│   ├── dashboard/         # Trang chính
+│   └── layout.tsx         # Layout chính
+├── components/            # React components
+│   ├── auth/             # Auth components
+│   └── ui/               # UI components (shadcn/ui)
+├── lib/                  # Utilities
+│   ├── firebase.ts       # Firebase config
+│   └── auth.ts           # Auth functions
+└── types/                # TypeScript types
+```
 
-## Deploy on Vercel
+## Roadmap
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### MVP (4-6 tuần) ✅
+- [x] Google Sign-in
+- [x] Tạo tài khoản với username slug
+- [x] Tạo nhóm (Public/Close/Secret)
+- [x] Tham gia nhóm
+- [ ] Tạo chuyến đi
+- [ ] Quản lý thành viên
+- [ ] Ghi nhận chi phí
+- [ ] Tạm ứng & quyết toán
+- [ ] Xuất báo cáo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Post-MVP
+- [ ] Notification system
+- [ ] Audit logs
+- [ ] Mobile app
+- [ ] Premium features
+
+## Đóng góp
+
+1. Fork repository
+2. Tạo feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Tạo Pull Request
+
+## License
+
+MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.

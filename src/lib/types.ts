@@ -1,0 +1,222 @@
+// User types
+export interface User {
+  id: string;
+  googleUid: string;
+  name: string;
+  email: string;
+  avatar: string;
+  username: string;
+  birthday?: Date; // Optional birthday field
+  createdAt: Date;
+}
+
+// Group types
+export type GroupType = 'public' | 'close' | 'secret';
+
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverUrl?: string;
+  type: GroupType;
+  ownerId: string;
+  slug: string;
+  createdAt: Date;
+  memberCount?: number; // Added for display purposes
+}
+
+export interface GroupMember {
+  id: string;
+  groupId: string;
+  userId: string;
+  role: 'owner' | 'member';
+  joinedAt: Date;
+  leftAt?: Date;
+}
+
+// Trip types
+export type Currency = 'VND' | 'USD';
+
+export interface Trip {
+  id: string;
+  name: string;
+  description?: string;
+  currency: Currency;
+  ownerId: string;
+  groupId?: string; // null for personal trips
+  status: 'active' | 'closed';
+  createdAt: Date;
+  closedAt?: Date;
+  startDate?: Date;
+  endDate?: Date;
+  destination?: string;
+  coverUrl?: string;
+  costPerPersonPlanned?: number;
+  category?: string;
+  slug: string;
+  paymentStatus: 'paid' | 'unpaid';
+  memberCount?: number; // Added for display purposes
+  statsCache: {
+    totalAdvance: number;
+    totalExpense: number;
+    computedAt: Date;
+  };
+}
+
+// Trip type helpers
+export type TripType = 'personal' | 'group';
+
+export const getTripType = (trip: Trip): TripType => {
+  return trip.groupId ? 'group' : 'personal';
+};
+
+export const getTripTypeLabel = (trip: Trip): string => {
+  return trip.groupId ? 'Chuyến đi nhóm' : 'Chuyến đi cá nhân';
+};
+
+export const getTripTypeIcon = (trip: Trip): string => {
+  return trip.groupId ? '👥' : '👤';
+};
+
+export interface TripMember {
+  id: string;
+  tripId: string;
+  userId?: string; // nếu là thành viên thật
+  ghostName?: string; // nếu là thành viên ảo
+  role: 'creator' | 'member';
+  joinedAt: Date;
+  leftAt?: Date;
+  // Additional fields for UI/UX (not in spec but needed for functionality)
+  name?: string; // display name (derived from userId or ghostName)
+  weight?: number; // for weighted splitting (derived from user profile)
+  optionalEmail?: string; // for ghost members
+  paymentStatus?: 'paid' | 'unpaid';
+  paymentStatusUpdatedAt?: Date;
+  paymentStatusUpdatedBy?: string;
+}
+
+// Expense types
+export type SplitMethod = 'equal' | 'weight';
+
+export interface WeightEntry {
+  memberId: string;
+  weight: number;
+}
+
+export interface Expense {
+  id: string;
+  tripId: string;
+  amount: number;
+  paidBy: string; // tripMemberId
+  splitMethod: SplitMethod; // 'equal' | 'weight'
+  weightMap?: WeightEntry[]; // for weighted splits
+  exclusions?: string[]; // member IDs to exclude
+  memberIdsAtCreation?: string[]; // tripMemberIds who were in the trip when expense was created
+  category?: string;
+  description?: string;
+  createdAt: Date;
+  createdBy: string; // userId
+}
+
+// Advance types
+export interface Advance {
+  id: string;
+  tripId: string;
+  amount: number;
+  description?: string;
+  paidBy: string; // tripMemberId who paid the advance
+  paidTo: string; // tripMemberId who received the advance
+  createdAt: Date;
+  createdBy: string; // userId
+  isRefund?: boolean; // true if this is a refund
+}
+
+// Settlement types
+export interface SettlementTransaction {
+  id: string;
+  tripId: string;
+  fromMemberId: string;
+  toMemberId: string;
+  amount: number;
+  currency: Currency;
+  status: 'pending' | 'completed';
+  createdAt: Date;
+  completedAt?: Date;
+  computedAt: Date;
+  rounded: boolean;
+}
+
+export interface SettlementSummary {
+  id: string;
+  tripId: string;
+  computedAt: Date;
+  computedBy: string;
+  totalExpense: number;
+  totalAdvance: number;
+  netBalance: number;
+  memberBalances: { [memberId: string]: number };
+  transactions: Array<{
+    from: string;
+    to: string;
+    amount: number;
+    fromName: string;
+    toName: string;
+  }>;
+}
+
+// Join Request types
+export interface JoinRequest {
+  id: string;
+  groupId: string;
+  userId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  requestedAt: Date;
+  processedAt?: Date;
+  processedBy?: string;
+  message?: string;
+}
+
+// Invite types
+export interface GroupInvite {
+  id: string;
+  groupId: string;
+  invitedBy: string;
+  invitedEmail: string;
+  invitedUsername?: string;
+  targetUserId?: string;
+  status: 'pending' | 'accepted' | 'expired';
+  invitedAt: Date;
+  acceptedAt?: Date;
+  acceptedBy?: string;
+  expiresAt: Date;
+  message?: string;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'group_invite' | 'group_request' | 'trip_invite' | 'expense_added' | 'trip_closed';
+  title: string;
+  message: string;
+  data: {
+    groupId?: string;
+    tripId?: string;
+    inviteId?: string;
+    requestId?: string;
+    [key: string]: any;
+  };
+  isRead: boolean;
+  createdAt: Date;
+  readAt?: Date;
+}
+
+// Audit Log types
+export interface AuditLog {
+  id: string;
+  entityType: string;
+  entityId: string;
+  action: string;
+  actorId: string;
+  at: Date;
+}

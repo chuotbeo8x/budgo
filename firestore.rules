@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function authed() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+
+    // Helper: check trip membership (active)
+    function isTripMember(tripId) {
+      return exists(/databases/$(database)/documents/tripMembers/$(tripId + '_' + uid()));
+    }
+
+    // Helper: check group membership (active)
+    function isGroupMember(groupId) {
+      return exists(/databases/$(database)/documents/groupMembers/$(groupId + '_' + uid()));
+    }
+
+    // USERS: each user manages own profile
+    match /users/{userId} {
+      allow read: if authed();
+      allow create: if authed() && userId == uid();
+      allow update: if authed() && userId == uid();
+      allow delete: if false;
+    }
+
+    // GROUPS: owner can update/delete; everyone authed can read (app filters by type)
+    match /groups/{groupId} {
+      allow read: if authed();
+      allow create: if authed() && request.resource.data.ownerId == uid();
+      allow update, delete: if authed() && resource.data.ownerId == uid();
+    }
+
+    // GROUP MEMBERS: app enforces business logic; reads require auth
+    // Doc id convention: `${groupId}_${userId}`
+    match /groupMembers/{docId} {
+      allow read: if authed();
+      allow create, update, delete: if authed();
+    }
+
+    // TRIPS: personal trips readable by owner; group trips by group members; only owner writes
+    match /trips/{tripId} {
+      allow read: if authed() && (
+        // personal trip: groupId is null → only owner
+        (resource.data.groupId == null && resource.data.ownerId == uid()) ||
+        // group trip: must be group member
+        (resource.data.groupId != null && isGroupMember(resource.data.groupId))
+      );
+      allow create: if authed() && request.resource.data.ownerId == uid();
+      allow update, delete: if authed() && resource.data.ownerId == uid();
+    }
+
+    // TRIP MEMBERS: authed read; writes allowed but guarded by server actions
+    match /tripMembers/{docId} {
+      allow read: if authed();
+      allow create, update, delete: if authed();
+    }
+
+    // EXPENSES: only trip members can read; create/update by creator; delete by trip owner
+    match /expenses/{expenseId} {
+      allow read: if authed() && isTripMember(resource.data.tripId);
+      allow create: if authed() && isTripMember(request.resource.data.tripId) && request.resource.data.createdBy == uid() &&
+        get(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.closedAt == null;
+      allow update: if authed() && resource.data.createdBy == uid() &&
+        get(/databases/$(database)/documents/trips/$(resource.data.tripId)).data.closedAt == null;
+      allow delete: if authed() &&
+        exists(/databases/$(database)/documents/trips/$(resource.data.tripId)) &&
+        get(/databases/$(database)/documents/trips/$(resource.data.tripId)).data.ownerId == uid() &&
+        get(/databases/$(database)/documents/trips/$(resource.data.tripId)).data.closedAt == null;
+    }
+
+    // ADVANCES: only trip members read; only trip owner writes; block if trip closed
+    match /advances/{advanceId} {
+      allow read: if authed() && isTripMember(resource.data.tripId);
+      allow create, update, delete: if authed() &&
+        exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId)) &&
+        get(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.ownerId == uid() &&
+        (get(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.closedAt == null);
+    }
+
+    // SETTLEMENTS: read for members; writes by owner (server actions)
+    match /settlements/{settlementId} {
+      allow read: if authed() && isTripMember(resource.data.tripId);
+      allow create, update, delete: if authed() &&
+        exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId)) &&
+        get(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.ownerId == uid();
+    }
+
+    // JOIN REQUESTS – chỉ owner group xem và xử lý
+    match /joinRequests/{requestId} {
+      allow read: if authed() && isGroupOwner(resource.data.groupId);
+      allow create: if authed() && request.resource.data.userId == uid();
+      allow update: if authed() && isGroupOwner(resource.data.groupId);
+      allow delete: if false; // không xóa, chỉ update status
+    }
+
+    // GROUP INVITES – chỉ owner group tạo, user được mời xem
+    match /groupInvites/{inviteId} {
+      allow read: if authed() && (
+        isGroupOwner(resource.data.groupId) || 
+        get(/databases/$(database)/documents/users/$(uid)).data.email == resource.data.invitedEmail
+      );
+      allow create: if authed() && isGroupOwner(request.resource.data.groupId);
+      allow update: if authed() && (
+        isGroupOwner(resource.data.groupId) ||
+        (get(/databases/$(database)/documents/users/$(uid)).data.email == resource.data.invitedEmail && 
+         request.resource.data.status == 'accepted')
+      );
+      allow delete: if false; // không xóa, chỉ update status
+    }
+
+    // AUDIT LOGS – chỉ owner trip xem
+    match /auditLogs/{logId} {
+      allow read: if authed() &&
+        exists(/databases/$(database)/documents/trips/$(resource.data.entityId)) &&
+        get(/databases/$(database)/documents/trips/$(resource.data.entityId)).data.ownerId == uid();
+      allow write: if false; // chỉ server ghi
+    }
+  }
+}
