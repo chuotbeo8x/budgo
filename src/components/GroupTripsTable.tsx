@@ -122,7 +122,7 @@ export default function GroupTripsTable({
       'staycation': Home,
     };
     
-    const IconComponent = categoryIcons[trip.category] || Globe;
+    const IconComponent = categoryIcons[trip.category || ''] || Globe;
     return <IconComponent className="w-6 h-6" />;
   };
 
@@ -156,7 +156,7 @@ export default function GroupTripsTable({
   const totalTrips = trips.length;
   const activeTrips = trips.filter(t => t.status === 'active').length;
   const closedTrips = trips.filter(t => t.status === 'closed').length;
-  const totalExpense = trips.reduce((sum, trip) => sum + (trip.totalExpense || 0), 0);
+  const totalExpense = trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0);
   const averageExpense = totalTrips > 0 ? totalExpense / totalTrips : 0;
 
   if (loading) {

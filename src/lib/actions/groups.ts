@@ -2,14 +2,17 @@
 
 import { adminDb } from '../firebase-admin';
 import { CreateGroupSchema } from '../schemas';
-import { Group, GroupMember, JoinRequest, GroupInvite } from '../types';
+import { Group, GroupMember, JoinRequest } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
-import { toDate } from '../utils/date';
+import { toDate, safeToDate } from '../utils/date';
 import { searchUsersByEmail, searchUsersByUsername } from './users';
-import { createGroupInviteNotification } from './notifications';
 
 export async function createGroup(formData: FormData) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     const userId = formData.get('userId') as string;
     if (!userId) {
       throw new Error('Chưa đăng nhập');
@@ -101,6 +104,10 @@ export async function createGroup(formData: FormData) {
 
 export async function getGroupBySlug(slug: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     const groupRef = adminDb.collection('groups').doc(slug);
     const groupSnap = await groupRef.get();
     
@@ -113,7 +120,7 @@ export async function getGroupBySlug(slug: string) {
     // Convert Firestore Timestamp to Date if needed
     const processedGroupData = {
       ...groupData,
-      createdAt: groupData.createdAt?.toDate ? groupData.createdAt.toDate() : groupData.createdAt
+      createdAt: safeToDate(groupData?.createdAt) || new Date()
     };
     
     return { id: groupSnap.id, ...processedGroupData } as Group;
@@ -125,12 +132,10 @@ export async function getGroupBySlug(slug: string) {
 
 export async function getUserGroups(userId: string) {
   try {
-    console.log('Getting groups for user:', userId);
-    
-    // Check if adminDb is available
     if (!adminDb) {
-      throw new Error('Firebase Admin SDK not initialized');
+      throw new Error('Database chưa được khởi tạo');
     }
+    console.log('Getting groups for user:', userId);
     
     // First get group members
     const membersQuery = adminDb.collection('groupMembers')
@@ -196,8 +201,8 @@ export async function getUserGroups(userId: string) {
           console.log(`Group ${groupId} - Total members: ${memberCountSnapshot.docs.length}, Active members: ${memberCount}`);
           
           // Convert Firestore Timestamp to Date if needed
-          console.log(`Group ${groupId} - createdAt raw:`, groupData.createdAt);
-          const createdAt = toDate(groupData.createdAt);
+          console.log(`Group ${groupId} - createdAt raw:`, groupData?.createdAt);
+          const createdAt = safeToDate(groupData?.createdAt) || new Date();
           console.log(`Group ${groupId} - createdAt converted:`, createdAt);
           
           const processedGroupData = {
@@ -235,6 +240,10 @@ export async function getUserGroups(userId: string) {
 
 export async function checkSlugExists(slug: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     const groupRef = adminDb.collection('groups').doc(slug);
     const groupSnap = await groupRef.get();
     return groupSnap.exists;
@@ -246,6 +255,10 @@ export async function checkSlugExists(slug: string) {
 
 export async function joinGroup(groupId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -333,7 +346,7 @@ export async function joinGroup(groupId: string, userId: string) {
       
       if (requestSnap.exists) {
         const requestData = requestSnap.data();
-        if (requestData.status === 'pending') {
+        if (requestData?.status === 'pending') {
           throw new Error('Bạn đã gửi yêu cầu tham gia nhóm này rồi');
         }
       }
@@ -364,6 +377,10 @@ export async function joinGroup(groupId: string, userId: string) {
 
 export async function leaveGroup(groupId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -505,14 +522,14 @@ export async function getGroupMembers(groupId: string) {
       // Convert Firestore Timestamps to Date if needed
       const processedData = {
         ...data,
-        joinedAt: toDate(data.joinedAt),
-        leftAt: data.leftAt ? toDate(data.leftAt) : data.leftAt
+        joinedAt: safeToDate(data.joinedAt) || new Date(),
+        leftAt: safeToDate(data.leftAt)
       };
       
       // Get user data for display
-      const userData = userDataMap.get(processedData.userId);
-      const titleVotes = titleVotesMap.get(processedData.userId) || {};
-      const topTitle = topTitleMap.get(processedData.userId) || null;
+      const userData = userDataMap.get((processedData as any).userId);
+      const titleVotes = titleVotesMap.get((processedData as any).userId) || {};
+      const topTitle = topTitleMap.get((processedData as any).userId) || null;
       
       return {
         id: doc.id,
@@ -548,6 +565,10 @@ export async function getGroupMembers(groupId: string) {
 
 export async function isGroupMember(groupId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     const memberId = `${groupId}_${userId}`;
     const memberRef = adminDb.collection('groupMembers').doc(memberId);
     const memberSnap = await memberRef.get();
@@ -567,6 +588,10 @@ export async function isGroupMember(groupId: string, userId: string) {
 // Add Group Member (by email)
 export async function addGroupMember(formData: FormData) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     const userId = formData.get('userId') as string;
     const groupId = formData.get('groupId') as string;
     const memberEmail = formData.get('memberEmail') as string;
@@ -640,6 +665,10 @@ export async function addGroupMember(formData: FormData) {
 // Remove Group Member
 export async function removeGroupMember(groupId: string, memberId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -814,6 +843,10 @@ export async function deleteGroup(formData: FormData) {
 // Join Request Management
 export async function getJoinRequests(groupId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -866,6 +899,10 @@ export async function getJoinRequests(groupId: string, userId: string) {
 
 export async function approveJoinRequest(requestId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -931,6 +968,10 @@ export async function approveJoinRequest(requestId: string, userId: string) {
 
 export async function rejectJoinRequest(requestId: string, userId: string) {
   try {
+    if (!adminDb) {
+      throw new Error('Database chưa được khởi tạo');
+    }
+
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -982,291 +1023,6 @@ export async function rejectJoinRequest(requestId: string, userId: string) {
   }
 }
 
-// Invite Management
-export async function createGroupInvite(formData: FormData) {
-  try {
-    const userId = formData.get('userId') as string;
-    const groupId = formData.get('groupId') as string;
-    const invitedEmail = formData.get('invitedEmail') as string;
-    const invitedUsername = formData.get('invitedUsername') as string;
-    const message = formData.get('message') as string;
-
-    if (!userId) {
-      throw new Error('Chưa đăng nhập');
-    }
-
-    if (!groupId) {
-      throw new Error('Group ID không được để trống');
-    }
-
-    if (!invitedEmail && !invitedUsername) {
-      return { success: false, message: 'Vui lòng nhập email hoặc username' };
-    }
-
-    // Check if group exists and user is owner
-    const groupRef = adminDb.collection('groups').doc(groupId);
-    const groupSnap = await groupRef.get();
-    
-    if (!groupSnap.exists) {
-      throw new Error('Nhóm không tồn tại');
-    }
-
-    const groupData = groupSnap.data() as Group;
-    if (groupData.ownerId !== userId) {
-      throw new Error('Chỉ chủ nhóm mới có thể mời thành viên');
-    }
-
-    // Allow invites for all group types, but with different behaviors
-    // Public groups: invite is optional (users can join directly)
-    // Close groups: invite bypasses approval process
-    // Secret groups: invite is the only way to join
-
-    // Find target user by email or username
-    let targetUser = null;
-    let targetEmail = invitedEmail;
-    
-    if (invitedUsername) {
-      // Search by username
-      const usersByUsername = await searchUsersByUsername(invitedUsername);
-      if (usersByUsername.length > 0) {
-        targetUser = usersByUsername[0];
-        targetEmail = targetUser.email;
-      } else {
-        return { success: false, message: 'Không tìm thấy người dùng với username này' };
-      }
-    } else if (invitedEmail) {
-      // Search by email
-      const usersByEmail = await searchUsersByEmail(invitedEmail);
-      if (usersByEmail.length > 0) {
-        targetUser = usersByEmail[0];
-      }
-    }
-
-    // Check if user is already a member (if user exists in system)
-    if (targetUser) {
-      const memberId = `${groupId}_${targetUser.id}`;
-      const memberRef = adminDb.collection('groupMembers').doc(memberId);
-      const memberSnap = await memberRef.get();
-      
-      if (memberSnap.exists) {
-        return { success: false, message: 'Người dùng này đã là thành viên của nhóm' };
-      }
-    }
-
-    // Check if there's already a pending invite
-    const inviteId = `${groupId}_${targetEmail}`;
-    const inviteRef = adminDb.collection('groupInvites').doc(inviteId);
-    const inviteSnap = await inviteRef.get();
-    
-    if (inviteSnap.exists) {
-      const inviteData = inviteSnap.data();
-      if (inviteData.status === 'pending') {
-        return { success: false, message: 'Đã gửi lời mời cho email này rồi' };
-      }
-    }
-
-    // Create invite
-    const inviteData = {
-      groupId,
-      invitedBy: userId,
-      invitedEmail: targetEmail,
-      invitedUsername: invitedUsername || undefined,
-      targetUserId: targetUser?.id || undefined,
-      status: 'pending',
-      invitedAt: new Date(),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      message: message || undefined,
-    };
-
-    const cleanedInviteData = prepareFirestoreData(inviteData);
-    await inviteRef.set(cleanedInviteData);
-
-    // Create notification if user exists in system
-    if (targetUser) {
-      try {
-        // Get group info for notification
-        const groupData = groupSnap.data() as Group;
-        
-        // Get inviter info
-        const inviterRef = adminDb.collection('users').doc(userId);
-        const inviterSnap = await inviterRef.get();
-        const inviterName = inviterSnap.exists ? inviterSnap.data()?.name || 'Người dùng' : 'Người dùng';
-        
-        await createGroupInviteNotification(
-          targetUser.id,
-          groupId,
-          groupData.name,
-          userId,
-          inviterName,
-          inviteId,
-          message
-        );
-      } catch (notificationError) {
-        console.error('Error creating notification:', notificationError);
-        // Don't fail the invite if notification fails
-      }
-    }
-
-    return { success: true, message: `Đã gửi lời mời đến ${targetEmail}` };
-  } catch (error) {
-    console.error('Error creating group invite:', error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Có lỗi xảy ra khi tạo lời mời');
-  }
-}
-
-export async function getGroupInvites(groupId: string, userId: string) {
-  try {
-    if (!userId) {
-      throw new Error('Chưa đăng nhập');
-    }
-
-    // Check if user is group owner
-    const groupRef = adminDb.collection('groups').doc(groupId);
-    const groupSnap = await groupRef.get();
-    
-    if (!groupSnap.exists) {
-      throw new Error('Nhóm không tồn tại');
-    }
-
-    const groupData = groupSnap.data() as Group;
-    if (groupData.ownerId !== userId) {
-      throw new Error('Chỉ chủ nhóm mới có thể xem lời mời');
-    }
-
-    const invitesQuery = adminDb.collection('groupInvites')
-      .where('groupId', '==', groupId);
-
-    const invitesSnapshot = await invitesQuery.get();
-    
-    const invites = invitesSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        invitedAt: data.invitedAt?.toDate ? data.invitedAt.toDate() : data.invitedAt,
-        acceptedAt: data.acceptedAt?.toDate ? data.acceptedAt.toDate() : data.acceptedAt,
-        expiresAt: data.expiresAt?.toDate ? data.expiresAt.toDate() : data.expiresAt,
-      };
-    }) as GroupInvite[];
-
-    // Sort by invitedAt in code (descending)
-    invites.sort((a, b) => {
-      const aTime = a.invitedAt instanceof Date ? a.invitedAt.getTime() : new Date(a.invitedAt).getTime();
-      const bTime = b.invitedAt instanceof Date ? b.invitedAt.getTime() : new Date(b.invitedAt).getTime();
-      return bTime - aTime; // descending order (newest first)
-    });
-
-    return invites;
-  } catch (error) {
-    console.error('Error getting group invites:', error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Có lỗi xảy ra khi lấy danh sách lời mời');
-  }
-}
-
-export async function getGroupInvite(inviteId: string) {
-  try {
-    if (!inviteId) {
-      throw new Error('Invite ID không được để trống');
-    }
-
-    const inviteRef = adminDb.collection('groupInvites').doc(inviteId);
-    const inviteSnap = await inviteRef.get();
-    
-    if (!inviteSnap.exists) {
-      return null;
-    }
-
-    const data = inviteSnap.data();
-    return {
-      id: inviteSnap.id,
-      ...data,
-      invitedAt: data.invitedAt?.toDate ? data.invitedAt.toDate() : data.invitedAt,
-      acceptedAt: data.acceptedAt?.toDate ? data.acceptedAt.toDate() : data.acceptedAt,
-      expiresAt: data.expiresAt?.toDate ? data.expiresAt.toDate() : data.expiresAt,
-    } as GroupInvite;
-  } catch (error) {
-    console.error('Error getting group invite:', error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Có lỗi xảy ra khi lấy thông tin lời mời');
-  }
-}
-
-export async function acceptGroupInvite(inviteId: string, userId: string) {
-  try {
-    if (!userId) {
-      throw new Error('Chưa đăng nhập');
-    }
-
-    // Get invite
-    const inviteRef = adminDb.collection('groupInvites').doc(inviteId);
-    const inviteSnap = await inviteRef.get();
-    
-    if (!inviteSnap.exists) {
-      throw new Error('Lời mời không tồn tại');
-    }
-
-    const inviteData = inviteSnap.data() as GroupInvite;
-    
-    if (inviteData.status !== 'pending') {
-      throw new Error('Lời mời này đã được xử lý rồi');
-    }
-
-    if (inviteData.expiresAt < new Date()) {
-      throw new Error('Lời mời đã hết hạn');
-    }
-
-    // Check if user email matches invite email
-    const userRef = adminDb.collection('users').doc(userId);
-    const userSnap = await userRef.get();
-    
-    if (!userSnap.exists) {
-      throw new Error('Người dùng không tồn tại');
-    }
-
-    const userData = userSnap.data();
-    if (userData.email !== inviteData.invitedEmail) {
-      throw new Error('Lời mời này không dành cho bạn');
-    }
-
-    // Add user to group
-    const memberId = `${inviteData.groupId}_${userId}`;
-    const memberData = {
-      groupId: inviteData.groupId,
-      userId: userId,
-      role: 'member',
-      joinedAt: new Date(),
-    };
-
-    const cleanedMemberData = prepareFirestoreData(memberData);
-    await adminDb.collection('groupMembers').doc(memberId).set(cleanedMemberData);
-
-    // Update invite status
-    const updateData = {
-      status: 'accepted',
-      acceptedAt: new Date(),
-      acceptedBy: userId,
-    };
-
-    const cleanedUpdateData = prepareFirestoreData(updateData);
-    await inviteRef.update(cleanedUpdateData);
-
-    return { success: true, message: 'Đã tham gia nhóm thành công!' };
-  } catch (error) {
-    console.error('Error accepting group invite:', error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Có lỗi xảy ra khi chấp nhận lời mời');
-  }
-}
 
 // Transfer Group Ownership
 export async function transferGroupOwnership(groupId: string, newOwnerId: string, currentOwnerId: string) {
@@ -1377,7 +1133,7 @@ export async function getGroupRequests(groupId: string, userId: string) {
         ...data,
         createdAt: toDate(data.createdAt),
         updatedAt: toDate(data.updatedAt),
-      } as JoinRequest;
+      } as any;
     });
 
     // Sort by createdAt in descending order (newest first)
@@ -1445,9 +1201,7 @@ export async function searchPublicGroups(searchTerm: string): Promise<Group[]> {
           ownerId: data.ownerId || '',
           memberCount: actualMemberCount,
           createdAt: toDate(data.createdAt),
-          updatedAt: toDate(data.updatedAt),
           coverUrl: data.coverUrl || null,
-          isPublic: data.isPublic || false,
         });
       }
     }

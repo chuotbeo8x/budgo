@@ -5,7 +5,7 @@ import { useProfile } from '@/components/auth/ProfileProvider';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, ShieldCheck } from 'lucide-react';
+import { Users, Settings, ShieldCheck, Megaphone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function AdminDashboardPage() {
@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -106,6 +106,20 @@ export default function AdminDashboardPage() {
             <CardContent className="flex items-center justify-between">
               <p className="text-sm text-gray-500">Xem danh sách, khóa/mở khóa, xóa</p>
               <Link href="/admin/users">
+                <Button variant="outline">Mở</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-md hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Megaphone className="w-5 h-5 text-orange-600" /> Gửi thông báo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">Gửi thông báo cho tất cả thành viên</p>
+              <Link href="/admin/broadcast">
                 <Button variant="outline">Mở</Button>
               </Link>
             </CardContent>

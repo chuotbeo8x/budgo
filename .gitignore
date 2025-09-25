@@ -43,3 +43,6 @@ src/lib/firebase-service-account.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Netlify folder
+.netlify

@@ -17,7 +17,7 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
     members.forEach(member => {
       settlementMap.set(member.id, {
         memberId: member.id,
-        memberName: member.name,
+        memberName: member.name || 'Unknown',
         totalExpenses: 0,
         totalAdvances: 0,
         balance: 0

@@ -13,16 +13,26 @@ export function cleanFirestoreData(data: any): any {
   }
 
   if (Array.isArray(data)) {
-    return data.map(cleanFirestoreData);
+    return data.map(cleanFirestoreData).filter(item => item !== null);
   }
   
   if (typeof data === 'object') {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(data)) {
-      if (value !== undefined) {
-        cleaned[key] = cleanFirestoreData(value);
+      if (value !== undefined && value !== null) {
+        const cleanedValue = cleanFirestoreData(value);
+        // Only add if the cleaned value is not null
+        if (cleanedValue !== null) {
+          cleaned[key] = cleanedValue;
+        }
       }
     }
+    
+    // Return null if the object becomes empty after cleaning
+    if (Object.keys(cleaned).length === 0) {
+      return null;
+    }
+    
     return cleaned;
   }
   

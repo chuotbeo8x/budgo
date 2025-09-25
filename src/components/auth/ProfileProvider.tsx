@@ -51,16 +51,23 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
         const userProfile = await getUserById(user.uid);
         
         if (!userProfile) {
-          // User doesn't have a profile, redirect to onboarding
-          router.push('/onboarding');
+          // User doesn't have a profile
+          setProfile(null);
+          // Only redirect to onboarding if not already there
+          if (window.location.pathname !== '/onboarding') {
+            router.push('/onboarding');
+          }
           return;
         }
         
         setProfile(userProfile);
       } catch (error) {
         console.error('Error checking user profile:', error);
-        // On error, redirect to onboarding to be safe
-        router.push('/onboarding');
+        setProfile(null);
+        // On error, redirect to onboarding to be safe (only if not already there)
+        if (window.location.pathname !== '/onboarding') {
+          router.push('/onboarding');
+        }
       } finally {
         setProfileLoading(false);
       }
@@ -75,6 +82,7 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
     </ProfileContext.Provider>
   );
 };
+
 
 
 

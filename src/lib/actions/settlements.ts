@@ -25,7 +25,7 @@ export async function computeSettlement(tripId: string, userId: string) {
     }
 
     const tripData = tripSnap.data();
-    if (tripData.ownerId !== userId) {
+    if (tripData?.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể tính toán');
     }
 
@@ -102,8 +102,8 @@ export async function getTripSettlement(tripId: string) {
       id: doc.id,
       ...doc.data()
     })).sort((a, b) => {
-      const aTime = a.computedAt?.toDate ? a.computedAt.toDate().getTime() : new Date(a.computedAt).getTime();
-      const bTime = b.computedAt?.toDate ? b.computedAt.toDate().getTime() : new Date(b.computedAt).getTime();
+      const aTime = (a as any).computedAt?.toDate ? (a as any).computedAt.toDate().getTime() : new Date((a as any).computedAt).getTime();
+      const bTime = (b as any).computedAt?.toDate ? (b as any).computedAt.toDate().getTime() : new Date((b as any).computedAt).getTime();
       return bTime - aTime; // descending order (newest first)
     });
 
@@ -112,7 +112,7 @@ export async function getTripSettlement(tripId: string) {
     // Convert Firestore Timestamps to Date if needed
     const processedSettlementData = {
       ...settlementDoc,
-      computedAt: settlementDoc.computedAt?.toDate ? settlementDoc.computedAt.toDate() : settlementDoc.computedAt,
+      computedAt: (settlementDoc as any).computedAt?.toDate ? (settlementDoc as any).computedAt.toDate() : (settlementDoc as any).computedAt,
     };
     
     return processedSettlementData as SettlementSummary;
@@ -130,13 +130,13 @@ async function calculateSettlement(expenses: Expense[], advances: Advance[], mem
   // Initialize member balances and names
   members.forEach(member => {
     memberBalances[member.id] = 0;
-    memberNames[member.id] = member.name;
+    memberNames[member.id] = member.name || 'Unknown';
   });
 
   // Process advances (positive balance)
   advances.forEach(advance => {
-    if (memberBalances.hasOwnProperty(advance.memberId)) {
-      memberBalances[advance.memberId] += advance.amount;
+    if (memberBalances.hasOwnProperty(advance.paidTo)) {
+      memberBalances[advance.paidTo] += advance.amount;
     }
   });
 
@@ -300,7 +300,7 @@ export async function createSettlementTransactions(tripId: string, userId: strin
     }
 
     const tripData = tripSnap.data();
-    if (tripData.ownerId !== userId) {
+    if (tripData?.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể tạo giao dịch');
     }
 
@@ -326,7 +326,7 @@ export async function createSettlementTransactions(tripId: string, userId: strin
       };
 
       const cleanedTransactionData = prepareFirestoreData(transactionData);
-      await adminDb.collection('settlementTransactions').doc(transactionId).set(cleanedTransactionData);
+      await adminDb!.collection('settlementTransactions').doc(transactionId).set(cleanedTransactionData);
       return transactionId;
     });
 

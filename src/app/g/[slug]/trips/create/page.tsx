@@ -122,7 +122,7 @@ export default function CreateGroupTripPage() {
         toast.success('Tạo chuyến đi thành công!');
         router.push(`/g/${group.slug}/trips/${result.slug}`);
       } else {
-        toast.error(result.message || 'Có lỗi xảy ra khi tạo chuyến đi');
+        toast.error('Có lỗi xảy ra khi tạo chuyến đi');
       }
     } catch (error) {
       console.error('Error creating trip:', error);

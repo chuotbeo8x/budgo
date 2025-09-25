@@ -28,7 +28,7 @@ export default function MaintenanceGuard({ children }: { children: React.ReactNo
   if (!enabled) return <>{children}</>;
   if ((profile as any)?.role === 'admin') return <>{children}</>;
   // Allowlisted routes accessible during maintenance
-  const allowList = [/^\/profiles$/, /^\/profile\//];
+  const allowList = [/^\/profiles\//, /^\/settings$/];
   if (allowList.some((re) => re.test(pathname))) {
     return <>{children}</>;
   }

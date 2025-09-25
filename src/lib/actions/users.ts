@@ -26,12 +26,12 @@ export async function getUserById(userId: string) {
     // Convert Firestore Timestamps to Date if needed
     const processedUserData = {
       ...userData,
-      createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData.createdAt),
-      updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData.updatedAt),
-      birthday: userData.birthday?.toDate ? userData.birthday.toDate() : (userData.birthday ? toDate(userData.birthday) : undefined),
+      createdAt: userData?.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData?.createdAt),
+      updatedAt: userData?.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData?.updatedAt),
+      birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
     };
     
-    return { id: userSnap.id, ...processedUserData } as User;
+    return { id: userSnap.id, ...processedUserData } as any;
   } catch (error) {
     console.error('Error getting user:', error);
     throw new Error('Có lỗi xảy ra khi lấy thông tin người dùng');
@@ -118,6 +118,11 @@ export async function getUserByIds(userIds: string[]) {
           if (userSnap.exists) {
             const userData = userSnap.data();
             
+            if (!userData) {
+              console.error(`User data is null for user ${userId}`);
+              continue;
+            }
+            
             // Convert Firestore Timestamps to Date if needed
             const processedUserData = {
               ...userData,
@@ -126,7 +131,7 @@ export async function getUserByIds(userIds: string[]) {
               birthday: userData.birthday?.toDate ? userData.birthday.toDate() : (userData.birthday ? toDate(userData.birthday) : undefined),
             };
             
-            batchUsers.push({ id: userSnap.id, ...processedUserData } as User);
+            batchUsers.push({ id: userSnap.id, ...processedUserData } as any);
           }
         } catch (error) {
           console.error(`Error getting user ${userId}:`, error);
@@ -175,12 +180,12 @@ export async function getUserByUsername(username: string) {
     // Convert Firestore Timestamps to Date if needed
     const processedUserData = {
       ...userData,
-      createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData.createdAt),
-      updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData.updatedAt),
-      birthday: userData.birthday?.toDate ? userData.birthday.toDate() : (userData.birthday ? toDate(userData.birthday) : undefined),
+      createdAt: userData?.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData?.createdAt),
+      updatedAt: userData?.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData?.updatedAt),
+      birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
     };
     
-    return { id: doc.id, ...processedUserData } as User;
+    return { id: doc.id, ...processedUserData } as any;
   } catch (error) {
     console.error('Error getting user by username:', error);
     throw new Error('Có lỗi xảy ra khi lấy thông tin người dùng');
@@ -216,7 +221,7 @@ export async function searchUsersByEmail(email: string) {
         createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt,
       };
       
-      return { id: doc.id, ...processedUserData } as User;
+      return { id: doc.id, ...processedUserData } as any;
     });
 
     return users;
@@ -253,7 +258,7 @@ export async function searchUsersByUsername(username: string) {
         createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt,
       };
       
-      return { id: doc.id, ...processedUserData } as User;
+      return { id: doc.id, ...processedUserData } as any;
     });
 
     return users;
@@ -291,7 +296,7 @@ export async function searchUsers(query: string) {
         createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt,
       };
       
-      return { id: doc.id, ...processedUserData } as User;
+      return { id: doc.id, ...processedUserData } as any;
     });
 
     // Filter users by name or email containing the search term
@@ -475,7 +480,7 @@ export async function getTodaysBirthdays(userId: string) {
     
     const usersSnapshot = await usersQuery.get();
     
-    const birthdayUsers = [];
+    const birthdayUsers: any[] = [];
     usersSnapshot.docs.forEach(doc => {
       try {
         const userData = doc.data();
@@ -729,7 +734,7 @@ export async function getUserProfile(usernameOrId: string) {
 
     const userData = userDoc.data();
     const userId = userDoc.id;
-    console.log('User found:', userId, userData.name);
+    console.log('User found:', userId, userData?.name);
 
     // Get real stats
     console.log('Fetching real user stats for user:', userId);
@@ -841,22 +846,22 @@ export async function getUserProfile(usernameOrId: string) {
     }
 
     // Get titles and votes
-    const titles = userData.titles || [];
-    const totalVotes = userData.totalVotes || 0;
+    const titles = userData?.titles || [];
+    const totalVotes = userData?.totalVotes || 0;
 
     const result = {
       success: true,
       data: {
         id: userId,
-        name: userData.name || 'Chưa có tên',
-        email: userData.email || '',
-        username: userData.username || userId,
-        avatar: userData.photoURL || userData.avatar,
-        bio: userData.bio || '',
-        phone: userData.phone || '',
-        location: userData.location || '',
-        isPublic: userData.isPublic || false,
-        createdAt: userData.createdAt?.toDate?.() || new Date(userData.createdAt),
+        name: userData?.name || 'Chưa có tên',
+        email: userData?.email || '',
+        username: userData?.username || userId,
+        avatar: userData?.photoURL || userData?.avatar,
+        bio: userData?.bio || '',
+        phone: userData?.phone || '',
+        location: userData?.location || '',
+        isPublic: userData?.isPublic || false,
+        createdAt: userData?.createdAt?.toDate?.() || new Date(userData?.createdAt),
         // Stats
         totalTrips,
         totalGroups,

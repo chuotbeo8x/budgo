@@ -5,6 +5,9 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { getUnreadNotificationsCount } from '@/lib/actions/notifications';
 import { getTodaysBirthdays } from '@/lib/actions/users';
 import NotificationPanel from './NotificationPanel';
+import { useNotificationToast } from '@/hooks/useNotificationToast';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
 
 export default function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -12,12 +15,32 @@ export default function NotificationProvider({ children }: { children: React.Rea
   const [unreadCount, setUnreadCount] = useState(0);
   const [birthdayMembers, setBirthdayMembers] = useState<any[]>([]);
 
+  // Enable toast notifications for new notifications
+  useNotificationToast();
+
   useEffect(() => {
     if (user) {
       loadData();
-      // Refresh every 30 seconds
-      const interval = setInterval(loadData, 30000);
-      return () => clearInterval(interval);
+      
+      // Set up real-time listener for notifications
+      const notificationsQuery = query(
+        collection(db, 'notifications'),
+        where('userId', '==', user.uid),
+        where('isRead', '==', false)
+      );
+
+      const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+        setUnreadCount(snapshot.size);
+      }, (error) => {
+        console.error('Error listening to notifications:', error);
+        // Fallback to polling if real-time fails
+        const interval = setInterval(loadData, 30000);
+        return () => clearInterval(interval);
+      });
+
+      return () => {
+        unsubscribe();
+      };
     } else {
       setUnreadCount(0);
       setBirthdayMembers([]);
@@ -63,6 +86,7 @@ export default function NotificationProvider({ children }: { children: React.Rea
         onClose={() => setIsPanelOpen(false)}
         unreadCount={unreadCount}
         birthdayMembers={birthdayMembers}
+        userId={user?.uid}
       />
     </>
   );

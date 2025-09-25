@@ -118,7 +118,7 @@ export default function DashboardPage() {
       if (!created) return;
       const key = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, '0')}`;
       if (buckets[key] !== undefined) {
-        buckets[key] += trip.totalExpense || 0;
+        buckets[key] += trip.statsCache?.totalExpense || 0;
       }
     });
     return buckets;
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-purple-100 text-xs font-medium">Tổng chi phí</p>
                   <p className="text-xl font-bold">
-                    {trips.reduce((sum, trip) => sum + (trip.totalExpense || 0), 0).toLocaleString('vi-VN')} VNĐ
+                    {trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0).toLocaleString('vi-VN')} VNĐ
                   </p>
                 </div>
                 <DollarSign className="w-6 h-6 text-purple-200" />
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                     <li key={group.id} className="p-4 flex items-center justify-between">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          {group.isPublic ? (
+                          {group.type === 'public' ? (
                             <Globe className="w-4 h-4 text-blue-500" />
                           ) : (
                             <Lock className="w-4 h-4 text-orange-500" />
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                   <ul className="divide-y divide-gray-200">
                     {trips
                       .filter(t => t.startDate && new Date(t.startDate) > new Date())
-                      .sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                      .sort((a,b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())
                       .slice(0,5)
                       .map(t => (
                         <li key={t.id} className="px-4 py-3 text-sm flex items-center justify-between">

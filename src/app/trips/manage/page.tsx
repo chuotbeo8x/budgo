@@ -176,7 +176,7 @@ export default function TripsManagePage() {
   const personalTrips = trips.filter(t => !t.groupId).length;
   const groupTrips = trips.filter(t => t.groupId).length;
   const activeTrips = trips.filter(t => t.status === 'active').length;
-  const totalExpense = trips.reduce((sum, trip) => sum + (trip.totalExpense || 0), 0);
+  const totalExpense = trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0);
   const averageExpense = totalTrips > 0 ? totalExpense / totalTrips : 0;
 
   if (loading) {

@@ -91,14 +91,28 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'group_invite':
-        return '👥';
       case 'group_request':
         return '📝';
-      case 'trip_invite':
+      case 'group_joined':
+        return '👥';
+      case 'group_left':
+        return '👋';
+      case 'trip_created':
         return '✈️';
+      case 'trip_updated':
+        return '✏️';
+      case 'trip_deleted':
+        return '🗑️';
       case 'expense_added':
         return '💰';
+      case 'expense_updated':
+        return '✏️';
+      case 'expense_deleted':
+        return '🗑️';
+      case 'settlement_ready':
+        return '✅';
+      case 'admin_broadcast':
+        return '📢';
       case 'trip_closed':
         return '🔒';
       default:
@@ -108,11 +122,11 @@ export default function NotificationsPage() {
 
   const getNotificationAction = (notification: Notification) => {
     switch (notification.type) {
-      case 'group_invite':
+      case 'group_request':
         return (
           <div className="flex space-x-2">
-            <Link href={`/notifications/invite/${notification.data.inviteId}`}>
-              <Button size="sm">Xem lời mời</Button>
+            <Link href={`/g/${notification.data.groupId}/requests`}>
+              <Button size="sm">Xem yêu cầu</Button>
             </Link>
             <Button
               size="sm"
@@ -123,12 +137,59 @@ export default function NotificationsPage() {
             </Button>
           </div>
         );
-      case 'group_request':
+      case 'trip_created':
+      case 'trip_updated':
         return (
           <div className="flex space-x-2">
-            <Link href={`/g/${notification.data.groupId}/requests`}>
-              <Button size="sm">Xem yêu cầu</Button>
+            <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}`}>
+              <Button size="sm">Xem chuyến đi</Button>
             </Link>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDeleteNotification(notification.id)}
+            >
+              Xóa
+            </Button>
+          </div>
+        );
+      case 'expense_added':
+      case 'expense_updated':
+        return (
+          <div className="flex space-x-2">
+            <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/expenses`}>
+              <Button size="sm">Xem chi phí</Button>
+            </Link>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDeleteNotification(notification.id)}
+            >
+              Xóa
+            </Button>
+          </div>
+        );
+      case 'settlement_ready':
+        return (
+          <div className="flex space-x-2">
+            <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/settlement`}>
+              <Button size="sm">Xem thanh toán</Button>
+            </Link>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDeleteNotification(notification.id)}
+            >
+              Xóa
+            </Button>
+          </div>
+        );
+      case 'admin_broadcast':
+        return (
+          <div className="flex space-x-2">
+            <Button size="sm" variant="outline" disabled>
+              Thông báo hệ thống
+            </Button>
             <Button
               size="sm"
               variant="outline"

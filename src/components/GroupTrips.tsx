@@ -7,21 +7,7 @@ import { Calendar, MapPin, Users, DollarSign, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils/date';
 import { getGroupTrips } from '@/lib/actions/trips';
-
-interface Trip {
-  id: string;
-  name: string;
-  destination?: string;
-  startDate?: Date;
-  endDate?: Date;
-  currency: string;
-  memberCount: number;
-  totalExpense: number;
-  status: 'active' | 'completed' | 'upcoming';
-  description?: string;
-  category?: string;
-  createdAt: Date;
-}
+import { Trip } from '@/lib/types';
 
 interface GroupTripsProps {
   groupId: string;
@@ -183,7 +169,7 @@ export default function GroupTrips({ groupId, groupSlug, isOwner, loading: exter
                         <DollarSign className="w-3 h-3 mr-1" />
                         Tổng chi phí
                       </p>
-                      <p className="font-semibold text-sm text-gray-900">{formatCurrency(trip.totalExpense, trip.currency)}</p>
+                      <p className="font-semibold text-sm text-gray-900">{formatCurrency(trip.statsCache?.totalExpense || 0, trip.currency)}</p>
                     </div>
                   </div>
                 </div>

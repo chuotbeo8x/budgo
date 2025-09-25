@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorAlert } from '@/components/ui/error-alert';
 import { signInWithGoogle } from '@/lib/auth';
+import { getUserById } from '@/lib/actions/users';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -19,9 +20,22 @@ export default function LoginPage() {
       setError(null);
       const result = await signInWithGoogle();
       
-      // Check if user exists in our system
-      // For now, redirect to onboarding for new users
-      router.push('/onboarding');
+      // Check if user has profile in our system
+      try {
+        const userProfile = await getUserById(result.user.uid);
+        
+        if (userProfile) {
+          // User has profile, redirect to dashboard
+          router.push('/dashboard');
+        } else {
+          // User doesn't have profile, redirect to onboarding
+          router.push('/onboarding');
+        }
+      } catch (profileError) {
+        console.error('Error checking user profile:', profileError);
+        // On error, redirect to onboarding to be safe
+        router.push('/onboarding');
+      }
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';

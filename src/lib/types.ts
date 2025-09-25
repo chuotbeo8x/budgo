@@ -176,27 +176,12 @@ export interface JoinRequest {
   message?: string;
 }
 
-// Invite types
-export interface GroupInvite {
-  id: string;
-  groupId: string;
-  invitedBy: string;
-  invitedEmail: string;
-  invitedUsername?: string;
-  targetUserId?: string;
-  status: 'pending' | 'accepted' | 'expired';
-  invitedAt: Date;
-  acceptedAt?: Date;
-  acceptedBy?: string;
-  expiresAt: Date;
-  message?: string;
-}
 
 // Notification types
 export interface Notification {
   id: string;
   userId: string;
-  type: 'group_invite' | 'group_request' | 'trip_invite' | 'expense_added' | 'trip_closed';
+  type: 'group_request' | 'trip_invite' | 'expense_added' | 'trip_closed' | 'group_joined' | 'group_left' | 'trip_created' | 'trip_updated' | 'expense_updated' | 'expense_deleted' | 'member_added' | 'member_removed' | 'group_updated' | 'trip_deleted' | 'settlement_ready' | 'admin_broadcast';
   title: string;
   message: string;
   data: {
@@ -204,6 +189,8 @@ export interface Notification {
     tripId?: string;
     inviteId?: string;
     requestId?: string;
+    isBroadcast?: boolean;
+    sentBy?: string;
     [key: string]: any;
   };
   isRead: boolean;

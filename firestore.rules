@@ -114,5 +114,19 @@ service cloud.firestore {
         get(/databases/$(database)/documents/trips/$(resource.data.entityId)).data.ownerId == uid();
       allow write: if false; // chỉ server ghi
     }
+
+    // NOTIFICATIONS – user chỉ đọc notifications của mình
+    match /notifications/{notificationId} {
+      allow read: if authed() && resource.data.userId == uid();
+      allow write: if false; // chỉ server actions ghi
+    }
+
+    // BROADCAST HISTORY – chỉ admin đọc
+    match /broadcastHistory/{historyId} {
+      allow read: if authed() && 
+        exists(/databases/$(database)/documents/users/$(uid)) &&
+        get(/databases/$(database)/documents/users/$(uid)).data.role == 'admin';
+      allow write: if false; // chỉ server actions ghi
+    }
   }
 }

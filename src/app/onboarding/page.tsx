@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { createUserProfile } from '@/lib/actions/users';
+import { createUserProfile, getUserById } from '@/lib/actions/users';
 import { CreateAccountSchema } from '@/lib/schemas';
 import { generateUsernameSlug } from '@/lib/utils/slug';
 
@@ -38,7 +38,29 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [submitting, setSubmitting] = useState(false);
   const [usernameError, setUsernameError] = useState('');
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
+  // Check if user already has profile
+  useEffect(() => {
+    const checkExistingProfile = async () => {
+      if (!user || loading) return;
+      
+      try {
+        const existingProfile = await getUserById(user.uid);
+        if (existingProfile) {
+          // User already has profile, redirect to dashboard
+          router.push('/dashboard');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking existing profile:', error);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+
+    checkExistingProfile();
+  }, [user, loading, router]);
 
   const generateSlugFromUsername = (username: string) => {
     return generateUsernameSlug(username);
@@ -111,7 +133,7 @@ export default function OnboardingPage() {
     }
   };
 
-  if (loading) {
+  if (loading || checkingProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />

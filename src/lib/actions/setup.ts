@@ -24,6 +24,8 @@ export async function createSampleUser(userId: string, userData: { name: string;
       name: userData.name,
       email: userData.email,
       username: userData.name.toLowerCase().replace(/\s+/g, '-'),
+      avatar: (userData as any).photoURL || '',
+      googleUid: (userData as any).uid,
       createdAt: new Date(),
     };
 
@@ -57,6 +59,8 @@ export async function setupSampleData(userId: string) {
         name: 'Bạn',
         email: 'user@example.com',
         username: 'user',
+        avatar: '',
+        googleUid: 'sample-uid',
         createdAt: new Date(),
       };
 
@@ -72,6 +76,7 @@ export async function setupSampleData(userId: string) {
     throw new Error('Có lỗi xảy ra khi setup dữ liệu mẫu');
   }
 }
+
 
 
 

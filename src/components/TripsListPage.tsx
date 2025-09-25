@@ -71,7 +71,7 @@ export default function TripsListPage({
       'staycation': Home,
     };
     
-    const IconComponent = categoryIcons[trip.category] || Globe;
+    const IconComponent = categoryIcons[trip.category || ''] || Globe;
     return <IconComponent className="w-6 h-6" />;
   };
 
@@ -239,7 +239,7 @@ export default function TripsListPage({
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">
-                          {trip.totalExpense ? formatCurrency(trip.totalExpense, trip.currency) : '0'}
+                          {trip.statsCache?.totalExpense ? formatCurrency(trip.statsCache.totalExpense, trip.currency) : '0'}
                         </div>
                         <div className="text-xs text-gray-500">Tổng chi phí</div>
                       </div>

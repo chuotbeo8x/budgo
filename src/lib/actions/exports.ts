@@ -1,7 +1,7 @@
 'use server';
 
 import { adminDb } from '../firebase-admin';
-import { Expense, Advance, TripMember, Settlement } from '../types';
+import { Expense, Advance, TripMember } from '../types';
 
 // Export Trip Data to CSV
 export async function exportTripData(tripId: string, userId: string, format: 'csv' | 'json' = 'csv') {
@@ -32,7 +32,7 @@ export async function exportTripData(tripId: string, userId: string, format: 'cs
       .where('leftAt', '==', null);
     
     const memberSnapshot = await memberQuery.get();
-    const isOwner = tripData.ownerId === userId;
+    const isOwner = tripData?.ownerId === userId;
     const isMember = memberSnapshot.docs.length > 0;
 
     if (!isOwner && !isMember) {
@@ -65,7 +65,7 @@ export async function exportTripData(tripId: string, userId: string, format: 'cs
     const settlements = settlementSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    })) as Settlement[];
+    })) as any[];
 
     // Get latest settlement
     const latestSettlement = settlements.sort((a, b) => {
@@ -89,7 +89,7 @@ export async function exportTripData(tripId: string, userId: string, format: 'cs
 }
 
 // Generate CSV data
-function generateCSV(trip: any, expenses: Expense[], advances: Advance[], members: TripMember[], settlement: Settlement | undefined) {
+function generateCSV(trip: any, expenses: Expense[], advances: Advance[], members: TripMember[], settlement: any | undefined) {
   const lines: string[] = [];
   
   // Trip info
@@ -108,10 +108,10 @@ function generateCSV(trip: any, expenses: Expense[], advances: Advance[], member
   lines.push('=== THÀNH VIÊN ===');
   lines.push('Tên,Loại,Vai trò,Ngày tham gia');
   members.forEach(member => {
-    const typeText = member.type === 'user' ? 'Người dùng' : 
-                    member.type === 'group' ? 'Nhóm' : 'Thành viên ảo';
+    const typeText = (member as any).type === 'user' ? 'Người dùng' :
+                     (member as any).type === 'group' ? 'Nhóm' : 'Thành viên ảo';
     const roleText = member.role === 'creator' ? 'Chủ chuyến đi' : 'Thành viên';
-    lines.push(`${member.name},${typeText},${roleText},${new Date(member.joinedAt).toLocaleDateString('vi-VN')}`);
+    lines.push(`${member.name || 'Unknown'},${typeText},${roleText},${new Date(member.joinedAt).toLocaleDateString('vi-VN')}`);
   });
   lines.push('');
 
@@ -129,8 +129,8 @@ function generateCSV(trip: any, expenses: Expense[], advances: Advance[], member
   lines.push('=== TẠM ỨNG ===');
   lines.push('Thành viên,Số tiền,Đơn vị,Mô tả,Ngày tạo');
   advances.forEach(advance => {
-    const member = members.find(m => m.id === advance.memberId);
-    lines.push(`${member?.name || 'N/A'},${advance.amount},,${advance.note || ''},${new Date(advance.createdAt).toLocaleDateString('vi-VN')}`);
+    const member = members.find(m => m.id === advance.paidTo);
+    lines.push(`${member?.name || 'N/A'},${advance.amount},,${advance.description || ''},${new Date(advance.createdAt).toLocaleDateString('vi-VN')}`);
   });
   lines.push('');
 
@@ -148,7 +148,7 @@ function generateCSV(trip: any, expenses: Expense[], advances: Advance[], member
     lines.push('Thành viên,Số dư,Trạng thái');
     Object.entries(settlement.memberBalances).forEach(([memberId, balance]) => {
       const member = members.find(m => m.id === memberId);
-      const status = balance > 0 ? 'Được hoàn' : balance < 0 ? 'Cần trả' : 'Cân bằng';
+      const status = (balance as number) > 0 ? 'Được hoàn' : (balance as number) < 0 ? 'Cần trả' : 'Cân bằng';
       lines.push(`${member?.name || 'N/A'},${balance},${status}`);
     });
     lines.push('');
@@ -157,7 +157,7 @@ function generateCSV(trip: any, expenses: Expense[], advances: Advance[], member
     if (settlement.transactions.length > 0) {
       lines.push('=== ĐỀ XUẤT HOÀN TRẢ ===');
       lines.push('Từ,Đến,Số tiền');
-      settlement.transactions.forEach(transaction => {
+      settlement.transactions.forEach((transaction: any) => {
         lines.push(`${transaction.fromName},${transaction.toName},${transaction.amount}`);
       });
     }
@@ -167,7 +167,7 @@ function generateCSV(trip: any, expenses: Expense[], advances: Advance[], member
 }
 
 // Generate JSON data
-function generateJSON(trip: any, expenses: Expense[], advances: Advance[], members: TripMember[], settlement: Settlement | undefined) {
+function generateJSON(trip: any, expenses: Expense[], advances: Advance[], members: TripMember[], settlement: any | undefined) {
   return {
     trip: {
       ...trip,
@@ -177,20 +177,20 @@ function generateJSON(trip: any, expenses: Expense[], advances: Advance[], membe
     },
     members: members.map(member => ({
       ...member,
-      joinedAt: member.joinedAt?.toDate ? member.joinedAt.toDate() : member.joinedAt,
-      leftAt: member.leftAt?.toDate ? member.leftAt.toDate() : member.leftAt,
+      joinedAt: member.joinedAt,
+      leftAt: member.leftAt,
     })),
     expenses: expenses.map(expense => ({
       ...expense,
-      createdAt: expense.createdAt?.toDate ? expense.createdAt.toDate() : expense.createdAt,
+      createdAt: expense.createdAt,
     })),
     advances: advances.map(advance => ({
       ...advance,
-      createdAt: advance.createdAt?.toDate ? advance.createdAt.toDate() : advance.createdAt,
+      createdAt: advance.createdAt,
     })),
     settlement: settlement ? {
       ...settlement,
-      computedAt: settlement.computedAt?.toDate ? settlement.computedAt.toDate() : settlement.computedAt,
+      computedAt: settlement.computedAt,
     } : null,
     exportedAt: new Date().toISOString(),
   };

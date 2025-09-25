@@ -262,13 +262,13 @@ export default function GroupMembersTable({
                               <span className="truncate max-w-48">{member.email}</span>
                             </div>
                           )}
-                          {member.phone && (
+                          {(member as any).phone && (
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Phone className="w-4 h-4 text-gray-400" />
-                              <span>{member.phone}</span>
+                              <span>{(member as any).phone}</span>
                             </div>
                           )}
-                          {!member.email && !member.phone && (
+                          {!member.email && !(member as any).phone && (
                             <span className="text-sm text-gray-400">Không có thông tin</span>
                           )}
                         </div>
@@ -333,7 +333,7 @@ export default function GroupMembersTable({
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => window.open(`/profile/${member.username || member.userId}`, '_blank')}
+                            onClick={() => window.open(`/profiles/${member.username || member.userId}`, '_blank')}
                             className="text-blue-600 hover:text-blue-800"
                             title="Xem trang cá nhân"
                           >

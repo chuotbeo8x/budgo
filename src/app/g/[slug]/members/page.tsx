@@ -331,7 +331,7 @@ export default function GroupMembersPage() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `thanh-vien-${group.slug}-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `thanh-vien-${group?.slug || 'group'}-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();

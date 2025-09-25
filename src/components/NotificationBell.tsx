@@ -5,6 +5,8 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { getUnreadNotificationsCount } from '@/lib/actions/notifications';
 import { getTodaysBirthdays } from '@/lib/actions/users';
 import { Bell } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 
 export default function NotificationBell() {
   const { user } = useAuth();
@@ -20,14 +22,32 @@ export default function NotificationBell() {
 
   useEffect(() => {
     if (user) {
-      loadUnreadCount();
       loadBirthdays();
-      // Refresh every 30 seconds
-      const interval = setInterval(() => {
+      
+      // Set up real-time listener for unread notifications count
+      const notificationsQuery = query(
+        collection(db, 'notifications'),
+        where('userId', '==', user.uid),
+        where('isRead', '==', false)
+      );
+
+      const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+        setUnreadCount(snapshot.size);
+        setLoading(false);
+      }, (error) => {
+        console.error('Error listening to notifications:', error);
+        // Fallback to polling if real-time fails
         loadUnreadCount();
-        loadBirthdays();
-      }, 30000);
-      return () => clearInterval(interval);
+        const interval = setInterval(() => {
+          loadUnreadCount();
+          loadBirthdays();
+        }, 30000);
+        return () => clearInterval(interval);
+      });
+
+      return () => {
+        unsubscribe();
+      };
     } else {
       setUnreadCount(0);
       setLoading(false);

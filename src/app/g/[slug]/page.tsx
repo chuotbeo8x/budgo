@@ -656,7 +656,7 @@ export default function GroupPage() {
 
         {activeTab === 'members' && (
           <GroupMembersTable
-            members={members}
+            members={members as (GroupMember & { name: string; email: string; username: string; avatar: string; titleVotes?: { [titleId: string]: number }; topTitle?: { titleId: string; count: number; latestAt?: Date } | null })[]}
             loading={loadingMembers}
             isOwner={isOwner}
             currentUserId={user?.uid}

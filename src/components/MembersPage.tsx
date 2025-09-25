@@ -577,7 +577,7 @@ export default function MembersPage({
                                   <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                                       <span className="text-white font-bold text-sm">
-                                        {member.name.charAt(0).toUpperCase()}
+                                        {(member.name || 'U').charAt(0).toUpperCase()}
                                       </span>
                                     </div>
                                     <div className="flex-1">
@@ -772,7 +772,7 @@ export default function MembersPage({
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                                 <span className="text-white font-bold text-sm">
-                                  {member.name.charAt(0).toUpperCase()}
+                                  {(member.name || 'U').charAt(0).toUpperCase()}
                                 </span>
                               </div>
                               <div>
@@ -795,7 +795,7 @@ export default function MembersPage({
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Phone className="w-4 h-4" />
-                              <span>{member.optionalPhone || 'Chưa có số điện thoại'}</span>
+                              <span>{(member as any).optionalPhone || 'Chưa có số điện thoại'}</span>
                             </div>
                           </td>
                           <td className="py-4 px-4">

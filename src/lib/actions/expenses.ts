@@ -114,7 +114,7 @@ export async function addExpense(formData: FormData) {
     });
 
     // Create weightMap if splitMethod is 'weight'
-    let finalWeightMap = formWeightMap;
+    let finalWeightMap: { memberId: string; weight: number }[] | undefined = formWeightMap;
     if (formData.get('splitMethod') === 'weight') {
       if (!finalWeightMap || finalWeightMap.length === 0) {
         // Create default weightMap with all members having weight 1
@@ -393,7 +393,7 @@ export async function updateExpense(expenseId: string, formData: FormData) {
     });
 
     // Create weightMap if splitMethod is 'weight'
-    let finalWeightMap = formWeightMap;
+    let finalWeightMap: { memberId: string; weight: number }[] | undefined = formWeightMap;
     if (formData.get('splitMethod') === 'weight') {
       if (!finalWeightMap || finalWeightMap.length === 0) {
         // Create default weightMap with all members having weight 1
@@ -583,7 +583,7 @@ export async function addAdvance(formData: FormData) {
     // For paidTo, we need to check if it's the trip owner or a trip member
     // First check if it's the trip owner
     const tripData = tripSnap.data();
-    if (validatedData.paidTo === tripData.ownerId) {
+    if (validatedData.paidTo === tripData?.ownerId) {
       // It's the trip owner, that's valid
     } else {
       // Check if it's a trip member
@@ -737,7 +737,7 @@ export async function updateAdvance(advanceId: string, formData: FormData) {
     }
 
     const tripData = tripSnap.data();
-    if (tripData.ownerId !== userId) {
+    if (tripData?.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể chỉnh sửa tạm ứng');
     }
 
@@ -822,7 +822,7 @@ export async function deleteAdvance(advanceId: string, userId: string) {
     }
 
     const tripData = tripSnap.data();
-    if (tripData.ownerId !== userId) {
+    if (tripData?.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể xóa tạm ứng');
     }
 

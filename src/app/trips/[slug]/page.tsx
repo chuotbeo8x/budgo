@@ -24,7 +24,7 @@ export default function PersonalTripDetailPage() {
   const loadTrip = async () => {
     try {
       setLoadingTrip(true);
-      const tripData = await getTripBySlug(tripSlug, null, user?.uid);
+      const tripData = await getTripBySlug(tripSlug, undefined, user?.uid);
       setTrip(tripData);
     } catch (error) {
       console.error('Error loading trip:', error);

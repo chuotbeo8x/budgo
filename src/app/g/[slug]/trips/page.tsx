@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { getGroupBySlug, getGroupMembers, isGroupMember } from '@/lib/actions/groups';
 import { getGroupTrips } from '@/lib/actions/trips';
-import { Group, GroupMember } from '@/lib/types';
+import { Group, GroupMember, Trip } from '@/lib/types';
 import { formatDate } from '@/lib/utils/date';
 import Link from 'next/link';
 import { 
@@ -28,21 +28,6 @@ import {
   UserPlus
 } from 'lucide-react';
 
-interface Trip {
-  id: string;
-  name: string;
-  destination?: string;
-  startDate?: Date;
-  endDate?: Date;
-  currency: string;
-  memberCount: number;
-  totalExpense: number;
-  status: 'active' | 'completed' | 'upcoming';
-  description?: string;
-  category?: string;
-  createdAt: Date;
-  ownerId: string;
-}
 
 export default function GroupTripsPage() {
   const { slug } = useParams();
@@ -133,7 +118,7 @@ export default function GroupTripsPage() {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800';
-      case 'completed':
+      case 'closed':
         return 'bg-blue-100 text-blue-800';
       case 'upcoming':
         return 'bg-yellow-100 text-yellow-800';
@@ -146,7 +131,7 @@ export default function GroupTripsPage() {
     switch (status) {
       case 'active':
         return 'Đang diễn ra';
-      case 'completed':
+      case 'closed':
         return 'Đã hoàn thành';
       case 'upcoming':
         return 'Sắp diễn ra';
@@ -178,7 +163,7 @@ export default function GroupTripsPage() {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'expense':
-          return b.totalExpense - a.totalExpense;
+          return (b.statsCache?.totalExpense || 0) - (a.statsCache?.totalExpense || 0);
         default:
           return 0;
       }
@@ -279,7 +264,7 @@ export default function GroupTripsPage() {
                 <div>
                   <p className="text-purple-100 text-sm font-medium">Đã hoàn thành</p>
                   <p className="text-2xl font-bold">
-                    {trips.filter(trip => trip.status === 'completed').length}
+                    {trips.filter(trip => trip.status === 'closed').length}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-purple-200" />
@@ -294,7 +279,7 @@ export default function GroupTripsPage() {
                   <p className="text-orange-100 text-sm font-medium">Tổng chi phí</p>
                   <p className="text-2xl font-bold">
                     {formatCurrency(
-                      trips.reduce((sum, trip) => sum + trip.totalExpense, 0),
+                      trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0),
                       trips.length > 0 ? trips[0].currency : 'VND'
                     )}
                   </p>
@@ -333,7 +318,7 @@ export default function GroupTripsPage() {
                 >
                   <option value="all">Tất cả</option>
                   <option value="active">Đang diễn ra</option>
-                  <option value="completed">Đã hoàn thành</option>
+                  <option value="closed">Đã hoàn thành</option>
                   <option value="upcoming">Sắp diễn ra</option>
                 </select>
               </div>
@@ -429,7 +414,7 @@ export default function GroupTripsPage() {
                         Tổng chi phí
                       </p>
                       <p className="font-semibold text-sm text-gray-900">
-                        {formatCurrency(trip.totalExpense, trip.currency)}
+                        {formatCurrency(trip.statsCache?.totalExpense || 0, trip.currency)}
                       </p>
                     </div>
                   </div>
@@ -499,5 +484,6 @@ export default function GroupTripsPage() {
     </div>
   );
 }
+
 
 

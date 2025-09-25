@@ -295,7 +295,7 @@ export default function ExpensesPage({
         if (!confirm('Bạn có chắc chắn muốn xóa chi phí này?')) return;
 
         try {
-            await deleteExpense(expenseId);
+            await deleteExpense(expenseId, user?.uid || '');
             toast.success('Xóa chi phí thành công!');
             loadData();
         } catch (error) {
@@ -785,9 +785,10 @@ export default function ExpensesPage({
                                                     description: '',
                                                     paidBy: '',
                                                     splitMethod: 'weight',
-                isEqualSplit: false,
+                                                    isEqualSplit: false,
                                                     category: '',
                                                     weights: {},
+                                                    createdAt: '',
                                                 });
                                             }}
                                             disabled={submitting}
@@ -961,7 +962,7 @@ export default function ExpensesPage({
                                                                         </span>
                                                                         <span className="text-[11px] italic text-gray-400 flex items-center gap-1">
                                                                             <CategoryIcon className="w-3 h-3 text-gray-500" />
-                                                                            {getCategoryLabel(expense.category)}
+                                                                             {getCategoryLabel(expense.category || '')}
                                                                         </span>
                                                                     </div>
                                                                 </div>

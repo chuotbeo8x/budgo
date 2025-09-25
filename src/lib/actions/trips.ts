@@ -2,9 +2,9 @@
 
 import { adminDb } from '../firebase-admin';
 import { CreateTripSchema, AddTripMemberSchema, AddExpenseSchema, AddAdvanceSchema, CloseTripSchema } from '../schemas';
-import { Trip, TripMember, Expense, Advance, Settlement } from '../types';
+import { Trip, TripMember, Expense, Advance } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
-import { toDate } from '../utils/date';
+import { toDate, safeToDate } from '../utils/date';
 import { isGroupMember } from './groups';
 
 // Get User Groups
@@ -318,11 +318,10 @@ export async function createTrip(formDataOrObj: FormData | Record<string, unknow
       tripId,
       userId: userId,
       name: 'Bạn', // Will be replaced with actual user name
-      type: 'user',
       weight: 1,
       role: 'creator',
       joinedAt: new Date(),
-      leftAt: null, // Explicitly set to null for active members
+      leftAt: undefined, // Explicitly set to undefined for active members
     };
 
     const cleanedMemberData = prepareFirestoreData(memberData);
@@ -505,6 +504,10 @@ export async function getTripById(tripId: string) {
 
     const tripData = tripSnap.data();
     
+    if (!tripData) {
+      throw new Error('Trip data not found');
+    }
+    
     // Convert Firestore Timestamps to Date if needed
     const processedTripData = {
       ...tripData,
@@ -597,7 +600,7 @@ export async function getGroupTrips(groupId: string) {
           }
         };
         
-        trips.push({ id: doc.id, ...processedTripData } as Trip);
+        trips.push({ id: doc.id, ...processedTripData } as any);
       } catch (error) {
         console.error(`Error processing trip ${doc.id}:`, error);
       }
@@ -675,15 +678,15 @@ export async function getUserTrips(userId: string) {
         // Convert Firestore Timestamps to Date if needed
         const processedTripData = {
           ...tripData,
-          createdAt: toDate(tripData.createdAt),
-          closedAt: toDate(tripData.closedAt),
-          startDate: toDate(tripData.startDate),
-          endDate: toDate(tripData.endDate),
+          createdAt: safeToDate(tripData.createdAt) || new Date(),
+          closedAt: safeToDate(tripData.closedAt),
+          startDate: safeToDate(tripData.startDate),
+          endDate: safeToDate(tripData.endDate),
           memberCount: memberCount,
-          statsCache: {
+          statsCache: tripData.statsCache ? {
             ...tripData.statsCache,
-            computedAt: toDate(tripData.statsCache?.computedAt)
-          }
+            computedAt: safeToDate(tripData.statsCache.computedAt)
+          } : null
         };
         
         allTrips.push({ id: doc.id, ...processedTripData } as Trip);
@@ -711,18 +714,23 @@ export async function getUserTrips(userId: string) {
             const memberCountSnapshot = await memberCountQuery.get();
             const memberCount = memberCountSnapshot.docs.length;
             
+            if (!tripData) {
+              console.error(`Trip data is null for trip ${tripSnap.id}`);
+              continue;
+            }
+            
             // Convert Firestore Timestamps to Date if needed
             const processedTripData = {
               ...tripData,
-              createdAt: toDate(tripData.createdAt),
-              closedAt: toDate(tripData.closedAt),
-              startDate: toDate(tripData.startDate),
-              endDate: toDate(tripData.endDate),
+              createdAt: safeToDate(tripData.createdAt) || new Date(),
+              closedAt: safeToDate(tripData.closedAt),
+              startDate: safeToDate(tripData.startDate),
+              endDate: safeToDate(tripData.endDate),
               memberCount: memberCount,
-              statsCache: {
+              statsCache: tripData.statsCache ? {
                 ...tripData.statsCache,
-                computedAt: toDate(tripData.statsCache?.computedAt)
-              }
+                computedAt: safeToDate(tripData.statsCache.computedAt)
+              } : null
             };
             
             allTrips.push({ id: tripSnap.id, ...processedTripData } as Trip);
@@ -822,7 +830,7 @@ export async function getTripMembers(tripId: string) {
         leftAt: data.leftAt?.toDate ? data.leftAt.toDate() : data.leftAt,
         paymentStatusUpdatedAt: data.paymentStatusUpdatedAt?.toDate ? data.paymentStatusUpdatedAt.toDate() : data.paymentStatusUpdatedAt,
         weightUpdatedAt: data.weightUpdatedAt?.toDate ? data.weightUpdatedAt.toDate() : data.weightUpdatedAt
-      };
+      } as any;
       
       // Derive name and contact info from user or ghost
       let displayName = processedData.name;
@@ -937,7 +945,6 @@ export async function addTripMember(formData: FormData, userId?: string) {
         name: ghostName.trim(),
         weight: 1,
         optionalEmail: ghostEmail,
-        optionalPhone: ghostPhone,
       };
       
     } else if (method === 'search') {
@@ -980,9 +987,9 @@ export async function addTripMember(formData: FormData, userId?: string) {
         role: 'member',
         joinedAt: new Date(),
         // Additional fields for UI
-        name: userData.name,
+        name: userData?.name || 'Unknown',
         weight: 1,
-        optionalEmail: userData.email,
+        optionalEmail: userData?.email || '',
       };
       
     } else if (method === 'group') {
@@ -1048,9 +1055,9 @@ export async function addTripMember(formData: FormData, userId?: string) {
             role: 'member',
             joinedAt: new Date(),
             // Additional fields for UI
-            name: userData.name,
+            name: userData?.name || 'Unknown',
             weight: 1,
-            optionalEmail: userData.email,
+            optionalEmail: userData?.email || '',
           };
           
           const cleanedMemberData = prepareFirestoreData(tripMemberData);
@@ -1163,7 +1170,6 @@ export async function isTripMember(tripId: string, userId: string) {
             tripId,
             userId: userId,
             name: 'Bạn', // Will be replaced with actual user name
-            type: 'user',
             weight: 1,
             role: 'creator',
             joinedAt: new Date(),
@@ -1442,6 +1448,9 @@ export async function updateMemberWeight(
     }
 
     const tripData = tripSnap.data();
+    if (!tripData) {
+      throw new Error('Trip data not found');
+    }
     if (tripData.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể cập nhật trọng số');
     }
@@ -1496,6 +1505,9 @@ export async function updateMemberExclusions(
     }
 
     const tripData = tripSnap.data();
+    if (!tripData) {
+      throw new Error('Trip data not found');
+    }
     if (tripData.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể cập nhật loại trừ');
     }
@@ -1589,6 +1601,9 @@ export async function updateMemberPaymentStatus(
     }
 
     const tripData = tripSnap.data();
+    if (!tripData) {
+      throw new Error('Trip data not found');
+    }
     if (tripData.ownerId !== userId) {
       throw new Error('Chỉ chủ chuyến đi mới có thể cập nhật trạng thái thanh toán');
     }
@@ -1603,6 +1618,9 @@ export async function updateMemberPaymentStatus(
 
     // Verify this member belongs to the trip
     const memberData = memberSnap.data();
+    if (!memberData) {
+      throw new Error('Member data not found');
+    }
     if (memberData.tripId !== tripId) {
       throw new Error('Thành viên không thuộc chuyến đi này');
     }
