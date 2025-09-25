@@ -30,11 +30,15 @@ try {
     }) : getApps()[0];
   } else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
     console.log('Initializing Firebase Admin SDK with environment variables');
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY
+      .replace(/\\n/g, '\n')
+      .replace(/"/g, '');
+    
     adminApp = getApps().length === 0 ? initializeApp({
       credential: cert({
         projectId: projectId,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        privateKey: privateKey,
       }),
     }) : getApps()[0];
   } else {
