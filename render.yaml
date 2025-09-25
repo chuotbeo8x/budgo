@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: qa-tracker
+            name: budgo
     env: node
     plan: free
     buildCommand: npm install && npm run build
@@ -12,35 +12,35 @@ services:
         value: budgo-aae32
       - key: NEXT_PUBLIC_FIREBASE_API_KEY
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_api_key
       - key: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_auth_domain
       - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_project_id
       - key: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_storage_bucket
       - key: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_messaging_sender_id
       - key: NEXT_PUBLIC_FIREBASE_APP_ID
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_app_id
       - key: FIREBASE_CLIENT_EMAIL
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_client_email
       - key: FIREBASE_PRIVATE_KEY
         fromDatabase:
-          name: qa-tracker-secrets
+            name: budgo-secrets
           property: firebase_private_key
 
 databases:

@@ -1,4 +1,4 @@
-# 🚀 Deploy QA Tracker lên Render.com
+# 🚀 Deploy Budgo lên Render.com
 
 ## Bước 1: Chuẩn bị
 1. Đăng ký tài khoản tại [render.com](https://render.com)
@@ -8,10 +8,10 @@
 1. Vào [Render Dashboard](https://dashboard.render.com)
 2. Click **"New +"** → **"Web Service"**
 3. Connect với GitHub repo của bạn
-4. Chọn repo `qa-tracker`
+4. Chọn repo `budgo`
 
 ## Bước 3: Cấu hình
-- **Name**: `qa-tracker`
+- **Name**: `budgo`
 - **Environment**: `Node`
 - **Branch**: `main` (hoặc `master`)
 - **Root Directory**: để trống
@@ -60,4 +60,4 @@ NODE_ENV = production
 - Nếu 404, kiểm tra start command
 
 ## URL sau khi deploy
-App sẽ có URL dạng: `https://qa-tracker-xxxxx.onrender.com`
+App sẽ có URL dạng: `https://budgo-xxxxx.onrender.com`

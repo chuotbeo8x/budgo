@@ -30,7 +30,7 @@ envContent.split('\n').forEach(line => {
   }
 });
 
-console.log('🚀 Environment Variables cho Render.com:');
+console.log('🚀 Environment Variables cho Render.com (Budgo):');
 console.log('='.repeat(50));
 
 // Hiển thị các biến cần thiết
