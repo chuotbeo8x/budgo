@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorAlert } from '@/components/ui/error-alert';
-import { signInWithGoogle } from '@/lib/auth';
+import { signInWithGoogle, handleGoogleRedirect } from '@/lib/auth';
 import { getUserById } from '@/lib/actions/users';
 import { toast } from 'sonner';
 
@@ -14,34 +14,54 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Handle Google redirect result when page loads
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await handleGoogleRedirect();
+        if (result) {
+          setLoading(true);
+          
+          // Check if user has profile in our system
+          try {
+            const userProfile = await getUserById(result.user.uid);
+            
+            if (userProfile) {
+              // User has profile, redirect to dashboard
+              router.push('/dashboard');
+            } else {
+              // User doesn't have profile, redirect to onboarding
+              router.push('/onboarding');
+            }
+          } catch (profileError) {
+            console.error('Error checking user profile:', profileError);
+            // On error, redirect to onboarding to be safe
+            router.push('/onboarding');
+          }
+        }
+      } catch (error) {
+        console.error('Error handling redirect result:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    handleRedirectResult();
+  }, [router]);
+
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await signInWithGoogle();
-      
-      // Check if user has profile in our system
-      try {
-        const userProfile = await getUserById(result.user.uid);
-        
-        if (userProfile) {
-          // User has profile, redirect to dashboard
-          router.push('/dashboard');
-        } else {
-          // User doesn't have profile, redirect to onboarding
-          router.push('/onboarding');
-        }
-      } catch (profileError) {
-        console.error('Error checking user profile:', profileError);
-        // On error, redirect to onboarding to be safe
-        router.push('/onboarding');
-      }
+      await signInWithGoogle();
+      // User will be redirected to Google, so we won't reach here
     } catch (error) {
       console.error('Login error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
+      if (error instanceof Error && error.message !== 'Redirect initiated') {
+        const errorMessage = error.message;
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
       setLoading(false);
     }
   };
