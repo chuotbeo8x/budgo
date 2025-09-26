@@ -25,11 +25,15 @@ export default function LoginPage() {
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
+        console.log('LoginPage: Checking for redirect result...');
         const result = await handleGoogleRedirect();
         if (result) {
+          console.log('LoginPage: Redirect result found, user authenticated');
           setLoading(true);
           // ProfileProvider will handle the redirect logic
           // Just show loading while ProfileProvider processes
+        } else {
+          console.log('LoginPage: No redirect result');
         }
       } catch (error) {
         console.error('Error handling redirect result:', error);

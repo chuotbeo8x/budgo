@@ -37,7 +37,9 @@ export const signInWithGoogle = async (): Promise<UserCredential> => {
 
 export const handleGoogleRedirect = async (): Promise<UserCredential | null> => {
   try {
+    console.log('handleGoogleRedirect: Checking for redirect result...');
     const result = await getRedirectResult(auth);
+    console.log('handleGoogleRedirect: Result:', result ? 'Found user' : 'No redirect result');
     return result;
   } catch (error: any) {
     console.error('Error handling Google redirect:', error);

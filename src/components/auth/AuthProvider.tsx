@@ -31,12 +31,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AuthProvider: Setting up auth state listener');
     const unsubscribe = onAuthStateChange((user) => {
+      console.log('AuthProvider: Auth state changed:', user ? `User: ${user.uid}` : 'No user');
       setUser(user);
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('AuthProvider: Cleaning up auth state listener');
+      unsubscribe();
+    };
   }, []);
 
   return (
