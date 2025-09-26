@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { ProfileProvider } from "@/components/auth/ProfileProvider";
 import NotificationProvider from "@/components/NotificationProvider";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
+import AuthDebug from "@/components/auth/AuthDebug";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
                   </MaintenanceGuard>
                   <Footer />
                   <Toaster position="top-right" />
+                  <AuthDebug />
                 </NotificationProvider>
               </ProfileProvider>
             </AuthProvider>

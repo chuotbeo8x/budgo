@@ -9,24 +9,13 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider } from './firebase';
 
-// Check if running in development
-const isDevelopment = process.env.NODE_ENV === 'development' || 
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost');
-
 export const signInWithGoogle = async (): Promise<UserCredential | void> => {
   try {
-    if (isDevelopment) {
-      // Development: Use popup
-      console.log('signInWithGoogle: Starting Google popup (dev mode)...');
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log('signInWithGoogle: Popup success!', result.user.uid);
-      return result;
-    } else {
-      // Production: Use redirect
-      console.log('signInWithGoogle: Starting Google redirect (prod mode)...');
-      await signInWithRedirect(auth, googleProvider);
-      console.log('signInWithGoogle: Redirect initiated');
-    }
+    // Always use popup for better UX
+    console.log('signInWithGoogle: Starting Google popup...');
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log('signInWithGoogle: Popup success!', result.user.uid);
+    return result;
   } catch (error: any) {
     console.error('Error signing in with Google:', error);
     
