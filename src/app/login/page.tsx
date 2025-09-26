@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorAlert } from '@/components/ui/error-alert';
-import { signInWithGoogle, handleGoogleRedirect } from '@/lib/auth';
+import { signInWithGoogle } from '@/lib/auth';
 import { getUserById } from '@/lib/actions/users';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
@@ -21,39 +21,22 @@ export default function LoginPage() {
   // Don't redirect here - let ProfileProvider handle it
   // ProfileProvider will check if user has profile and redirect accordingly
 
-  // Handle Google redirect result when page loads
-  useEffect(() => {
-    const handleRedirectResult = async () => {
-      try {
-        console.log('LoginPage: Checking for redirect result...');
-        const result = await handleGoogleRedirect();
-        if (result) {
-          console.log('LoginPage: Redirect result found, user authenticated');
-          setLoading(true);
-          // ProfileProvider will handle the redirect logic
-          // Just show loading while ProfileProvider processes
-        } else {
-          console.log('LoginPage: No redirect result');
-        }
-      } catch (error) {
-        console.error('Error handling redirect result:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    handleRedirectResult();
-  }, [router]);
+  // No need to handle redirect result with popup
 
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
       setError(null);
-      await signInWithGoogle();
-      // User will be redirected to Google, so we won't reach here
+      console.log('LoginPage: Starting Google sign in...');
+      const result = await signInWithGoogle();
+      console.log('LoginPage: Google sign in successful!', result.user.uid);
+      
+      // ProfileProvider will handle the redirect logic
+      // Just show loading while ProfileProvider processes
+      setLoading(false);
     } catch (error) {
       console.error('Login error:', error);
-      if (error instanceof Error && error.message !== 'Redirect initiated') {
+      if (error instanceof Error) {
         const errorMessage = error.message;
         setError(errorMessage);
         toast.error(errorMessage);
