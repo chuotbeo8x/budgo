@@ -48,21 +48,26 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
 
       try {
         setProfileLoading(true);
+        console.log('ProfileProvider: Checking profile for user:', user.uid);
         const userProfile = await getUserById(user.uid);
+        console.log('ProfileProvider: Profile result:', userProfile ? 'Found' : 'Not found');
         
         if (!userProfile) {
           // User doesn't have a profile
+          console.log('ProfileProvider: No profile found, redirecting to onboarding');
           setProfile(null);
           // Only redirect to onboarding if not already there
           if (window.location.pathname !== '/onboarding') {
             // Small delay to ensure smooth transition
             setTimeout(() => {
+              console.log('ProfileProvider: Redirecting to /onboarding');
               router.push('/onboarding');
             }, 100);
           }
           return;
         }
         
+        console.log('ProfileProvider: Profile found, setting profile state');
         setProfile(userProfile);
       } catch (error) {
         console.error('Error checking user profile:', error);

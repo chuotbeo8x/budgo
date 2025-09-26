@@ -9,6 +9,8 @@ import { toDate } from '../utils/date';
 // Get User by ID
 export async function getUserById(userId: string) {
   try {
+    console.log('getUserById: Checking for user ID:', userId);
+    
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
@@ -17,11 +19,15 @@ export async function getUserById(userId: string) {
     const userRef = adminDb.collection('users').doc(userId);
     const userSnap = await userRef.get();
     
+    console.log('getUserById: Document exists:', userSnap.exists);
+    
     if (!userSnap.exists) {
+      console.log('getUserById: User not found in database');
       return null;
     }
 
     const userData = userSnap.data();
+    console.log('getUserById: User data found:', userData?.name || 'No name');
     
     // Convert Firestore Timestamps to Date if needed
     const processedUserData = {
@@ -31,6 +37,7 @@ export async function getUserById(userId: string) {
       birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
     };
     
+    console.log('getUserById: Returning user data');
     return { id: userSnap.id, ...processedUserData } as any;
   } catch (error) {
     console.error('Error getting user:', error);
