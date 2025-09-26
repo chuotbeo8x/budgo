@@ -7,53 +7,6 @@ import { prepareFirestoreData } from '../utils/firestore';
 import { toDate, safeToDate } from '../utils/date';
 import { isGroupMember } from './groups';
 
-// Get User Groups
-export async function getUserGroups(userId: string) {
-  try {
-    if (!adminDb) {
-      console.error('Admin database not initialized');
-      throw new Error('Database chưa được khởi tạo');
-    }
-
-    // Get groups where user is a member
-    const groupMembersQuery = adminDb.collection('groupMembers')
-      .where('userId', '==', userId);
-    
-    const groupMembersSnapshot = await groupMembersQuery.get();
-    
-    // Filter out members who have left (leftAt is not null/undefined/empty)
-    const activeMembers = groupMembersSnapshot.docs.filter(doc => {
-      const data = doc.data();
-      const leftAt = data.leftAt;
-      // Consider null, undefined, or empty object as "not left"
-      return leftAt === null || leftAt === undefined || (typeof leftAt === 'object' && Object.keys(leftAt).length === 0);
-    });
-    
-    if (activeMembers.length === 0) {
-      return [];
-    }
-
-    const groupIds = activeMembers.map(doc => doc.data().groupId);
-    
-    // Get group details
-    const groupsQuery = adminDb.collection('groups')
-      .where('__name__', 'in', groupIds);
-    
-    const groupsSnapshot = await groupsQuery.get();
-    
-    const groups = groupsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      description: doc.data().description,
-      type: doc.data().type
-    }));
-
-    return groups;
-  } catch (error) {
-    console.error('Error getting user groups:', error);
-    throw new Error('Có lỗi xảy ra khi lấy danh sách nhóm');
-  }
-}
 
 
 // Get Group Members
