@@ -14,7 +14,9 @@ import {
   ChevronDown,
   Settings,
   Users,
-  MapPin
+  MapPin,
+  Menu,
+  X
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
@@ -25,11 +27,13 @@ export default function Header() {
   const pathname = usePathname();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [language, setLanguage] = useState('vi');
   const [isHydrated, setIsHydrated] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
   const [siteName, setSiteName] = useState<string>('Budgo');
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Ensure hydration is complete before rendering
   useEffect(() => {
@@ -56,6 +60,9 @@ export default function Header() {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setShowProfileMenu(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setShowMobileMenu(false);
       }
     };
 
@@ -157,8 +164,21 @@ export default function Header() {
 
         </nav>
 
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          title="Menu"
+        >
+          {showMobileMenu ? (
+            <X className="w-5 h-5 text-gray-600" />
+          ) : (
+            <Menu className="w-5 h-5 text-gray-600" />
+          )}
+        </button>
+
         {/* Right side icons and profile */}
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           {loading ? (
             <span className="text-sm text-gray-500">Đang tải…</span>
           ) : user ? (
@@ -269,7 +289,138 @@ export default function Header() {
             </button>
           )}
         </div>
+
+        {/* Mobile Profile Button */}
+        <div className="md:hidden flex items-center gap-2">
+          {loading ? (
+            <span className="text-sm text-gray-500">Đang tải…</span>
+          ) : user ? (
+            <>
+              <NotificationBell />
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {user.photoURL ? (
+                  <Image 
+                    src={user.photoURL} 
+                    alt="Avatar" 
+                    width={24} 
+                    height={24} 
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                )}
+                <ChevronDown className="w-4 h-4 text-gray-600" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => signInWithGoogle()}
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              Đăng nhập
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden border-t bg-white" ref={mobileMenuRef}>
+          <div className="container mx-auto px-4 py-4">
+            <nav className="flex flex-col gap-2">
+              <Link 
+                href="/groups/manage" 
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/groups') 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <Users className="w-5 h-5" />
+                <span>Nhóm</span>
+              </Link>
+              <Link 
+                href="/trips/manage" 
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/trips') 
+                    ? 'text-green-600 bg-green-50' 
+                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+                }`}
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <MapPin className="w-5 h-5" />
+                <span>Chuyến đi</span>
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Profile Menu */}
+      {showProfileMenu && user && (
+        <div className="md:hidden border-t bg-white">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-3 px-4 py-3 border-b">
+                {user.photoURL ? (
+                  <Image 
+                    src={user.photoURL} 
+                    alt="Avatar" 
+                    width={32} 
+                    height={32} 
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                )}
+                <div>
+                  <div className="font-medium text-sm">{user.displayName || 'Người dùng'}</div>
+                  <div className="text-xs text-gray-500">{user.email}</div>
+                </div>
+              </div>
+              
+              <Link
+                href="/profile"
+                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={() => setShowProfileMenu(false)}
+              >
+                <User className="w-4 h-4" />
+                Hồ sơ cá nhân
+              </Link>
+              
+              <button
+                onClick={() => {
+                  logout();
+                  setShowProfileMenu(false);
+                }}
+                className="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg text-left"
+              >
+                <Settings className="w-4 h-4" />
+                Đăng xuất
+              </button>
+              
+              {profile && (profile as any).role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                  onClick={() => setShowProfileMenu(false)}
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin Dashboard
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -6,39 +6,37 @@ import { CreateAccountSchema } from '../schemas';
 import { prepareFirestoreData } from '../utils/firestore';
 import { toDate } from '../utils/date';
 
-// Get User by ID
+// Get User by ID (Firebase Auth UID)
 export async function getUserById(userId: string) {
   try {
-    console.log('getUserById: Checking for user ID:', userId);
+    console.log('getUserById: Looking for user ID:', userId);
     
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
+    // Direct lookup by document ID (Firebase Auth UID)
     const userRef = adminDb.collection('users').doc(userId);
     const userSnap = await userRef.get();
     
-    console.log('getUserById: Document exists:', userSnap.exists);
-    
-    if (!userSnap.exists) {
-      console.log('getUserById: User not found in database');
-      return null;
+    if (userSnap.exists) {
+      const userData = userSnap.data();
+      console.log('getUserById: User found:', userData?.name || 'No name');
+      
+      // Convert Firestore Timestamps to Date if needed
+      const processedUserData = {
+        ...userData,
+        createdAt: userData?.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData?.createdAt),
+        updatedAt: userData?.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData?.updatedAt),
+        birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
+      };
+      
+      return { id: userSnap.id, ...processedUserData } as any;
     }
 
-    const userData = userSnap.data();
-    console.log('getUserById: User data found:', userData?.name || 'No name');
-    
-    // Convert Firestore Timestamps to Date if needed
-    const processedUserData = {
-      ...userData,
-      createdAt: userData?.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData?.createdAt),
-      updatedAt: userData?.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData?.updatedAt),
-      birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
-    };
-    
-    console.log('getUserById: Returning user data');
-    return { id: userSnap.id, ...processedUserData } as any;
+    console.log('getUserById: User not found, needs to create profile');
+    return null;
   } catch (error) {
     console.error('Error getting user:', error);
     throw new Error('Có lỗi xảy ra khi lấy thông tin người dùng');
@@ -567,6 +565,9 @@ export async function getTodaysBirthdays(userId: string) {
 // Create User Profile
 export async function createUserProfile(formData: FormData) {
   try {
+    console.log('createUserProfile: Starting profile creation');
+    console.log('createUserProfile: FormData entries:', Array.from(formData.entries()));
+    
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
@@ -574,6 +575,9 @@ export async function createUserProfile(formData: FormData) {
 
     const googleUid = formData.get('googleUid') as string;
     const email = formData.get('email') as string;
+    
+    console.log('createUserProfile: Google UID:', googleUid);
+    console.log('createUserProfile: Email:', email);
     
     if (!googleUid) {
       throw new Error('Google UID không được để trống');
@@ -583,7 +587,7 @@ export async function createUserProfile(formData: FormData) {
       throw new Error('Email không được để trống');
     }
 
-    // Check if user already exists
+    // Check if user already exists by Firebase Auth UID (not googleUid)
     const existingUserRef = adminDb.collection('users').doc(googleUid);
     const existingUserSnap = await existingUserRef.get();
     
@@ -613,20 +617,28 @@ export async function createUserProfile(formData: FormData) {
       throw new Error('Username đã được sử dụng');
     }
 
-    // Create user profile
+    // Create user profile with document ID = Firebase Auth UID
     const userData = {
-      googleUid: googleUid,
-      email: email,
       name: validatedData.name,
+      email: email,
       username: validatedData.username,
       avatar: validatedData.avatarUrl || '',
-      birthday: validatedData.birthday || undefined,
+      googleUid: googleUid,
+      role: 'user',
+      disabled: false,
       createdAt: new Date(),
+      updatedAt: new Date(),
+      ...(validatedData.birthday && { birthday: new Date(validatedData.birthday) }),
     };
+
+    console.log('createUserProfile: Creating user with document ID:', googleUid);
+    console.log('createUserProfile: User data:', userData);
 
     // Clean data before saving to Firestore
     const cleanedUserData = prepareFirestoreData(userData);
     await existingUserRef.set(cleanedUserData);
+    
+    console.log('createUserProfile: User profile saved successfully');
 
     return { success: true, userId: googleUid };
   } catch (error) {
