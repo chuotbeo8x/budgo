@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorAlert } from '@/components/ui/error-alert';
-import { signInWithGoogle } from '@/lib/auth';
+import { signInWithGoogle, handleGoogleRedirect } from '@/lib/auth';
 import { getUserById } from '@/lib/actions/users';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
@@ -18,10 +18,30 @@ export default function LoginPage() {
   const { user, loading: authLoading } = useAuth();
   const { profile, profileLoading } = useProfile();
 
-  // Don't redirect here - let ProfileProvider handle it
-  // ProfileProvider will check if user has profile and redirect accordingly
+  // Handle Google redirect result (only in production)
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        console.log('LoginPage: Checking for redirect result...');
+        const result = await handleGoogleRedirect();
+        if (result) {
+          console.log('LoginPage: Google redirect successful!', result.user.uid);
+          // ProfileProvider will handle the redirect logic
+        }
+      } catch (error) {
+        console.error('Redirect error:', error);
+        if (error instanceof Error) {
+          setError(error.message);
+          toast.error(error.message);
+        }
+      }
+    };
 
-  // No need to handle redirect result with popup
+    // Only handle redirect in production
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      handleRedirect();
+    }
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -29,11 +49,15 @@ export default function LoginPage() {
       setError(null);
       console.log('LoginPage: Starting Google sign in...');
       const result = await signInWithGoogle();
-      console.log('LoginPage: Google sign in successful!', result.user.uid);
       
-      // ProfileProvider will handle the redirect logic
-      // Just show loading while ProfileProvider processes
-      setLoading(false);
+      if (result) {
+        // Development: Popup result
+        console.log('LoginPage: Google sign in successful!', result.user.uid);
+        setLoading(false);
+      } else {
+        // Production: Redirect initiated
+        console.log('LoginPage: Redirect initiated');
+      }
     } catch (error) {
       console.error('Login error:', error);
       if (error instanceof Error) {

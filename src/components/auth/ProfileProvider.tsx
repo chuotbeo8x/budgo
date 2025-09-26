@@ -59,6 +59,12 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
           // User has profile
           console.log('ProfileProvider: Profile found, setting profile state');
           setProfile(userProfile);
+          
+          // Redirect to dashboard if not already there
+          if (window.location.pathname !== '/dashboard') {
+            console.log('ProfileProvider: Redirecting to dashboard');
+            router.push('/dashboard');
+          }
         } else {
           // User needs to create profile
           console.log('ProfileProvider: No profile found, redirecting to onboarding');

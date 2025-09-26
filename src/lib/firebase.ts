@@ -23,4 +23,11 @@ export const db = getFirestore(app);
 // Google Auth Provider
 export const googleProvider = new GoogleAuthProvider();
 
+// Set redirect URL for development
+if (typeof window !== 'undefined') {
+  // Use localhost without port for Firebase Auth
+  const currentUrl = window.location.protocol + '//' + window.location.hostname;
+  console.log('Firebase: Setting redirect URL to:', currentUrl);
+}
+
 export default app;
