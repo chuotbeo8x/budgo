@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/error-alert';
 import { signInWithGoogle, handleGoogleRedirect } from '@/lib/auth';
 import { getUserById } from '@/lib/actions/users';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useProfile } from '@/components/auth/ProfileProvider';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -15,15 +16,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { profile, profileLoading } = useProfile();
 
-  // Redirect authenticated users
-  useEffect(() => {
-    if (!authLoading && user) {
-      // User is already authenticated, ProfileProvider will handle redirect
-      // Just redirect to dashboard for now
-      router.push('/dashboard');
-    }
-  }, [user, authLoading, router]);
+  // Don't redirect here - let ProfileProvider handle it
+  // ProfileProvider will check if user has profile and redirect accordingly
 
   // Handle Google redirect result when page loads
   useEffect(() => {
@@ -62,8 +58,8 @@ export default function LoginPage() {
     }
   };
 
-  // Show loading if auth is loading or user is being redirected
-  if (authLoading || user) {
+  // Show loading if auth is loading, profile is loading, or user is authenticated
+  if (authLoading || profileLoading || user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -71,7 +67,9 @@ export default function LoginPage() {
             <div className="flex flex-col items-center space-y-4">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
               <p className="text-gray-600">
-                {user ? 'Đang chuyển hướng...' : 'Đang kiểm tra đăng nhập...'}
+                {authLoading ? 'Đang kiểm tra đăng nhập...' : 
+                 profileLoading ? 'Đang kiểm tra profile...' : 
+                 'Đang chuyển hướng...'}
               </p>
             </div>
           </CardContent>

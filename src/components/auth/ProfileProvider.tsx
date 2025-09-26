@@ -55,7 +55,10 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
           setProfile(null);
           // Only redirect to onboarding if not already there
           if (window.location.pathname !== '/onboarding') {
-            router.push('/onboarding');
+            // Small delay to ensure smooth transition
+            setTimeout(() => {
+              router.push('/onboarding');
+            }, 100);
           }
           return;
         }
@@ -66,7 +69,9 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
         setProfile(null);
         // On error, redirect to onboarding to be safe (only if not already there)
         if (window.location.pathname !== '/onboarding') {
-          router.push('/onboarding');
+          setTimeout(() => {
+            router.push('/onboarding');
+          }, 100);
         }
       } finally {
         setProfileLoading(false);
