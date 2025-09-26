@@ -7,12 +7,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ErrorAlert } from '@/components/ui/error-alert';
 import { signInWithGoogle, handleGoogleRedirect } from '@/lib/auth';
 import { getUserById } from '@/lib/actions/users';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect authenticated users
+  useEffect(() => {
+    if (!authLoading && user) {
+      // User is already authenticated, ProfileProvider will handle redirect
+      // Just redirect to dashboard for now
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
 
   // Handle Google redirect result when page loads
   useEffect(() => {
@@ -21,23 +32,8 @@ export default function LoginPage() {
         const result = await handleGoogleRedirect();
         if (result) {
           setLoading(true);
-          
-          // Check if user has profile in our system
-          try {
-            const userProfile = await getUserById(result.user.uid);
-            
-            if (userProfile) {
-              // User has profile, redirect to dashboard
-              router.push('/dashboard');
-            } else {
-              // User doesn't have profile, redirect to onboarding
-              router.push('/onboarding');
-            }
-          } catch (profileError) {
-            console.error('Error checking user profile:', profileError);
-            // On error, redirect to onboarding to be safe
-            router.push('/onboarding');
-          }
+          // ProfileProvider will handle the redirect logic
+          // Just show loading while ProfileProvider processes
         }
       } catch (error) {
         console.error('Error handling redirect result:', error);
@@ -65,6 +61,24 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Show loading if auth is loading or user is being redirected
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex items-center justify-center py-8">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-600">
+                {user ? 'Đang chuyển hướng...' : 'Đang kiểm tra đăng nhập...'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
