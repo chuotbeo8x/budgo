@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 
 export default function Footer() {
-  const [copyright, setCopyright] = useState<string>('© 2025 Q&A Tracker');
+  const [copyright, setCopyright] = useState<string>('© 2025 Budgo');
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
-  const [siteName, setSiteName] = useState<string>('Q&A Tracker');
+  const [siteName, setSiteName] = useState<string>('Budgo');
 
   useEffect(() => {
     const load = async () => {

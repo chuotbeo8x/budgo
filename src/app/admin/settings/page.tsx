@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <Label htmlFor="siteName" className="text-sm">Tên hệ thống</Label>
-                <input id="siteName" value={siteName} onChange={(e) => setSiteName(e.target.value)} className="mt-1 w-full p-2 border rounded-md" placeholder="Q&A Tracker" />
+                <input id="siteName" value={siteName} onChange={(e) => setSiteName(e.target.value)} className="mt-1 w-full p-2 border rounded-md" placeholder="Budgo" />
               </div>
               <div>
                 <Label htmlFor="logoUrl" className="text-sm">Logo URL</Label>

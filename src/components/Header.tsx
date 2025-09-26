@@ -28,7 +28,7 @@ export default function Header() {
   const [language, setLanguage] = useState('vi');
   const [isHydrated, setIsHydrated] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
-  const [siteName, setSiteName] = useState<string>('Q&A Tracker');
+  const [siteName, setSiteName] = useState<string>('Budgo');
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Ensure hydration is complete before rendering

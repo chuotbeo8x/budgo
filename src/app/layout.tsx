@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Q&A Tracker",
+  title: "Budgo",
   description: "Quản lý nhóm, chuyến đi và chia sẻ chi phí một cách minh bạch và dễ dàng",
 };
 

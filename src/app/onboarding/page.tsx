@@ -158,7 +158,7 @@ export default function OnboardingPage() {
         <div className="max-w-2xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Chào mừng đến với Q&A Tracker!
+              Chào mừng đến với Budgo!
             </h1>
             <p className="text-gray-600">
               Hãy tạo profile để bắt đầu sử dụng ứng dụng
