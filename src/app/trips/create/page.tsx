@@ -8,6 +8,7 @@ import { getUserGroups } from '@/lib/actions/groups';
 import { Group } from '@/lib/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -50,15 +51,11 @@ export default function CreateTripPage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Cần đăng nhập</h1>
-          <p className="text-muted-foreground mb-4">Vui lòng đăng nhập để tạo chuyến đi</p>
-          <Link href="/login">
-            <Button>Đăng nhập</Button>
-          </Link>
-        </div>
-      </div>
+      <LoginPrompt
+        title="Cần đăng nhập"
+        description="Vui lòng đăng nhập để tạo chuyến đi"
+        icon={<MapPin className="w-8 h-8 text-blue-600" />}
+      />
     );
   }
 

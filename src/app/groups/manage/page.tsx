@@ -8,6 +8,7 @@ import { getUserGroups, searchPublicGroups, joinGroup } from '@/lib/actions/grou
 import { Group } from '@/lib/types';
 import { formatDateTime } from '@/lib/utils/date';
 import { toast } from 'sonner';
+import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
 import { 
   Plus, 
@@ -147,14 +148,11 @@ export default function GroupsManagePage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Vui lòng đăng nhập</h1>
-          <Link href="/login">
-            <Button>Đăng nhập</Button>
-          </Link>
-        </div>
-      </div>
+      <LoginPrompt
+        title="Vui lòng đăng nhập"
+        description="Đăng nhập để quản lý nhóm của bạn"
+        icon={<Users className="w-8 h-8 text-blue-600" />}
+      />
     );
   }
 

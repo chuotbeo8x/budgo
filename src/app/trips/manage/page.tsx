@@ -8,6 +8,7 @@ import { getUserTrips } from '@/lib/actions/trips';
 import { Trip } from '@/lib/types';
 import { formatDate, formatDateTime } from '@/lib/utils/date';
 import { toast } from 'sonner';
+import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
 import { 
   Plus, 
@@ -192,20 +193,11 @@ export default function TripsManagePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <MapPin className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Vui lòng đăng nhập</h1>
-              <p className="text-gray-600 mb-6">Đăng nhập để quản lý chuyến đi của bạn</p>
-              <Link href="/login">
-                <Button className="w-full">Đăng nhập</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <LoginPrompt
+        title="Vui lòng đăng nhập"
+        description="Đăng nhập để quản lý chuyến đi của bạn"
+        icon={<MapPin className="w-8 h-8 text-blue-600" />}
+      />
     );
   }
 

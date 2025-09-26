@@ -18,6 +18,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
 import { updateUserProfile } from '@/lib/actions/users';
 import { toast } from 'sonner';
+import LoginPrompt from '@/components/auth/LoginPrompt';
 
 export default function ProfilesPage() {
   const { user, loading } = useAuth();
@@ -234,20 +235,11 @@ export default function ProfilesPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <User className="w-8 h-8 text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-3">Vui lòng đăng nhập</h2>
-            <p className="text-gray-600 mb-8">Bạn cần đăng nhập để xem trang cá nhân.</p>
-            <Link href="/login">
-              <Button>Đăng nhập</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <LoginPrompt
+        title="Vui lòng đăng nhập"
+        description="Bạn cần đăng nhập để xem trang cá nhân"
+        icon={<User className="w-8 h-8 text-blue-600" />}
+      />
     );
   }
 

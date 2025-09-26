@@ -14,6 +14,7 @@ import {
 import { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/utils/date';
 import Link from 'next/link';
+import LoginPrompt from '@/components/auth/LoginPrompt';
 
 export default function NotificationsPage() {
   const { user, loading } = useAuth();
@@ -231,19 +232,11 @@ export default function NotificationsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Cần đăng nhập
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Bạn cần đăng nhập để xem thông báo
-          </p>
-          <Link href="/login">
-            <Button>Đăng nhập</Button>
-          </Link>
-        </div>
-      </div>
+      <LoginPrompt
+        title="Cần đăng nhập"
+        description="Bạn cần đăng nhập để xem thông báo"
+        icon={<Bell className="w-8 h-8 text-blue-600" />}
+      />
     );
   }
 
