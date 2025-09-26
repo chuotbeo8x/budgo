@@ -40,6 +40,13 @@ export default function OnboardingPage() {
   const [usernameError, setUsernameError] = useState('');
   const [checkingProfile, setCheckingProfile] = useState(true);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
   // Check if user already has profile
   useEffect(() => {
     const checkExistingProfile = async () => {
@@ -140,13 +147,6 @@ export default function OnboardingPage() {
       </div>
     );
   }
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
 
   if (!user) {
     return null;
