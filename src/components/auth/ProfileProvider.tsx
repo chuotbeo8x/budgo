@@ -53,12 +53,14 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
         setProfileLoading(true);
         console.log('ProfileProvider: Checking profile for user:', user.uid);
         
-        const userProfile = await getUserById(user.uid);
+        // Check if user profile exists using API route
+        const response = await fetch(`/api/check-profile?userId=${user.uid}`);
+        const result = await response.json();
         
-        if (userProfile) {
+        if (result.success && result.hasProfile) {
           // User has profile
           console.log('ProfileProvider: Profile found, setting profile state');
-          setProfile(userProfile);
+          setProfile(result.profile);
           
           // Redirect to dashboard if not already there
           if (window.location.pathname !== '/dashboard') {

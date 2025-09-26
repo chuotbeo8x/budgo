@@ -120,7 +120,16 @@ export default function OnboardingPage() {
       formDataObj.append('googleUid', user.uid);
       formDataObj.append('email', user.email || '');
 
-      await createUserProfile(formDataObj);
+      const response = await fetch('/api/create-profile', {
+        method: 'POST',
+        body: formDataObj,
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create profile');
+      }
       
       toast.success('Tạo profile thành công!');
       router.push('/dashboard');
@@ -153,7 +162,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8 text-center">
@@ -173,7 +182,7 @@ export default function OnboardingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Tên hiển thị *</Label>
                   <Input

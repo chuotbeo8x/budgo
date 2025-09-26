@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
 
   if (!user || (profile as any)?.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <Card className="shadow-md">
             <CardHeader>
@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Cài đặt hệ thống</h1>

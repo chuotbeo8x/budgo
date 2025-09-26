@@ -45,7 +45,7 @@ export default function LoginPage() {
   // Show loading if auth is loading or user is authenticated
   if (authLoading || user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <Card className="w-full max-w-md">
           <CardContent className="flex items-center justify-center py-8">
             <div className="flex flex-col items-center space-y-4">
@@ -61,7 +61,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">

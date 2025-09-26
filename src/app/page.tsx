@@ -1,12 +1,12 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, MapPin, Receipt, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { Users, MapPin, Receipt, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -27,95 +27,54 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Hero */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-md">
-          <div className="px-6 md:px-10 py-12 md:py-16">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-3 py-1 text-xs font-medium mb-3">
-                <ShieldCheck className="w-3.5 h-3.5" /> Minh bạch • Dễ dùng • Nhanh chóng
-              </div>
-              <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-3">Quản lý nhóm, chuyến đi và chi phí chuyên nghiệp</h1>
-              <p className="text-sm md:text-base text-white/90 mb-6 md:mb-8">Lập kế hoạch, ghi nhận và quyết toán minh bạch. Tập trung vào trải nghiệm, chúng tôi lo phần còn lại.</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link href="/login">
-                  <Button size="lg" className="bg-white text-gray-900 hover:bg-white/90">
-                    Bắt đầu ngay <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
+    <div className="bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 text-sm font-medium mb-6">
+            <ShieldCheck className="w-4 h-4 text-blue-600" /> 
+            Minh bạch • Dễ dùng • Nhanh chóng
           </div>
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+            Quản lý nhóm và chuyến đi
+          </h1>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Tạo nhóm, lập kế hoạch chuyến đi và chia sẻ chi phí một cách minh bạch và dễ dàng
+          </p>
+          <Link href="/login">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+              Bắt đầu ngay <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
         </div>
 
-        {/* Quick Features */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-gray-900 flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600" /> Quản lý nhóm
-              </CardTitle>
-              <CardDescription>Tạo nhóm Public, Close, Secret. Mời bạn bè và quản trị dễ dàng.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-gray-600">
-              - Thành viên thật & ảo • Quyền sở hữu rõ ràng • Mời qua link
-            </CardContent>
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="text-center p-6 border-0 shadow-lg">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Users className="w-6 h-6 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Quản lý nhóm</h3>
+            <p className="text-gray-600">Tạo nhóm, mời bạn bè và quản lý thành viên dễ dàng</p>
           </Card>
-          <Card className="shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-gray-900 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-green-600" /> Chuyến đi thông minh
-              </CardTitle>
-              <CardDescription>Tạo chuyến đi cá nhân/nhóm, theo dõi ngày đi - ngày về, danh mục.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-gray-600">
-              - Hỗ trợ VND/USD • Chi phí dự kiến • Quản lý thành viên
-            </CardContent>
+
+          <Card className="text-center p-6 border-0 shadow-lg">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <MapPin className="w-6 h-6 text-green-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Chuyến đi thông minh</h3>
+            <p className="text-gray-600">Lập kế hoạch chuyến đi cá nhân hoặc nhóm một cách chi tiết</p>
           </Card>
-          <Card className="shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-gray-900 flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-purple-600" /> Chia sẻ chi phí
-              </CardTitle>
-              <CardDescription>Ghi nhận chi phí, tạm ứng; chia đều/ trọng số, quyết toán minh bạch.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-gray-600">
-              - Xuất báo cáo • Tổng hợp nhanh • Thống kê trực quan
-            </CardContent>
+
+          <Card className="text-center p-6 border-0 shadow-lg">
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Receipt className="w-6 h-6 text-purple-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Chia sẻ chi phí</h3>
+            <p className="text-gray-600">Ghi nhận chi phí và quyết toán minh bạch, công bằng</p>
           </Card>
         </div>
 
-        {/* Value Props */}
-        <div className="mt-6">
-          <Card className="shadow-md">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 text-amber-600 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Giao diện gọn gàng</div>
-                    <div className="text-sm text-gray-600">Tối ưu khoảng cách, shadow thống nhất, trải nghiệm mượt.</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Dữ liệu đáng tin cậy</div>
-                    <div className="text-sm text-gray-600">Đồng bộ thời gian thực, xử lý ngày giờ và quyền truy cập chuẩn.</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Hợp tác hiệu quả</div>
-                    <div className="text-sm text-gray-600">Thành viên, danh hiệu, thông báo sinh nhật & hoạt động.</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

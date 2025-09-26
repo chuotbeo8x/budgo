@@ -110,12 +110,12 @@ export default function Header() {
       {/* Locked account banner */}
       {profile && (profile as any).disabled === true && (
         <div className="w-full bg-red-600 text-white text-sm">
-          <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="container mx-auto px-4 py-2 flex items-center justify-between max-w-7xl">
             <span>Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.</span>
           </div>
         </div>
       )}
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
@@ -256,9 +256,10 @@ export default function Header() {
                     </Link>
                     <hr className="my-1" />
                     <button
-                      onClick={() => {
-                        logout();
+                      onClick={async () => {
+                        await logout();
                         setShowProfileMenu(false);
+                        window.location.href = '/';
                       }}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
                     >
@@ -333,7 +334,7 @@ export default function Header() {
       {/* Mobile Navigation Menu */}
       {showMobileMenu && (
         <div className="md:hidden border-t bg-white" ref={mobileMenuRef}>
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-4 max-w-7xl">
             <nav className="flex flex-col gap-2">
               <Link 
                 href="/groups/manage" 
@@ -367,7 +368,7 @@ export default function Header() {
       {/* Mobile Profile Menu */}
       {showProfileMenu && user && (
         <div className="md:hidden border-t bg-white">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-4 max-w-7xl">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 px-4 py-3 border-b">
                 {user.photoURL ? (
@@ -399,9 +400,10 @@ export default function Header() {
               </Link>
               
               <button
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   setShowProfileMenu(false);
+                  window.location.href = '/';
                 }}
                 className="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg text-left"
               >
