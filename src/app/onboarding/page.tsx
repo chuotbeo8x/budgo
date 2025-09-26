@@ -141,8 +141,14 @@ export default function OnboardingPage() {
     );
   }
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
   if (!user) {
-    router.push('/login');
     return null;
   }
 
