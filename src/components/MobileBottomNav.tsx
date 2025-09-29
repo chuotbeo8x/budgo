@@ -71,7 +71,10 @@ export default function MobileBottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md lg:hidden" style={{ boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md lg:hidden" style={{ 
+      boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }}>
       <div className="flex items-end justify-around px-1 py-1 relative">
         {navItems.map((item) => {
           const Icon = item.icon;

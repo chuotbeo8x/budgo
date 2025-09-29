@@ -129,7 +129,7 @@
   
     /* Mobile bottom navigation spacing */
     .pb-mobile-nav {
-      padding-bottom: 60px;
+      padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
     
     @media (min-width: 1024px) {
