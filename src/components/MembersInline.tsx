@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
@@ -56,6 +56,7 @@ export default function MembersInline({
   const { user } = useAuth();
   const [localMembers, setLocalMembers] = useState<TripMember[]>(members);
   const [showAddForm, setShowAddForm] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
   
   const [submitting, setSubmitting] = useState(false);
   const [addMethod, setAddMethod] = useState<'search' | 'group' | 'ghost'>('search');
@@ -64,6 +65,17 @@ export default function MembersInline({
   useEffect(() => {
     setLocalMembers(members);
   }, [members]);
+
+  // Focus management for modal
+  useEffect(() => {
+    if (showAddForm && modalRef.current) {
+      // Focus on first input when modal opens
+      const firstInput = modalRef.current.querySelector('input, select, textarea') as HTMLElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }
+  }, [showAddForm]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -525,8 +537,13 @@ export default function MembersInline({
               setShowAddForm(false);
             }
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setShowAddForm(false);
+            }
+          }}
         >
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <Card ref={modalRef} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Thêm thành viên</h2>
