@@ -161,7 +161,19 @@ export default function MembersInline({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trip || !user) return;
+    console.log('=== handleSubmit START ===');
+    console.log('Trip:', trip?.id);
+    console.log('User:', user?.uid);
+    console.log('Add method:', addMethod);
+    console.log('Form data:', formData);
+    console.log('Selected user:', selectedUser);
+    console.log('Selected group:', selectedGroup);
+    console.log('Selected group members:', selectedGroupMembers);
+    
+    if (!trip || !user) {
+      console.log('Missing trip or user');
+      return;
+    }
 
     // Validate form based on method
     if (addMethod === 'ghost') {
@@ -205,6 +217,7 @@ export default function MembersInline({
 
       // Create optimistic member objects based on method
       const optimisticMembers: TripMember[] = [];
+      console.log('Creating optimistic members for method:', addMethod);
       
       if (addMethod === 'ghost') {
         const tempMember: TripMember = {
@@ -251,9 +264,11 @@ export default function MembersInline({
       }
       
       // Optimistically add to local state FIRST
+      console.log('Adding optimistic members:', optimisticMembers);
       setLocalMembers(prev => [...prev, ...optimisticMembers]);
       
       // Reset form
+      console.log('Closing form and resetting state');
       setShowAddForm(false);
       setFormData({
         name: '',
