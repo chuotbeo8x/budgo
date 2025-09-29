@@ -1039,12 +1039,15 @@ export async function addTripMember(formData: FormData, userId?: string) {
       throw new Error('Phương thức thêm thành viên không hợp lệ');
     }
 
-    // Clean data before saving to Firestore
-    const cleanedMemberData = prepareFirestoreData(memberData);
-    await adminDb.collection('tripMembers').doc(memberId).set(cleanedMemberData);
+    // Only save individual member if not group method
+    if (method !== 'group') {
+      // Clean data before saving to Firestore
+      const cleanedMemberData = prepareFirestoreData(memberData);
+      await adminDb.collection('tripMembers').doc(memberId).set(cleanedMemberData);
 
-    console.log('=== addTripMember SUCCESS ===');
-    return { success: true, memberId };
+      console.log('=== addTripMember SUCCESS ===');
+      return { success: true, memberId };
+    }
   } catch (error) {
     console.error('=== addTripMember ERROR ===');
     console.error('Error adding trip member:', error);
