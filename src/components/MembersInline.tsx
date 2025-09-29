@@ -56,6 +56,11 @@ export default function MembersInline({
   const { user } = useAuth();
   const [localMembers, setLocalMembers] = useState<TripMember[]>(members);
   const [showAddForm, setShowAddForm] = useState(false);
+  
+  // Debug logging for modal state changes
+  useEffect(() => {
+    console.log('Modal state changed:', showAddForm);
+  }, [showAddForm]);
   const [submitting, setSubmitting] = useState(false);
   const [addMethod, setAddMethod] = useState<'search' | 'group' | 'ghost'>('search');
   
@@ -411,7 +416,10 @@ export default function MembersInline({
               <p className="text-gray-600 mb-6">Bắt đầu thêm thành viên cho chuyến đi</p>
               {showAddButton && !isTripClosed && (
                 <Button 
-                  onClick={() => setShowAddForm(true)}
+                  onClick={() => {
+                    console.log('Button clicked - opening modal');
+                    setShowAddForm(true);
+                  }}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -517,7 +525,16 @@ export default function MembersInline({
 
       {/* Add Member Form Modal */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            console.log('Modal backdrop clicked');
+            if (e.target === e.currentTarget) {
+              console.log('Clicking outside modal - closing');
+              setShowAddForm(false);
+            }
+          }}
+        >
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -525,7 +542,10 @@ export default function MembersInline({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={() => {
+                    console.log('Close button clicked - closing modal');
+                    setShowAddForm(false);
+                  }}
                 >
                   <XCircle className="w-5 h-5" />
                 </Button>
