@@ -24,6 +24,8 @@ import {
   Plus,
   MapPin
 } from 'lucide-react';
+import GroupCreateModal from '@/components/modals/GroupCreateModal';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -124,13 +126,30 @@ export default function DashboardPage() {
                   <MapPin className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Tạo chuyến đi</h3>
-                <p className="text-blue-100 text-sm mb-4">Bắt đầu chuyến đi mới và quản lý chi phí</p>
-                <Link href="/trips/create">
-                  <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 w-full shadow-lg font-semibold">
-                    <Plus className="w-5 h-5 mr-2" />
-                    Tạo chuyến đi
-                  </Button>
-                </Link>
+                <p className="text-blue-100 text-sm mb-4">Cá nhân hoặc nhóm - linh hoạt tùy bạn</p>
+                <TripCreateModal
+                  trigger={
+                    <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 w-full shadow-lg font-semibold">
+                      <Plus className="w-5 h-5 mr-2" />
+                      Tạo chuyến đi
+                    </Button>
+                  }
+                  groups={groups}
+                  onSuccess={(tripId, groupId, tripSlug) => {
+                    toast.success('Chuyến đi đã được tạo thành công!');
+                    if (groupId) {
+                      // Find group slug for redirect
+                      const group = groups.find(g => g.id === groupId);
+                      if (group) {
+                        router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
+                      } else {
+                        router.push(`/trips/${tripId}/manage`);
+                      }
+                    } else {
+                      router.push(`/trips/${tripId}/manage`);
+                    }
+                  }}
+                />
               </div>
               <div className="border-t border-blue-400/50 pt-4">
                 <div className="flex items-center justify-between">
@@ -278,12 +297,18 @@ export default function DashboardPage() {
                   <p className="text-gray-600 mb-6 max-w-sm mx-auto">
                     Tạo nhóm để đi cùng bạn bè và quản lý chuyến đi tập thể
                   </p>
-                  <Link href="/groups/create">
-                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-lg">
-                      <Plus className="w-5 h-5 mr-2" />
-                      Tạo nhóm mới
-                    </Button>
-                  </Link>
+                  <GroupCreateModal
+                    trigger={
+                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-lg">
+                        <Plus className="w-5 h-5 mr-2" />
+                        Tạo nhóm mới
+                      </Button>
+                    }
+                    onSuccess={(groupId) => {
+                      toast.success('Nhóm đã được tạo thành công!');
+                      router.push(`/g/${groupId}`);
+                    }}
+                  />
                 </CardContent>
               </Card>
             ) : (
@@ -356,19 +381,44 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Tạo chuyến đi đầu tiên</h3>
                   <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-                    Bắt đầu quản lý chi phí chuyến đi, chia sẻ với bạn bè và tạo những kỷ niệm đáng nhớ
+                    Tạo chuyến đi cá nhân hoặc chọn nhóm để quản lý chi phí cùng bạn bè
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link href="/trips/create">
-                      <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg">
-                        <Plus className="w-5 h-5 mr-2" /> Tạo chuyến đi
-                      </Button>
-                    </Link>
-                    <Link href="/groups/create">
-                      <Button size="lg" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
-                        <Users className="w-5 h-5 mr-2" /> Tạo nhóm
-                      </Button>
-                    </Link>
+                    <TripCreateModal
+                      trigger={
+                        <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg">
+                          <Plus className="w-5 h-5 mr-2" /> Tạo chuyến đi
+                        </Button>
+                      }
+                      groups={groups}
+                      onSuccess={(tripId, groupId, tripSlug) => {
+                        toast.success('Chuyến đi đã được tạo thành công!');
+                        if (groupId) {
+                          // Find group slug for redirect
+                          const group = groups.find(g => g.id === groupId);
+                          if (group) {
+                            router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
+                          } else {
+                            router.push(`/trips/${tripSlug}/manage`);
+                          }
+                        } else {
+                          router.push(`/trips/${tripSlug}/manage`);
+                        }
+                        loadTrips(); // Reload trips list
+                      }}
+                    />
+                    <GroupCreateModal
+                      trigger={
+                        <Button size="lg" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
+                          <Users className="w-5 h-5 mr-2" /> Tạo nhóm
+                        </Button>
+                      }
+                      onSuccess={(groupId) => {
+                        toast.success('Nhóm đã được tạo thành công!');
+                        router.push(`/g/${groupId}`);
+                        loadGroups(); // Reload groups list
+                      }}
+                    />
                   </div>
                 </CardContent>
               </Card>

@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/simple-select';
 import { updateTrip, deleteTrip, closeTrip } from '@/lib/actions/trips';
 import { toDate } from '@/lib/utils/date';
 import { Trip } from '@/lib/types';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { ArrowLeft, Save, Trash2, AlertTriangle, Edit, X, Calendar, MapPin } from 'lucide-react';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 
 interface TripManagePageProps {
   trip: Trip;
@@ -44,12 +47,14 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
     endDate: safeDateInput(trip.endDate),
     destination: trip.destination || '',
     coverUrl: trip.coverUrl || '',
+    currency: trip.currency || 'VND',
+    costPerPersonPlanned: trip.costPerPersonPlanned ? trip.costPerPersonPlanned.toString() : '',
   });
 
   const isOwner = user?.uid === trip.ownerId;
   const isTripClosed = trip.status === 'closed';
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -82,10 +87,6 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
   const handleDelete = async () => {
     if (!trip || !user) return;
 
-    if (!confirm('Bạn có chắc chắn muốn xóa chuyến đi này? Hành động này không thể hoàn tác.')) {
-      return;
-    }
-
     try {
       setSubmitting(true);
       await deleteTrip(trip.id, user.uid);
@@ -102,19 +103,15 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
   const handleCloseTrip = async () => {
     if (!trip || !user) return;
 
-    if (!confirm('Bạn có chắc chắn muốn chốt chuyến đi này? Sau khi chốt, không thể thêm, sửa hoặc xóa chi phí và tạm ứng.')) {
-      return;
-    }
-
     try {
       setSubmitting(true);
       await closeTrip(trip.id, user.uid);
-      toast.success('Chốt chuyến đi thành công');
+      toast.success('Lưu trữ chuyến đi thành công');
       // Reload the page to get updated data
       window.location.reload();
     } catch (error) {
       console.error('Error closing trip:', error);
-      toast.error('Có lỗi xảy ra khi chốt chuyến đi');
+      toast.error('Có lỗi xảy ra khi lưu trữ chuyến đi');
     } finally {
       setSubmitting(false);
     }
@@ -174,7 +171,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                     <AlertTriangle className="w-5 h-5 text-red-600" />
                   </div>
                   <div>
-                    <h3 className="text-red-800 font-semibold mb-1">Chuyến đi đã được chốt</h3>
+                    <h3 className="text-red-800 font-semibold mb-1">Chuyến đi đã được lưu trữ</h3>
                     <p className="text-red-700 text-sm">
                       Không thể thêm, sửa hoặc xóa chi phí và tạm ứng
                     </p>
@@ -201,7 +198,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                 <div>
                   <CardTitle className="text-2xl text-gray-900">{trip.name}</CardTitle>
                   <p className="text-gray-600 mt-1">
-                    {isTripClosed ? 'Chuyến đi đã được chốt' : 'Chuyến đi đang hoạt động'} • Cập nhật thông tin chi tiết
+                    {isTripClosed ? 'Chuyến đi đã được lưu trữ' : 'Chuyến đi đang hoạt động'} • Cập nhật thông tin chi tiết
                   </p>
                 </div>
                 <div className="ml-auto flex gap-3">
@@ -331,16 +328,54 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
 
                   <div className="space-y-2">
                     <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả</Label>
-                    <textarea
+                    <Textarea
                       id="description"
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
                       placeholder="Nhập mô tả chuyến đi"
-                      className={`w-full px-3 py-2 border rounded-md resize-none ${!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
                       rows={3}
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="currency" className="text-sm font-medium text-gray-700">Tiền tệ</Label>
+                      <Select
+                        id="currency"
+                        name="currency"
+                        value={formData.currency}
+                        onChange={handleInputChange}
+                        disabled={!editing || isTripClosed}
+                        className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      >
+                        <option value="VND">🇻🇳 VND (Việt Nam Đồng)</option>
+                        <option value="USD">🇺🇸 USD (US Dollar)</option>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="costPerPersonPlanned" className="text-sm font-medium text-gray-700">Chi phí dự kiến cho mỗi người</Label>
+                      <div className="relative">
+                        <Input
+                          id="costPerPersonPlanned"
+                          name="costPerPersonPlanned"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.costPerPersonPlanned}
+                          onChange={handleInputChange}
+                          disabled={!editing || isTripClosed}
+                          placeholder="Nhập chi phí dự kiến"
+                          className={`pr-8 ${!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}`}
+                        />
+                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                          {formData.currency}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -352,29 +387,47 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
             {isTripClosed && (
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <AlertTriangle className="w-4 h-4" />
-                Chuyến đi đã được chốt - Không thể thực hiện thay đổi
+                Chuyến đi đã được lưu trữ - Không thể thực hiện thay đổi
               </div>
             )}
             <div className="flex gap-3 ml-auto">
               {!isTripClosed && (
-                <Button
-                  onClick={handleCloseTrip}
-                  disabled={submitting}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
-                >
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  {submitting ? 'Đang chốt...' : 'Chốt chuyến đi'}
-                </Button>
+                <DeleteConfirmDialog
+                  trigger={
+                    <Button
+                      disabled={submitting}
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                    >
+                      <AlertTriangle className="w-4 h-4 mr-2" />
+                      {submitting ? 'Đang lưu trữ...' : 'Lưu trữ chuyến đi'}
+                    </Button>
+                  }
+                  title="Lưu trữ chuyến đi"
+                  description="Bạn có chắc chắn muốn lưu trữ chuyến đi này? Sau khi lưu trữ, không thể thêm, sửa hoặc xóa chi phí và tạm ứng."
+                  confirmText="Lưu trữ"
+                  cancelText="Hủy"
+                  onConfirm={handleCloseTrip}
+                  loadingText="Đang lưu trữ..."
+                />
               )}
 
-              <Button
-                onClick={handleDelete}
-                disabled={submitting}
-                variant="destructive"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {submitting ? 'Đang xóa...' : 'Xóa chuyến đi'}
-              </Button>
+              <DeleteConfirmDialog
+                trigger={
+                  <Button
+                    disabled={submitting}
+                    variant="destructive"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {submitting ? 'Đang xóa...' : 'Xóa chuyến đi'}
+                  </Button>
+                }
+                title="Xóa chuyến đi"
+                description="Bạn có chắc chắn muốn xóa chuyến đi này? Hành động này không thể hoàn tác."
+                confirmText="Xóa"
+                cancelText="Hủy"
+                onConfirm={handleDelete}
+                loadingText="Đang xóa..."
+              />
             </div>
           </div>
           
@@ -385,7 +438,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                 <div>
                   <p className="text-sm text-yellow-800 font-medium mb-1">Lưu ý quan trọng</p>
                   <p className="text-xs text-yellow-700">
-                    Sau khi chốt chuyến đi, bạn sẽ không thể thêm, sửa hoặc xóa chi phí và tạm ứng. 
+                    Sau khi lưu trữ chuyến đi, bạn sẽ không thể thêm, sửa hoặc xóa chi phí và tạm ứng. 
                     Hành động này không thể hoàn tác.
                   </p>
                 </div>

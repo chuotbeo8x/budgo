@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getGroupBySlug, getJoinRequests, approveJoinRequest, rejectJoinRequest } from '@/lib/actions/groups';
@@ -99,10 +100,6 @@ export default function GroupRequestsPage() {
 
   const handleRejectRequest = async (requestId: string) => {
     if (!user) return;
-    
-    if (!confirm('Bạn có chắc chắn muốn từ chối yêu cầu này?')) {
-      return;
-    }
     
     try {
       setActionLoading(requestId);
@@ -238,14 +235,23 @@ export default function GroupRequestsPage() {
                         >
                           {actionLoading === request.id ? 'Đang xử lý...' : 'Phê duyệt'}
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleRejectRequest(request.id)}
-                          disabled={actionLoading === request.id}
-                        >
-                          {actionLoading === request.id ? 'Đang xử lý...' : 'Từ chối'}
-                        </Button>
+                        <DeleteConfirmDialog
+                          trigger={
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              disabled={actionLoading === request.id}
+                            >
+                              {actionLoading === request.id ? 'Đang xử lý...' : 'Từ chối'}
+                            </Button>
+                          }
+                          title="Từ chối yêu cầu tham gia"
+                          description="Bạn có chắc chắn muốn từ chối yêu cầu tham gia này?"
+                          confirmText="Từ chối"
+                          cancelText="Hủy"
+                          onConfirm={() => handleRejectRequest(request.id)}
+                          loadingText="Đang xử lý..."
+                        />
                       </div>
                     </div>
                   );

@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin';
+import { adminDb } from '../firebase-admin-new';
 import { FieldValue } from 'firebase-admin/firestore';
 import { AddExpenseSchema, AddAdvanceSchema } from '../schemas';
 import { Expense, Advance, TripMember } from '../types';
@@ -244,8 +244,17 @@ export async function getExpenses(tripId: string) {
       
       return {
         id: doc.id,
-        ...data,
+        tripId: data.tripId,
+        amount: data.amount,
+        description: data.description,
+        paidBy: data.paidBy,
+        splitMethod: data.splitMethod,
+        category: data.category,
+        weightMap: data.weightMap,
+        exclusions: data.exclusions,
+        memberIdsAtCreation: data.memberIdsAtCreation,
         createdAt: convertedCreatedAt,
+        createdBy: data.createdBy,
       } as Expense;
     });
 
@@ -436,7 +445,6 @@ export async function updateExpense(expenseId: string, formData: FormData) {
       weightMap: validatedData.weightMap,
       exclusions: validatedData.exclusions,
       createdAt: createdAt,
-      updatedAt: new Date(),
     };
 
     console.log('Updating expense with data:', updateData);
@@ -667,8 +675,14 @@ export async function getAdvances(tripId: string) {
       
       return {
         id: doc.id,
-        ...data,
+        tripId: data.tripId,
+        amount: data.amount,
+        description: data.description,
+        paidBy: data.paidBy,
+        paidTo: data.paidTo,
         createdAt: convertedCreatedAt,
+        createdBy: data.createdBy,
+        isRefund: data.isRefund,
       } as Advance;
     });
 
@@ -759,8 +773,6 @@ export async function updateAdvance(advanceId: string, formData: FormData) {
     const updateData = {
       ...validatedData,
       createdAt: createdAt,
-      updatedAt: new Date(),
-      updatedBy: userId,
     };
 
     // Clean data before saving to Firestore

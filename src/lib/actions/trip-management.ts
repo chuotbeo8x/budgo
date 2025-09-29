@@ -26,11 +26,11 @@ export async function closeTrip(tripId: string, userId: string) {
 
     const tripData = tripSnap.data() as Trip;
     if (tripData.ownerId !== userId) {
-      throw new Error('Chỉ chủ chuyến đi mới có thể đóng chuyến đi');
+      throw new Error('Chỉ chủ chuyến đi mới có thể lưu trữ chuyến đi');
     }
 
     if (tripData.status === 'closed') {
-      throw new Error('Chuyến đi đã được đóng');
+      throw new Error('Chuyến đi đã được lưu trữ');
     }
 
     // Update trip status
@@ -43,13 +43,13 @@ export async function closeTrip(tripId: string, userId: string) {
     const cleanedUpdateData = prepareFirestoreData(updateData);
     await tripRef.set(cleanedUpdateData, { merge: true });
 
-    return { success: true, message: 'Đóng chuyến đi thành công!' };
+    return { success: true, message: 'Lưu trữ chuyến đi thành công!' };
   } catch (error) {
     console.error('Error closing trip:', error);
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error('Có lỗi xảy ra khi đóng chuyến đi');
+    throw new Error('Có lỗi xảy ra khi lưu trữ chuyến đi');
   }
 }
 
@@ -75,7 +75,7 @@ export async function reopenTrip(tripId: string, userId: string) {
 
     const tripData = tripSnap.data() as Trip;
     if (tripData.ownerId !== userId) {
-      throw new Error('Chỉ chủ chuyến đi mới có thể mở lại chuyến đi');
+      throw new Error('Chỉ chủ chuyến đi mới có thể khôi phục chuyến đi');
     }
 
     if (tripData.status === 'active') {
@@ -92,13 +92,13 @@ export async function reopenTrip(tripId: string, userId: string) {
     const cleanedUpdateData = prepareFirestoreData(updateData);
     await tripRef.set(cleanedUpdateData, { merge: true });
 
-    return { success: true, message: 'Mở lại chuyến đi thành công!' };
+    return { success: true, message: 'Khôi phục chuyến đi thành công!' };
   } catch (error) {
     console.error('Error reopening trip:', error);
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error('Có lỗi xảy ra khi mở lại chuyến đi');
+    throw new Error('Có lỗi xảy ra khi khôi phục chuyến đi');
   }
 }
 
@@ -173,6 +173,7 @@ export async function deleteTrip(tripId: string, userId: string) {
     throw new Error('Có lỗi xảy ra khi xóa chuyến đi');
   }
 }
+
 
 
 

@@ -62,18 +62,31 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
           console.log('ProfileProvider: Profile found, setting profile state');
           setProfile(result.profile);
           
-          // Redirect to dashboard if not already there
-          if (window.location.pathname !== '/dashboard') {
-            console.log('ProfileProvider: Redirecting to dashboard');
-            router.push('/dashboard');
+          // Check if user is new (created within last 24 hours) and redirect to welcome
+          const profileCreatedAt = new Date(result.profile.createdAt);
+          const now = new Date();
+          const timeDiff = now.getTime() - profileCreatedAt.getTime();
+          const oneDay = 24 * 60 * 60 * 1000;
+          const isNewUser = timeDiff < oneDay;
+          
+          // Check if user has already seen the welcome page
+          const hasSeenWelcome = localStorage.getItem(`budgo_welcome_seen_${user.uid}`) === 'true';
+          
+          // Redirect to welcome page for new users (only once)
+          // Only redirect if not already on the correct page and not on onboarding
+          if (isNewUser && !hasSeenWelcome && pathname !== '/welcome' && pathname !== '/onboarding') {
+            console.log('ProfileProvider: New user, redirecting to welcome page for first time');
+            router.push('/welcome');
           }
+          // Note: Removed automatic redirect to dashboard for existing users
+          // This allows users to navigate freely between pages
         } else {
           // User needs to create profile
           console.log('ProfileProvider: No profile found, redirecting to onboarding');
           setProfile(null);
           
           // Only redirect if not already on onboarding page
-          if (window.location.pathname !== '/onboarding') {
+          if (pathname !== '/onboarding') {
             router.push('/onboarding');
           }
         }
@@ -82,7 +95,7 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
         setProfile(null);
         
         // On error, redirect to onboarding
-        if (window.location.pathname !== '/onboarding') {
+        if (pathname !== '/onboarding') {
           router.push('/onboarding');
         }
       } finally {
@@ -91,7 +104,7 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
     };
 
     checkProfile();
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname]);
 
   // Enforce onboarding: if logged in but no profile, force stay on /onboarding
   const mustOnboard = !!user && !profile && !profileLoading;

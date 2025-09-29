@@ -13,6 +13,11 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
   const settlements = useMemo(() => {
     const settlementMap = new Map<string, Settlement>();
     
+    // Safety check for undefined/null arrays
+    if (!members || !Array.isArray(members)) {
+      return [];
+    }
+    
     // Initialize settlements for all members
     members.forEach(member => {
       settlementMap.set(member.id, {
@@ -25,11 +30,12 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
     });
 
     // Calculate expenses for each member
-    expenses.forEach(expense => {
+    if (expenses && Array.isArray(expenses)) {
+      expenses.forEach(expense => {
       // Only split among members who were in the trip when expense was created
       const eligibleMembers = members.filter(member => {
-        // If memberIdsAtCreation is not set (legacy expenses), include all members
-        if (!expense.memberIdsAtCreation) {
+        // If memberIdsAtCreation is not set or empty (legacy expenses), include all members
+        if (!expense.memberIdsAtCreation || expense.memberIdsAtCreation.length === 0) {
           return true;
         }
         // Only include members who were in the trip when expense was created
@@ -38,6 +44,14 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
 
       if (expense.splitMethod === 'equal') {
         const amountPerPerson = expense.amount / eligibleMembers.length;
+        
+        // Add money to the person who paid (paidBy)
+        const paidBySettlement = settlementMap.get(expense.paidBy);
+        if (paidBySettlement) {
+          paidBySettlement.totalAdvances += expense.amount; // They should receive the full amount back
+        }
+        
+        // Subtract money from all eligible members (including the payer)
         eligibleMembers.forEach(member => {
           const settlement = settlementMap.get(member.id);
           if (settlement) {
@@ -52,6 +66,13 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
         
         const totalWeight = eligibleWeightMap.reduce((sum, entry) => sum + entry.weight, 0);
         if (totalWeight > 0) {
+          // Add money to the person who paid (paidBy)
+          const paidBySettlement = settlementMap.get(expense.paidBy);
+          if (paidBySettlement) {
+            paidBySettlement.totalAdvances += expense.amount; // They should receive the full amount back
+          }
+          
+          // Subtract money from all eligible members based on their weight
           eligibleWeightMap.forEach(weightEntry => {
             const settlement = settlementMap.get(weightEntry.memberId);
             if (settlement) {
@@ -61,10 +82,12 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
           });
         }
       }
-    });
+      });
+    }
 
     // Calculate advances for each member
-    advances.forEach(advance => {
+    if (advances && Array.isArray(advances)) {
+      advances.forEach(advance => {
       // Person who paid the advance (paidBy) should receive money back
       const paidBySettlement = settlementMap.get(advance.paidBy);
       if (paidBySettlement) {
@@ -76,7 +99,8 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
       if (paidToSettlement) {
         paidToSettlement.totalAdvances -= advance.amount;
       }
-    });
+      });
+    }
 
     // Calculate final balance
     settlementMap.forEach(settlement => {
@@ -87,22 +111,22 @@ export const useSettlement = (expenses: Expense[], advances: Advance[], members:
   }, [expenses, advances, members]);
 
   const totalExpense = useMemo(() => 
-    expenses.reduce((sum, expense) => sum + expense.amount, 0), 
+    expenses && Array.isArray(expenses) ? expenses.reduce((sum, expense) => sum + expense.amount, 0) : 0, 
     [expenses]
   );
 
   const totalAdvance = useMemo(() => 
-    advances.reduce((sum, advance) => sum + advance.amount, 0), 
+    advances && Array.isArray(advances) ? advances.reduce((sum, advance) => sum + advance.amount, 0) : 0, 
     [advances]
   );
 
   const debtors = useMemo(() => 
-    settlements.filter(s => s.balance < -0.01), 
+    settlements && Array.isArray(settlements) ? settlements.filter(s => s.balance < -0.01) : [], 
     [settlements]
   );
 
   const creditors = useMemo(() => 
-    settlements.filter(s => s.balance > 0.01), 
+    settlements && Array.isArray(settlements) ? settlements.filter(s => s.balance > 0.01) : [], 
     [settlements]
   );
 

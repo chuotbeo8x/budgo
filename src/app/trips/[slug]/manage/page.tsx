@@ -6,7 +6,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { getTripBySlug } from '@/lib/actions/trips';
 import { Trip } from '@/lib/types';
 import { toast } from 'sonner';
-import TripManagePage from '@/components/TripManagePage';
+import TripManagePageWithTabs from '@/components/TripManagePageWithTabs';
 
 export default function PersonalTripManagePage() {
   const params = useParams();
@@ -61,7 +61,7 @@ export default function PersonalTripManagePage() {
   }
 
   return (
-    <TripManagePage
+    <TripManagePageWithTabs
       trip={trip}
       backUrl="/dashboard"
       backLabel="Về trang chủ"

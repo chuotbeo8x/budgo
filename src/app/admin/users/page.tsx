@@ -5,6 +5,7 @@ import { useProfile } from '@/components/auth/ProfileProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -206,14 +207,23 @@ export default function AdminUsersPage() {
                               <span className="hidden md:inline">Khóa</span>
                             </Button>
                           )}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                            disabled={!!actionLoading[u.id] || u.role === 'admin'}
-                            onClick={async () => {
-                              const ok = window.confirm('Xóa người dùng này? Hành động không thể hoàn tác.');
-                              if (!ok) return;
+                          <DeleteConfirmDialog
+                            trigger={
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                disabled={!!actionLoading[u.id] || u.role === 'admin'}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                <span className="hidden md:inline">Xóa</span>
+                              </Button>
+                            }
+                            title="Xóa người dùng"
+                            description="Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác."
+                            confirmText="Xóa"
+                            cancelText="Hủy"
+                            onConfirm={async () => {
                               setActionLoading((s) => ({ ...s, [u.id]: true }));
                               try {
                                 const res = await fetch(`/api/admin/users/delete?userId=${encodeURIComponent(u.id)}`, { method: 'DELETE' });
@@ -225,10 +235,8 @@ export default function AdminUsersPage() {
                                 setActionLoading((s) => ({ ...s, [u.id]: false }));
                               }
                             }}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            <span className="hidden md:inline">Xóa</span>
-                          </Button>
+                            loadingText="Đang xóa..."
+                          />
                         </div>
                       </td>
                     </tr>

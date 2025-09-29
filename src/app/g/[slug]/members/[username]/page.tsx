@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getGroupBySlug, getGroupMembers } from '@/lib/actions/groups';
@@ -343,17 +344,24 @@ export default function MemberProfilePage() {
                   </Button>
                 )}
                 {member.role === 'member' && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      if (confirm('Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?')) {
-                        toast.info('Tính năng xóa thành viên sẽ được thêm sau');
-                      }
+                  <DeleteConfirmDialog
+                    trigger={
+                      <Button
+                        variant="destructive"
+                        className="w-full"
+                      >
+                        Xóa khỏi nhóm
+                      </Button>
+                    }
+                    title="Xóa thành viên"
+                    description="Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?"
+                    confirmText="Xóa"
+                    cancelText="Hủy"
+                    onConfirm={() => {
+                      toast.info('Tính năng xóa thành viên sẽ được thêm sau');
                     }}
-                    className="w-full"
-                  >
-                    Xóa khỏi nhóm
-                  </Button>
+                    loadingText="Đang xóa..."
+                  />
                 )}
                 <Link href={`/g/${group.slug}/members`} className="w-full">
                   <Button variant="outline" className="w-full">

@@ -4,18 +4,23 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getTripBySlug } from '@/lib/actions/trips';
-import { Trip } from '@/lib/types';
+import { getExpenses, getAdvances } from '@/lib/actions/expenses';
+import { getTripMembers } from '@/lib/actions/trips';
+import { Trip, Expense, Advance, TripMember } from '@/lib/types';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import MembersPage from '@/components/MembersPage';
+import ExpensesPage from '@/components/ExpensesPage';
 
-export default function PersonalTripMembersPage() {
+export default function PersonalTripExpensesPage() {
   const params = useParams();
   const { user, loading } = useAuth();
   const tripSlug = params.slug as string;
 
   const [trip, setTrip] = useState<Trip | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [advances, setAdvances] = useState<Advance[]>([]);
+  const [members, setMembers] = useState<TripMember[]>([]);
   const [loadingData, setLoadingData] = useState(false);
 
   useEffect(() => {
@@ -33,6 +38,19 @@ export default function PersonalTripMembersPage() {
         return;
       }
       setTrip(tripData);
+      
+      // Load expenses, advances, and members
+      console.log('🔄 Loading data for trip:', tripData.id);
+      const [expensesData, advancesData, membersData] = await Promise.all([
+        getExpenses(tripData.id),
+        getAdvances(tripData.id),
+        getTripMembers(tripData.id)
+      ]);
+      console.log('📊 Loaded expenses from server:', expensesData.length, 'expenses');
+      console.log('🐛 First expense createdAt:', expensesData[0]?.createdAt, 'Type:', typeof expensesData[0]?.createdAt);
+      setExpenses(expensesData);
+      setAdvances(advancesData);
+      setMembers(membersData);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error instanceof Error && error.message.includes('quyền truy cập')) {
@@ -69,14 +87,16 @@ export default function PersonalTripMembersPage() {
   }
 
   return (
-    <MembersPage
+    <ExpensesPage
       trip={trip}
-      backUrl={`/trips/${tripSlug}`}
-      backLabel="Quay lại chuyến đi"
+      expenses={expenses}
+      advances={advances}
+      members={members}
+      backUrl={`/trips/${tripSlug}/manage`}
+      backLabel="Quay lại quản lý chuyến đi"
       showAddButton={true}
       canEdit={true}
       canDelete={true}
-      canInvite={true}
     />
   );
 }

@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin';
+import { adminDb } from '../firebase-admin-new';
 import { CreateTripSchema, AddTripMemberSchema, AddExpenseSchema, AddAdvanceSchema, CloseTripSchema } from '../schemas';
 import { Trip, TripMember, Expense, Advance } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
@@ -280,7 +280,20 @@ export async function createTrip(formDataOrObj: FormData | Record<string, unknow
     const cleanedMemberData = prepareFirestoreData(memberData);
     await adminDb.collection('tripMembers').doc(memberId).set(cleanedMemberData);
 
-    return { success: true, tripId, slug: validatedData.slug };
+    // Get group slug if groupId exists
+    let groupSlug = undefined;
+    if (validatedData.groupId) {
+      try {
+        const groupDoc = await adminDb.collection('groups').doc(validatedData.groupId).get();
+        if (groupDoc.exists) {
+          groupSlug = groupDoc.data()?.slug;
+        }
+      } catch (error) {
+        console.error('Error getting group slug:', error);
+      }
+    }
+
+    return { success: true, tripId, slug: validatedData.slug, groupId: validatedData.groupId, groupSlug };
   } catch (error) {
     console.error('Error creating trip:', error);
     if (error instanceof Error) {
@@ -422,7 +435,7 @@ export async function closeTrip(tripId: string, userId: string, rounding: boolea
 
     const tripData = tripSnap.data() as Trip;
     if (tripData.ownerId !== userId) {
-      throw new Error('Chỉ chủ chuyến đi mới có thể chốt chuyến');
+      throw new Error('Chỉ chủ chuyến đi mới có thể lưu trữ chuyến đi');
     }
 
     await tripRef.set({ 
@@ -436,7 +449,7 @@ export async function closeTrip(tripId: string, userId: string, rounding: boolea
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error('Có lỗi xảy ra khi chốt chuyến');
+    throw new Error('Có lỗi xảy ra khi lưu trữ chuyến đi');
   }
 }
 
@@ -1182,7 +1195,7 @@ export async function updateTrip(formDataOrObj: FormData | Record<string, unknow
 
     // Check if trip is closed
     if (tripData.status === 'closed') {
-      throw new Error('Không thể chỉnh sửa chuyến đi đã đóng');
+      throw new Error('Không thể chỉnh sửa chuyến đi đã được lưu trữ');
     }
 
     const data = {

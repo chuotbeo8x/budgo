@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { ProfileProvider } from "@/components/auth/ProfileProvider";
 import NotificationProvider from "@/components/NotificationProvider";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
+import WelcomeNotification from "@/components/WelcomeNotification";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,18 +36,19 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             suppressHydrationWarning={true}
           >
-            <AuthProvider>
-              <ProfileProvider>
-                <NotificationProvider>
-                  <Header />
-                  <MaintenanceGuard>
-                    {children}
-                  </MaintenanceGuard>
-                  <Footer />
-                      <Toaster position="top-right" />
-                </NotificationProvider>
-              </ProfileProvider>
-            </AuthProvider>
+                    <AuthProvider>
+                      <ProfileProvider>
+                        <NotificationProvider>
+                          <WelcomeNotification />
+                          <Header />
+                          <MaintenanceGuard>
+                            {children}
+                          </MaintenanceGuard>
+                          <Footer />
+                              <Toaster position="top-right" />
+                        </NotificationProvider>
+                      </ProfileProvider>
+                    </AuthProvider>
           </body>
         </html>
   );

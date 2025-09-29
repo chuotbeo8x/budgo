@@ -11,6 +11,7 @@ import {
   CheckCircle, 
   AlertCircle
 } from 'lucide-react';
+import { AlertMessage } from '@/components/ui/AlertMessage';
 import { useState } from 'react';
 
 interface Settlement {
@@ -29,6 +30,9 @@ interface SettlementSummaryProps {
   isOwner?: boolean;
   paymentStatus?: Record<string, boolean>;
   onPaymentStatusChange?: (memberId: string, status: boolean) => void;
+  // Legacy props for backward compatibility
+  paymentStatuses?: Record<string, boolean>;
+  onPaymentStatusUpdate?: (memberId: string, status: boolean) => void;
   updating?: boolean;
   loading?: boolean;
 }
@@ -41,14 +45,17 @@ export default function SettlementSummary({
   isOwner = false,
   paymentStatus: externalPaymentStatus,
   onPaymentStatusChange,
+  // Legacy props
+  paymentStatuses,
+  onPaymentStatusUpdate,
   updating = false,
   loading = false
 }: SettlementSummaryProps) {
-  const [isExpanded, setIsExpanded] = useState(showDetails);
   const [internalPaymentStatus, setInternalPaymentStatus] = useState<Record<string, boolean>>({});
   
   // Use external payment status if provided, otherwise use internal state
-  const paymentStatus = externalPaymentStatus || internalPaymentStatus;
+  const paymentStatus = externalPaymentStatus || paymentStatuses || internalPaymentStatus;
+  const paymentStatusCallback = onPaymentStatusChange || onPaymentStatusUpdate;
 
   const debtors = settlements.filter(s => s.balance < -0.01);
   const creditors = settlements.filter(s => s.balance > 0.01);
@@ -56,11 +63,9 @@ export default function SettlementSummary({
   const togglePaymentStatus = (memberId: string) => {
     const newStatus = !paymentStatus[memberId];
     
-    if (onPaymentStatusChange) {
-      // Use external callback if provided
-      onPaymentStatusChange(memberId, newStatus);
+    if (paymentStatusCallback) {
+      paymentStatusCallback(memberId, newStatus);
     } else {
-      // Use internal state if no external callback
       setInternalPaymentStatus(prev => ({
         ...prev,
         [memberId]: newStatus
@@ -69,46 +74,128 @@ export default function SettlementSummary({
   };
 
   if (settlements.length === 0) {
-    return null;
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <Calculator className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+        <p>Chưa có dữ liệu quyết toán</p>
+        <p className="text-sm">Thêm chi phí và tạm ứng để xem quyết toán</p>
+      </div>
+    );
   }
 
   return (
-    <Card className="mt-8">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <UserCheck className="w-6 h-6 text-purple-600" />
-            Tóm tắt thanh toán
-          </CardTitle>
-          {showToggle && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? 'Ẩn chi tiết' : 'Xem chi tiết'}
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      
-      {isExpanded && (
-        <CardContent>
-          <div className="space-y-6">
+    <div className="space-y-6">
             
             {/* Info Note */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Lưu ý về tính toán thanh toán:</p>
-                  <p>Chi phí chỉ được chia cho những thành viên có trong chuyến đi khi chi phí được tạo. Thành viên mới thêm vào sau sẽ không bị chia tiền cho các chi phí trước đó.</p>
-                </div>
+            <AlertMessage
+              type="info"
+              title="Lưu ý về tính toán thanh toán"
+              message="Chi phí chỉ được chia cho những thành viên có trong chuyến đi khi chi phí được tạo. Thành viên mới thêm vào sau sẽ không bị chia tiền cho các chi phí trước đó."
+              icon={<AlertCircle className="w-4 h-4" />}
+            />
+            
+            {/* Settlement List (mobile-first) */}
+            <div className="block md:hidden">
+              <div className="space-y-2">
+                {settlements.map((settlement) => {
+                  const isPositive = settlement.balance > 0;
+                  const isNegative = settlement.balance < 0;
+                  const isZero = Math.abs(settlement.balance) < 0.01;
+                  return (
+                    <div key={settlement.memberId} className="border border-gray-200 rounded-lg p-3 bg-white">
+                      {/* Row: Avatar + Name */}
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shrink-0">
+                          <span className="text-white font-semibold text-xs">
+                            {settlement.memberName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-900 truncate">{settlement.memberName}</p>
+                          <div className="text-[11px] text-gray-500 mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
+                            <span>Tổng chi: {formatCurrency(settlement.totalExpenses, currency)}</span>
+                            <span>Tạm ứng: {formatCurrency(settlement.totalAdvances, currency)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Row: Amount + Status (same row) */}
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <div className={`text-base font-bold ${
+                          isZero ? 'text-gray-600' : isPositive ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {formatCurrency(settlement.balance, currency)}
+                        </div>
+                        {isZero ? (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <CheckCircle className="w-4 h-4" />
+                            <span className="text-sm font-medium">Đã cân bằng</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-end w-full max-w-[200px]">
+                            {isOwner ? (
+                              <Button
+                                variant={paymentStatus[settlement.memberId] ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => togglePaymentStatus(settlement.memberId)}
+                                disabled={updating}
+                                className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
+                                  paymentStatus[settlement.memberId]
+                                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                                    : isPositive
+                                      ? 'border-green-600 text-green-600 hover:bg-green-50'
+                                      : 'border-red-600 text-red-600 hover:bg-red-50'
+                                }`}
+                              >
+                                {paymentStatus[settlement.memberId] ? (
+                                  <>
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span>{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertCircle className="w-4 h-4" />
+                                    <span>{isPositive ? 'Chưa nhận' : 'Chưa trả'}</span>
+                                  </>
+                                )}
+                              </Button>
+                            ) : (
+                              <div className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
+                                paymentStatus[settlement.memberId]
+                                  ? 'text-green-600'
+                                  : isPositive
+                                    ? 'text-amber-600'
+                                    : 'text-red-600'
+                              }`}>
+                                {paymentStatus[settlement.memberId] ? (
+                                  <>
+                                    <CheckCircle className="w-5 h-5" />
+                                    <span className="text-sm font-medium">{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                                  </>
+                                ) : isPositive ? (
+                                  <>
+                                    <CheckCircle className="w-5 h-5" />
+                                    <span className="text-sm font-medium">Chưa nhận</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertCircle className="w-5 h-5" />
+                                    <span className="text-sm font-medium">Chưa trả</span>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            
-            {/* Settlement Table */}
-            <div className="overflow-x-auto">
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
@@ -180,7 +267,7 @@ export default function SettlementSummary({
                                 size="sm"
                                 onClick={() => togglePaymentStatus(settlement.memberId)}
                                 disabled={updating}
-                                className={`flex items-center gap-2 ${
+                                className={`flex items-center gap-2 min-w-[128px] justify-start ${
                                   paymentStatus[settlement.memberId] 
                                     ? 'bg-green-600 hover:bg-green-700 text-white' 
                                     : isPositive 
@@ -201,9 +288,12 @@ export default function SettlementSummary({
                                 )}
                               </Button>
                             ) : (
-                              <div className={`flex items-center gap-2 ${
-                                paymentStatus[settlement.memberId] ? 'text-green-600' : 
-                                isPositive ? 'text-green-600' : 'text-red-600'
+                              <div className={`flex items-center gap-2 min-w-[128px] justify-start ${
+                                paymentStatus[settlement.memberId]
+                                  ? 'text-green-600'
+                                  : isPositive
+                                    ? 'text-amber-600'
+                                    : 'text-red-600'
                               }`}>
                                 {paymentStatus[settlement.memberId] ? (
                                   <>
@@ -213,12 +303,12 @@ export default function SettlementSummary({
                                 ) : isPositive ? (
                                   <>
                                     <CheckCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Sẽ nhận tiền</span>
+                                    <span className="text-sm font-medium">Chưa nhận</span>
                                   </>
                                 ) : (
                                   <>
                                     <AlertCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Cần trả tiền</span>
+                                    <span className="text-sm font-medium">Chưa trả</span>
                                   </>
                                 )}
                               </div>
@@ -237,109 +327,69 @@ export default function SettlementSummary({
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Những người cần trả tiền:</h4>
                 <div className="space-y-2">
-                  {debtors.map(settlement => {
-                    const isPaid = paymentStatus[settlement.memberId];
-                    return (
-                      <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                        isPaid ? 'bg-gray-100' : 'bg-red-50'
-                      }`}>
-                        <span className={`font-medium ${isPaid ? 'line-through text-gray-500' : ''}`}>
-                          {settlement.memberName}
-                        </span>
-                        <span className={`font-bold ${isPaid ? 'line-through text-gray-500' : 'text-red-600'}`}>
-                          {formatCurrency(Math.abs(settlement.balance), currency)}
-                        </span>
-                      </div>
-                    );
-                  })}
+                  {debtors.length === 0 ? (
+                    <div className="text-center py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
+                      Không có ai cần trả tiền
+                    </div>
+                  ) : (
+                    debtors.map(settlement => {
+                      const isPaid = paymentStatus[settlement.memberId];
+                      return (
+                        <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
+                          isPaid ? 'bg-gray-100' : 'bg-red-50'
+                        }`}>
+                          <span className={`font-medium ${isPaid ? 'line-through text-gray-500' : ''}`}>
+                            {settlement.memberName}
+                          </span>
+                          <span className={`font-bold ${isPaid ? 'line-through text-gray-500' : 'text-red-600'}`}>
+                            {formatCurrency(Math.abs(settlement.balance), currency)}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
               
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Những người sẽ nhận tiền:</h4>
                 <div className="space-y-2">
-                  {creditors.map(settlement => {
-                    const isReceived = paymentStatus[settlement.memberId];
-                    const isRefund = settlement.totalAdvances > settlement.totalExpenses;
-                    return (
-                      <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                        isReceived ? 'bg-gray-100' : 'bg-green-50'
-                      }`}>
-                        <div className="flex flex-col">
-                          <span className={`font-medium ${isReceived ? 'line-through text-gray-500' : ''}`}>
-                            {settlement.memberName}
-                          </span>
-                          {isRefund && (
-                            <span className="text-xs text-blue-600 font-medium">
-                              (Hoàn trả tạm ứng)
+                  {creditors.length === 0 ? (
+                    <div className="text-center py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
+                      Không có ai cần nhận tiền
+                    </div>
+                  ) : (
+                    creditors.map(settlement => {
+                      const isReceived = paymentStatus[settlement.memberId];
+                      const isRefund = settlement.totalAdvances > settlement.totalExpenses;
+                      return (
+                        <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
+                          isReceived ? 'bg-gray-100' : 'bg-amber-50'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-medium ${isReceived ? 'line-through text-gray-500' : ''}`}>
+                              {settlement.memberName}
                             </span>
-                          )}
+                            {!isReceived && (
+                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Chưa nhận</span>
+                            )}
+                            {isRefund && (
+                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                                Hoàn trả tạm ứng
+                              </span>
+                            )}
+                          </div>
+                          <span className={`font-bold ${isReceived ? 'line-through text-gray-500' : 'text-amber-700'}`}>
+                            {formatCurrency(settlement.balance, currency)}
+                          </span>
                         </div>
-                        <span className={`font-bold ${isReceived ? 'line-through text-gray-500' : 'text-green-600'}`}>
-                          {formatCurrency(settlement.balance, currency)}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
             
-          </div>
-        </CardContent>
-      )}
-      
-      {!isExpanded && (
-        <CardContent>
-          <div className="space-y-4">
-            {/* Quick Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Những người cần trả tiền:</h4>
-                <div className="space-y-2">
-                  {debtors.map(settlement => {
-                    const isPaid = paymentStatus[settlement.memberId];
-                    return (
-                      <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                        isPaid ? 'bg-gray-100' : 'bg-red-50'
-                      }`}>
-                        <span className={`font-medium ${isPaid ? 'line-through text-gray-500' : ''}`}>
-                          {settlement.memberName}
-                        </span>
-                        <span className={`font-bold ${isPaid ? 'line-through text-gray-500' : 'text-red-600'}`}>
-                          {formatCurrency(Math.abs(settlement.balance), currency)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Những người sẽ nhận tiền:</h4>
-                <div className="space-y-2">
-                  {creditors.map(settlement => {
-                    const isReceived = paymentStatus[settlement.memberId];
-                    return (
-                      <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                        isReceived ? 'bg-gray-100' : 'bg-green-50'
-                      }`}>
-                        <span className={`font-medium ${isReceived ? 'line-through text-gray-500' : ''}`}>
-                          {settlement.memberName}
-                        </span>
-                        <span className={`font-bold ${isReceived ? 'line-through text-gray-500' : 'text-green-600'}`}>
-                          {formatCurrency(settlement.balance, currency)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      )}
-      
-    </Card>
+    </div>
   );
 }

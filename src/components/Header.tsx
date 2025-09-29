@@ -11,29 +11,33 @@ import {
   Sun, 
   Moon, 
   User,
-  ChevronDown,
   Settings,
   Users,
   MapPin,
-  Menu,
-  X
+  Heart,
+  MoreVertical
 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Header() {
   const { user, loading } = useAuth();
   const { profile } = useProfile();
   const pathname = usePathname();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [language, setLanguage] = useState('vi');
   const [isHydrated, setIsHydrated] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
   const [siteName, setSiteName] = useState<string>('Budgo');
-  const profileMenuRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Ensure hydration is complete before rendering
   useEffect(() => {
@@ -55,23 +59,6 @@ export default function Header() {
     load();
   }, []);
 
-  // Close profile menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
-        setShowProfileMenu(false);
-      }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
-        setShowMobileMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     // TODO: Implement theme switching logic
@@ -86,20 +73,12 @@ export default function Header() {
   if (!isHydrated) {
     return (
       <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
             <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
           </div>
-          <div className="hidden md:flex items-center gap-2">
-            <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
-            <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-          </div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
         </div>
       </header>
     );
@@ -115,6 +94,7 @@ export default function Header() {
           </div>
         </div>
       )}
+      
       <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
         {/* Logo */}
         <div className="flex items-center gap-3">
@@ -131,7 +111,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Navigation */}
+        {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden md:flex items-center gap-2">
           <Link 
             href="/groups/manage" 
@@ -163,270 +143,257 @@ export default function Header() {
             }`} />
             <span>Chuyến đi</span>
           </Link>
-
         </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          title="Menu"
-        >
-          {showMobileMenu ? (
-            <X className="w-5 h-5 text-gray-600" />
-          ) : (
-            <Menu className="w-5 h-5 text-gray-600" />
-          )}
-        </button>
-
-        {/* Right side icons and profile */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Right side - User actions */}
+        <div className="flex items-center gap-2">
           {loading ? (
-            <span className="text-sm text-gray-500">Đang tải…</span>
+            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
           ) : user ? (
             <>
               {/* Notification Bell */}
               <NotificationBell />
               
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                title="Chuyển ngôn ngữ"
-              >
-                <Globe className="w-5 h-5 text-gray-600" />
-              </button>
-              
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                title={isDarkMode ? "Chế độ sáng" : "Chế độ tối"}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5 text-yellow-500" />
-                ) : (
-                  <Moon className="w-5 h-5 text-gray-600" />
-                )}
-              </button>
-              
-              {/* Profile Dropdown */}
-              <div className="relative" ref={profileMenuRef}>
-                <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  {user.photoURL ? (
-                    <Image 
-                      src={user.photoURL} 
-                      alt="Avatar" 
-                      width={32} 
-                      height={32} 
-                      className="rounded-full" 
-                    />
-                  ) : (
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                  )}
-                  <span className="text-sm font-medium text-gray-700">
-                    {profile?.name || 'Bạn'}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </button>
-                
-                {/* Profile Menu Dropdown */}
-                {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border py-1 z-50">
-                    <Link
-                      href="/profiles/me"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <User className="w-4 h-4" />
-                      Cài đặt cá nhân
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      Cài đặt
-                    </Link>
-                    <hr className="my-1" />
-                    <button
-                      onClick={async () => {
-                        await logout();
-                        setShowProfileMenu(false);
-                        window.location.href = '/';
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                    >
-                      Đăng xuất
-                    </button>
+              {/* Desktop Profile Dropdown */}
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      {user.photoURL ? (
+                        <Image 
+                          src={user.photoURL} 
+                          alt="Avatar" 
+                          width={32} 
+                          height={32} 
+                          className="rounded-full" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-gray-700">
+                        {profile?.name || 'Bạn'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {profile?.name || 'Bạn'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href="/welcome" className="flex items-center gap-2">
+                        <Heart className="w-4 h-4" />
+                        <span>Giới thiệu</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href="/profiles/me" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        <span>Cài đặt cá nhân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        <span>Cài đặt</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    {/* Admin section */}
                     {profile && (profile as any).role === 'admin' && (
                       <>
-                        <hr className="my-1" />
-                        <div className="px-4 py-1 text-[11px] uppercase tracking-wide text-gray-400">Khu vực quản trị</div>
-                        <Link
-                          href="/admin"
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setShowProfileMenu(false)}
-                        >
-                          <Settings className="w-4 h-4" />
-                          Admin Dashboard
-                        </Link>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-gray-400">
+                          Khu vực quản trị
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin" className="flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
                       </>
                     )}
-                  </div>
-                )}
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={toggleTheme}>
+                      {isDarkMode ? (
+                        <>
+                          <Sun className="w-4 h-4 mr-2" />
+                          <span>Chế độ sáng</span>
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="w-4 h-4 mr-2" />
+                          <span>Chế độ tối</span>
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={toggleLanguage}>
+                      <Globe className="w-4 h-4 mr-2" />
+                      <span>Chuyển ngôn ngữ</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem 
+                      onClick={async () => {
+                        await logout();
+                        window.location.href = '/';
+                      }}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      Đăng xuất
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Mobile Profile Dropdown */}
+              <div className="md:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="p-1">
+                      {user.photoURL ? (
+                        <Image 
+                          src={user.photoURL} 
+                          alt="Avatar" 
+                          width={32} 
+                          height={32} 
+                          className="rounded-full" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {profile?.name || 'Bạn'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    {/* Navigation */}
+                    <DropdownMenuItem asChild>
+                      <Link href="/groups/manage" className="flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        <span>Nhóm</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/trips/manage" className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        <span>Chuyến đi</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/welcome" className="flex items-center gap-2">
+                        <Heart className="w-4 h-4" />
+                        <span>Giới thiệu</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    {/* Settings */}
+                    <DropdownMenuItem asChild>
+                      <Link href="/profiles/me" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        <span>Cài đặt cá nhân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        <span>Cài đặt</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    {/* Admin section */}
+                    {profile && (profile as any).role === 'admin' && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-gray-400">
+                          Khu vực quản trị
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin" className="flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={toggleTheme}>
+                      {isDarkMode ? (
+                        <>
+                          <Sun className="w-4 h-4 mr-2" />
+                          <span>Chế độ sáng</span>
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="w-4 h-4 mr-2" />
+                          <span>Chế độ tối</span>
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={toggleLanguage}>
+                      <Globe className="w-4 h-4 mr-2" />
+                      <span>Chuyển ngôn ngữ</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem 
+                      onClick={async () => {
+                        await logout();
+                        window.location.href = '/';
+                      }}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      Đăng xuất
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </>
           ) : (
-            <button
+            <Button
               onClick={() => signInWithGoogle()}
-              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              Đăng nhập với Google
-            </button>
-          )}
-        </div>
-
-        {/* Mobile Profile Button */}
-        <div className="md:hidden flex items-center gap-2">
-          {loading ? (
-            <span className="text-sm text-gray-500">Đang tải…</span>
-          ) : user ? (
-            <>
-              <NotificationBell />
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {user.photoURL ? (
-                  <Image 
-                    src={user.photoURL} 
-                    alt="Avatar" 
-                    width={24} 
-                    height={24} 
-                    className="rounded-full"
-                  />
-                ) : (
-                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <ChevronDown className="w-4 h-4 text-gray-600" />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => signInWithGoogle()}
-              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+              size="sm"
+              className="text-sm"
             >
               Đăng nhập
-            </button>
+            </Button>
           )}
         </div>
       </div>
-
-      {/* Mobile Navigation Menu */}
-      {showMobileMenu && (
-        <div className="md:hidden border-t bg-white" ref={mobileMenuRef}>
-          <div className="container mx-auto px-4 py-4 max-w-7xl">
-            <nav className="flex flex-col gap-2">
-              <Link 
-                href="/groups/manage" 
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  pathname.startsWith('/groups') 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                <Users className="w-5 h-5" />
-                <span>Nhóm</span>
-              </Link>
-              <Link 
-                href="/trips/manage" 
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  pathname.startsWith('/trips') 
-                    ? 'text-green-600 bg-green-50' 
-                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
-                }`}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                <MapPin className="w-5 h-5" />
-                <span>Chuyến đi</span>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Profile Menu */}
-      {showProfileMenu && user && (
-        <div className="md:hidden border-t bg-white">
-          <div className="container mx-auto px-4 py-4 max-w-7xl">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3 px-4 py-3 border-b">
-                {user.photoURL ? (
-                  <Image 
-                    src={user.photoURL} 
-                    alt="Avatar" 
-                    width={32} 
-                    height={32} 
-                    className="rounded-full"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                )}
-                <div>
-                  <div className="font-medium text-sm">{user.displayName || 'Người dùng'}</div>
-                  <div className="text-xs text-gray-500">{user.email}</div>
-                </div>
-              </div>
-              
-              <Link
-                href="/profile"
-                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-                onClick={() => setShowProfileMenu(false)}
-              >
-                <User className="w-4 h-4" />
-                Hồ sơ cá nhân
-              </Link>
-              
-              <button
-                onClick={async () => {
-                  await logout();
-                  setShowProfileMenu(false);
-                  window.location.href = '/';
-                }}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg text-left"
-              >
-                <Settings className="w-4 h-4" />
-                Đăng xuất
-              </button>
-              
-              {profile && (profile as any).role === 'admin' && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setShowProfileMenu(false)}
-                >
-                  <Settings className="w-4 h-4" />
-                  Admin Dashboard
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
-
-

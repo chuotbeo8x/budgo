@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin';
+import { adminDb } from '../firebase-admin-new';
 import { Notification } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
 import { safeToDate } from '../utils/date';

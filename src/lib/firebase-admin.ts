@@ -8,6 +8,8 @@ let serviceAccount;
 try {
   serviceAccount = require('./firebase-service-account.json');
   console.log('Service account key file loaded successfully');
+  console.log('Service account project ID:', serviceAccount.project_id);
+  console.log('Service account client email:', serviceAccount.client_email);
 } catch (error) {
   console.log('Service account key file not found, using environment variables');
   console.log('Error loading service account:', error);
@@ -23,10 +25,15 @@ let adminApp;
 let adminDb: Firestore | null;
 
 try {
+  // Force use service account if available
   if (serviceAccount) {
     console.log('Initializing Firebase Admin SDK with service account key file');
+    console.log('Service account project_id:', serviceAccount.project_id);
+    console.log('Service account client_email:', serviceAccount.client_email);
+    
     adminApp = getApps().length === 0 ? initializeApp({
       credential: cert(serviceAccount),
+      projectId: serviceAccount.project_id,
     }) : getApps()[0];
   } else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
     console.log('Initializing Firebase Admin SDK with environment variables');
@@ -42,10 +49,8 @@ try {
       }),
     }) : getApps()[0];
   } else {
-    console.log('Initializing Firebase Admin SDK with default credentials');
-    adminApp = getApps().length === 0 ? initializeApp({
-      projectId: projectId,
-    }) : getApps()[0];
+    console.log('No service account or environment variables found');
+    throw new Error('Firebase Admin SDK requires service account or environment variables');
   }
   
   if (adminApp) {

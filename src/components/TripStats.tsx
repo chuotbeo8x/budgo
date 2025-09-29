@@ -13,23 +13,28 @@ interface TripStatsProps {
 }
 
 export default function TripStats({ trip, members, expenses, advances }: TripStatsProps) {
+  // Safety checks
+  const safeExpenses = expenses || [];
+  const safeAdvances = advances || [];
+  const safeMembers = members || [];
+  
   // Calculate basic stats
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalAdvances = advances.reduce((sum, advance) => sum + advance.amount, 0);
+  const totalExpenses = safeExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalAdvances = safeAdvances.reduce((sum, advance) => sum + advance.amount, 0);
   const netAmount = totalExpenses - totalAdvances;
 
   // Calculate per member stats
-  const memberStats = members.map(member => {
+  const memberStats = safeMembers.map(member => {
     // Expenses paid by this member
-    const paidExpenses = expenses.filter(expense => expense.paidBy === member.id);
+    const paidExpenses = safeExpenses.filter(expense => expense.paidBy === member.id);
     const totalPaid = paidExpenses.reduce((sum, expense) => sum + expense.amount, 0);
     
     // Advances paid by this member
-    const paidAdvances = advances.filter(advance => advance.paidBy === member.id);
+    const paidAdvances = safeAdvances.filter(advance => advance.paidBy === member.id);
     const totalAdvancePaid = paidAdvances.reduce((sum, advance) => sum + advance.amount, 0);
     
     // Advances received by this member
-    const receivedAdvances = advances.filter(advance => advance.paidTo === member.id);
+    const receivedAdvances = safeAdvances.filter(advance => advance.paidTo === member.id);
     const totalAdvanceReceived = receivedAdvances.reduce((sum, advance) => sum + advance.amount, 0);
     
     // For now, we'll use a simplified calculation

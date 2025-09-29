@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTripMembers, addTripMember, removeTripMember, searchUsers, getGroupMembers } from '@/lib/actions/trips';
 import { getUserGroups } from '@/lib/actions/groups';
@@ -230,8 +231,6 @@ export default function MembersPage({
 
 
   const handleDeleteMember = async (memberId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa thành viên này?')) return;
-
     try {
       await removeTripMember(trip.id, memberId);
       toast.success('Xóa thành viên thành công!');
@@ -816,14 +815,23 @@ export default function MembersPage({
                           </td>
                           <td className="py-4 px-4 text-right">
                             {canDelete && !isOwnerMember && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteMember(member.id)}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <DeleteConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                }
+                                title="Xóa thành viên"
+                                description="Bạn có chắc chắn muốn xóa thành viên này?"
+                                confirmText="Xóa"
+                                cancelText="Hủy"
+                                onConfirm={() => handleDeleteMember(member.id)}
+                                loadingText="Đang xóa..."
+                              />
                             )}
                           </td>
                         </tr>

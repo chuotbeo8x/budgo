@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,8 +31,6 @@ export default function GroupMembersPage() {
   const [searching, setSearching] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'owner' | 'member'>('all');
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<GroupMember | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
 
@@ -211,9 +210,6 @@ export default function GroupMembersPage() {
       return;
     }
 
-    if (!confirm(`Bạn có chắc chắn muốn xóa thành viên "${memberName}" khỏi nhóm?`)) {
-      return;
-    }
 
     try {
       const result = await removeGroupMember(group.id, memberId, user.uid);
@@ -234,9 +230,6 @@ export default function GroupMembersPage() {
     const userInfo = memberUsers[member.userId];
     const memberName = userInfo?.name || `User ${member.userId.slice(0, 8)}`;
 
-    if (!confirm(`Bạn có chắc chắn muốn chuyển quyền chủ nhóm cho "${memberName}"? Bạn sẽ trở thành thành viên thường.`)) {
-      return;
-    }
 
     try {
       setIsSubmitting(true);
@@ -282,9 +275,6 @@ export default function GroupMembersPage() {
       return user?.name || `User ${member?.userId.slice(0, 8)}`;
     }).join(', ');
 
-    if (!confirm(`Bạn có chắc chắn muốn xóa ${selectedMembers.length} thành viên: ${memberNames}?`)) {
-      return;
-    }
 
     try {
       setIsSubmitting(true);
@@ -591,13 +581,22 @@ export default function GroupMembersPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="destructive"
-                  onClick={handleBulkRemove}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Đang xóa...' : `Xóa ${selectedMembers.length} thành viên`}
-                </Button>
+                <DeleteConfirmDialog
+                  trigger={
+                    <Button
+                      variant="destructive"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Đang xóa...' : `Xóa ${selectedMembers.length} thành viên`}
+                    </Button>
+                  }
+                  title="Xóa nhiều thành viên"
+                  description={`Bạn có chắc chắn muốn xóa ${selectedMembers.length} thành viên đã chọn?`}
+                  confirmText="Xóa"
+                  cancelText="Hủy"
+                  onConfirm={handleBulkRemove}
+                  loadingText="Đang xóa..."
+                />
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -674,25 +673,40 @@ export default function GroupMembersPage() {
                       )}
                       {member.role === 'member' && (
                         <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedMember(member);
-                              setShowTransferModal(true);
-                            }}
-                            disabled={isSubmitting}
-                          >
-                            Chuyển quyền
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleRemoveMember(member.id, 'Thành viên')}
-                            disabled={isSubmitting}
-                          >
-                            Xóa
-                          </Button>
+                          <DeleteConfirmDialog
+                            trigger={
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={isSubmitting}
+                              >
+                                Chuyển quyền
+                              </Button>
+                            }
+                            title="Chuyển quyền chủ nhóm"
+                            description={`Bạn có chắc chắn muốn chuyển quyền chủ nhóm cho "${memberUsers[member.userId]?.name || 'Thành viên'}"? Bạn sẽ trở thành thành viên thường.`}
+                            confirmText="Chuyển quyền"
+                            cancelText="Hủy"
+                            onConfirm={() => handleTransferOwnership(member)}
+                            loadingText="Đang chuyển..."
+                          />
+                          <DeleteConfirmDialog
+                            trigger={
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={isSubmitting}
+                              >
+                                Xóa
+                              </Button>
+                            }
+                            title="Xóa thành viên"
+                            description={`Bạn có chắc chắn muốn xóa thành viên "${memberUsers[member.userId]?.name || 'Thành viên'}" khỏi nhóm?`}
+                            confirmText="Xóa"
+                            cancelText="Hủy"
+                            onConfirm={() => handleRemoveMember(member.id, 'Thành viên')}
+                            loadingText="Đang xóa..."
+                          />
                         </>
                       )}
                     </div>
@@ -703,61 +717,6 @@ export default function GroupMembersPage() {
           </CardContent>
         </Card>
 
-        {/* Transfer Ownership Modal */}
-        {showTransferModal && selectedMember && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md mx-4">
-              <CardHeader>
-                <CardTitle>Chuyển quyền chủ nhóm</CardTitle>
-                <CardDescription>
-                  Bạn có chắc chắn muốn chuyển quyền chủ nhóm?
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Lưu ý:</strong> Sau khi chuyển quyền, bạn sẽ trở thành thành viên thường và không thể hoàn tác hành động này.
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                    👤
-                  </div>
-                  <div>
-                    <p className="font-medium">
-                      {memberUsers[selectedMember.userId]?.name || `User ${selectedMember.userId.slice(0, 8)}`}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {memberUsers[selectedMember.userId]?.email || 'Email không có'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => handleTransferOwnership(selectedMember)}
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  >
-                    {isSubmitting ? 'Đang chuyển...' : 'Xác nhận chuyển quyền'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowTransferModal(false);
-                      setSelectedMember(null);
-                    }}
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  >
-                    Hủy
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );

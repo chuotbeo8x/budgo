@@ -131,8 +131,8 @@ export default function OnboardingPage() {
         throw new Error(result.error || 'Failed to create profile');
       }
       
-      toast.success('Tạo profile thành công!');
-      router.push('/dashboard');
+              toast.success('Tạo profile thành công!');
+              router.push('/welcome');
     } catch (error) {
       console.error('Error creating profile:', error);
       if (error instanceof Error) {

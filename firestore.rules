@@ -3,6 +3,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function authed() { return request.auth != null; }
     function uid() { return request.auth.uid; }
+    
+    // Allow Firebase Admin SDK access (service account)
+    function isAdminSDK() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'custom';
+    }
 
     // Helper: check trip membership (active)
     function isTripMember(tripId) {
@@ -14,9 +19,15 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/groupMembers/$(groupId + '_' + uid()));
     }
 
+    // Helper: check if user is group owner
+    function isGroupOwner(groupId) {
+      return exists(/databases/$(database)/documents/groups/$(groupId)) &&
+        get(/databases/$(database)/documents/groups/$(groupId)).data.ownerId == uid();
+    }
+
     // USERS: each user manages own profile
     match /users/{userId} {
-      allow read: if authed();
+      allow read: if authed() || isAdminSDK();
       allow create: if authed() && userId == uid();
       allow update: if authed() && userId == uid();
       allow delete: if false;
@@ -118,7 +129,7 @@ service cloud.firestore {
     // NOTIFICATIONS – user chỉ đọc notifications của mình
     match /notifications/{notificationId} {
       allow read: if authed() && resource.data.userId == uid();
-      allow write: if false; // chỉ server actions ghi
+      allow write: if isAdminSDK(); // chỉ server actions ghi
     }
 
     // BROADCAST HISTORY – chỉ admin đọc

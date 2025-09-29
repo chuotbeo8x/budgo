@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +21,7 @@ import {
   AlertTriangle,
   Shield
 } from 'lucide-react';
+import { AlertMessage } from '@/components/ui/AlertMessage';
 
 export default function GroupManagePage() {
   const { slug } = useParams();
@@ -101,12 +103,6 @@ export default function GroupManagePage() {
 
   const handleDelete = async () => {
     if (!group || !user) return;
-    
-    const confirmed = window.confirm(
-      `Bạn có chắc chắn muốn xóa nhóm "${group.name}"? Hành động này không thể hoàn tác.`
-    );
-    
-    if (!confirmed) return;
 
     try {
       setSubmitting(true);
@@ -293,32 +289,31 @@ export default function GroupManagePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="p-6 border border-red-200 rounded-lg bg-red-50">
-                <div className="flex items-start space-x-3">
-                  <Trash2 className="w-6 h-6 text-red-600 mt-1" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-red-800 mb-2">Xóa nhóm vĩnh viễn</h3>
-                    <p className="text-sm text-red-700 mb-4">
-                      Hành động này sẽ xóa vĩnh viễn nhóm "{group.name}" và tất cả dữ liệu liên quan bao gồm:
-                    </p>
-                    <ul className="text-sm text-red-700 mb-4 space-y-1">
-                      <li>• Tất cả thành viên và quyền hạn</li>
-                      <li>• Tất cả chuyến đi và chi phí</li>
-                      <li>• Tất cả lời mời và yêu cầu tham gia</li>
-                      <li>• Tất cả dữ liệu không thể khôi phục</li>
-                    </ul>
-                    <Button
-                      variant="destructive"
-                      onClick={handleDelete}
-                      disabled={submitting}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      {submitting ? 'Đang xóa...' : 'Xóa nhóm vĩnh viễn'}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <AlertMessage
+                type="danger"
+                title="Xóa nhóm vĩnh viễn"
+                message={`Hành động này sẽ xóa vĩnh viễn nhóm "${group?.name}" và tất cả dữ liệu liên quan bao gồm: Tất cả thành viên và quyền hạn, Tất cả chuyến đi và chi phí, Tất cả lời mời và yêu cầu tham gia, Tất cả dữ liệu không thể khôi phục.`}
+                icon={<Trash2 className="w-4 h-4" />}
+                className="mb-4"
+              />
+              <DeleteConfirmDialog
+                trigger={
+                  <Button
+                    variant="destructive"
+                    disabled={submitting}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {submitting ? 'Đang xóa...' : 'Xóa nhóm vĩnh viễn'}
+                  </Button>
+                }
+                title="Xóa nhóm vĩnh viễn"
+                description={`Bạn có chắc chắn muốn xóa nhóm "${group?.name}"? Hành động này không thể hoàn tác.`}
+                confirmText="Xóa nhóm"
+                cancelText="Hủy"
+                onConfirm={handleDelete}
+                loadingText="Đang xóa..."
+              />
             </CardContent>
           </Card>
         </div>

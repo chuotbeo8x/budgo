@@ -1,25 +1,26 @@
 'use server';
 
-import { adminDb } from '../firebase-admin';
+import { adminDb } from '../firebase-admin-new';
 import { CreateGroupSchema } from '../schemas';
 import { Group, GroupMember, JoinRequest } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
 import { toDate, safeToDate } from '../utils/date';
 import { searchUsersByEmail, searchUsersByUsername } from './users';
 
-export async function createGroup(formData: FormData) {
+export async function createGroup(inputData: any) {
   try {
     if (!adminDb) {
       throw new Error('Database chưa được khởi tạo');
     }
 
-    const userId = formData.get('userId') as string;
+    // Handle both FormData and object formats
+    const userId = inputData.get ? inputData.get('userId') as string : inputData.userId;
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
 
-    const groupName = formData.get('name') as string;
-    const baseSlug = formData.get('slug') as string;
+    const groupName = inputData.get ? inputData.get('name') as string : inputData.name;
+    const baseSlug = inputData.get ? inputData.get('slug') as string : inputData.slug;
     
     // Generate unique slug
     let finalSlug = baseSlug;
@@ -44,9 +45,9 @@ export async function createGroup(formData: FormData) {
 
     const data = {
       name: groupName,
-      description: formData.get('description') as string || undefined,
-      coverUrl: formData.get('coverUrl') as string || undefined,
-      type: formData.get('type') as 'public' | 'close' | 'secret',
+      description: inputData.get ? inputData.get('description') as string : inputData.description || undefined,
+      coverUrl: inputData.get ? inputData.get('coverUrl') as string : inputData.coverUrl || undefined,
+      type: inputData.get ? inputData.get('type') as 'public' | 'close' | 'secret' : inputData.type,
       slug: finalSlug,
     };
 

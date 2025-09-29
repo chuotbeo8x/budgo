@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -292,8 +293,6 @@ export default function ExpensesPage({
     };
 
     const handleDeleteExpense = async (expenseId: string) => {
-        if (!confirm('Bạn có chắc chắn muốn xóa chi phí này?')) return;
-
         try {
             await deleteExpense(expenseId, user?.uid || '');
             toast.success('Xóa chi phí thành công!');
@@ -1079,16 +1078,25 @@ export default function ExpensesPage({
                                                                         </Button>
                                                                     )}
                                                                     {canDelete && (
-                                                                        <Button
-                                                                            variant="outline"
-                                                                            size="sm"
-                                                                            onClick={() => handleDeleteExpense(expense.id)}
-                                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                            disabled={isTripClosed}
-                                                                            title={isTripClosed ? 'Chuyến đi đã được chốt, không thể xóa chi phí' : ''}
-                                                                        >
-                                                                            <Trash2 className="w-4 h-4" />
-                                                                        </Button>
+                                                                        <DeleteConfirmDialog
+                                                                            trigger={
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    size="sm"
+                                                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                                    disabled={isTripClosed}
+                                                                                    title={isTripClosed ? 'Chuyến đi đã được lưu trữ, không thể xóa chi phí' : ''}
+                                                                                >
+                                                                                    <Trash2 className="w-4 h-4" />
+                                                                                </Button>
+                                                                            }
+                                                                            title="Xóa chi phí"
+                                                                            description="Bạn có chắc chắn muốn xóa chi phí này?"
+                                                                            confirmText="Xóa"
+                                                                            cancelText="Hủy"
+                                                                            onConfirm={() => handleDeleteExpense(expense.id)}
+                                                                            loadingText="Đang xóa..."
+                                                                        />
                                                                     )}
                                                                 </div>
                                                             </td>
@@ -1184,12 +1192,24 @@ export default function ExpensesPage({
                                                                         </Button>
                                                                     )}
                                                                     {canDelete && (
-                                                                        <Button
-                                                                            variant="outline"
-                                                                            size="sm"
-                                                                            onClick={async () => {
+                                                                        <DeleteConfirmDialog
+                                                                            trigger={
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    size="sm"
+                                                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                                    disabled={isTripClosed}
+                                                                                    title={isTripClosed ? 'Chuyến đi đã được lưu trữ, không thể xóa tạm ứng' : ''}
+                                                                                >
+                                                                                    <Trash2 className="w-4 h-4" />
+                                                                                </Button>
+                                                                            }
+                                                                            title="Xóa tạm ứng"
+                                                                            description="Bạn có chắc chắn muốn xóa tạm ứng này?"
+                                                                            confirmText="Xóa"
+                                                                            cancelText="Hủy"
+                                                                            onConfirm={async () => {
                                                                                 if (!user) return;
-                                                                                if (!confirm('Bạn có chắc chắn muốn xóa tạm ứng này?')) return;
                                                                                 try {
                                                                                     await deleteAdvance(advance.id!, user.uid);
                                                                                     toast.success('Xóa tạm ứng thành công!');
@@ -1199,12 +1219,8 @@ export default function ExpensesPage({
                                                                                     toast.error('Có lỗi xảy ra khi xóa tạm ứng');
                                                                                 }
                                                                             }}
-                                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                            disabled={isTripClosed}
-                                                                            title={isTripClosed ? 'Chuyến đi đã được chốt, không thể xóa tạm ứng' : ''}
-                                                                        >
-                                                                            <Trash2 className="w-4 h-4" />
-                                                                        </Button>
+                                                                            loadingText="Đang xóa..."
+                                                                        />
                                                                     )}
                                                                 </div>
                                                             </td>
