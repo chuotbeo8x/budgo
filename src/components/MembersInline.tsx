@@ -57,10 +57,6 @@ export default function MembersInline({
   const [localMembers, setLocalMembers] = useState<TripMember[]>(members);
   const [showAddForm, setShowAddForm] = useState(false);
   
-  // Debug logging for modal state changes
-  useEffect(() => {
-    console.log('Modal state changed:', showAddForm);
-  }, [showAddForm]);
   const [submitting, setSubmitting] = useState(false);
   const [addMethod, setAddMethod] = useState<'search' | 'group' | 'ghost'>('search');
   
@@ -416,10 +412,7 @@ export default function MembersInline({
               <p className="text-gray-600 mb-6">Bắt đầu thêm thành viên cho chuyến đi</p>
               {showAddButton && !isTripClosed && (
                 <Button 
-                  onClick={() => {
-                    console.log('Button clicked - opening modal');
-                    setShowAddForm(true);
-                  }}
+                  onClick={() => setShowAddForm(true)}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -528,9 +521,7 @@ export default function MembersInline({
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           onClick={(e) => {
-            console.log('Modal backdrop clicked');
             if (e.target === e.currentTarget) {
-              console.log('Clicking outside modal - closing');
               setShowAddForm(false);
             }
           }}
@@ -542,10 +533,7 @@ export default function MembersInline({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    console.log('Close button clicked - closing modal');
-                    setShowAddForm(false);
-                  }}
+                  onClick={() => setShowAddForm(false)}
                 >
                   <XCircle className="w-5 h-5" />
                 </Button>
@@ -810,9 +798,10 @@ export default function MembersInline({
                     Hủy
                   </Button>
                   <Button
-                    type="submit"
+                    type="button"
                     className="flex-1"
                     disabled={submitting}
+                    onClick={handleSubmit}
                   >
                     {submitting ? (
                       <>
