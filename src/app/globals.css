@@ -126,4 +126,22 @@
     background-image: radial-gradient(circle, #9C92AC 1px, transparent 1px);
     background-size: 20px 20px;
   }
+  
+    /* Mobile bottom navigation spacing */
+    .pb-mobile-nav {
+      padding-bottom: 60px;
+    }
+    
+    @media (min-width: 1024px) {
+      .pb-mobile-nav {
+        padding-bottom: 0;
+      }
+    }
+}
+
+/* Safe area support for mobile devices */
+@supports (padding: max(0px)) {
+  .h-safe-area-inset-bottom {
+    height: max(0px, env(safe-area-inset-bottom));
+  }
 }

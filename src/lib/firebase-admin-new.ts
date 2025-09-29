@@ -3,29 +3,31 @@ import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
 console.log('Firebase Admin SDK: Starting initialization...');
 
-// Try to load service account key file first, then fallback to environment variables
+// Try to load from environment variables first, then fallback to service account key file
 let serviceAccount;
-try {
-  serviceAccount = require('./firebase-service-account.json');
-  console.log('✅ Service account key file loaded successfully');
+
+// First try environment variables (preferred method)
+if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+  console.log('✅ Environment variables found');
+  serviceAccount = {
+    project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'chuotbeo8x-229',
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n').replace(/"/g, ''),
+  };
   console.log('📋 Project ID:', serviceAccount.project_id);
   console.log('📧 Client Email:', serviceAccount.client_email);
   console.log('🔑 Has Private Key:', !!serviceAccount.private_key);
-} catch (error) {
-  console.log('⚠️ Service account key file not found, trying environment variables...');
+} else {
+  console.log('⚠️ Environment variables not found, trying service account key file...');
   
-  // Fallback to environment variables
-  if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-    console.log('✅ Environment variables found');
-    serviceAccount = {
-      project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'chuotbeo8x-229',
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n').replace(/"/g, ''),
-    };
+  // Fallback to service account key file
+  try {
+    serviceAccount = require('../../serviceAccountKey.json');
+    console.log('✅ Service account key file loaded successfully');
     console.log('📋 Project ID:', serviceAccount.project_id);
     console.log('📧 Client Email:', serviceAccount.client_email);
     console.log('🔑 Has Private Key:', !!serviceAccount.private_key);
-  } else {
+  } catch (error) {
     console.error('❌ No service account key file or environment variables found');
     throw new Error('Firebase Admin SDK requires service account or environment variables');
   }

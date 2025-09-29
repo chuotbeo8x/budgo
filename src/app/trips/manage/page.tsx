@@ -281,10 +281,10 @@ export default function TripsManagePage() {
 
         {/* Search and Filter Section */}
         <Card className="mb-8 shadow-md">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4">
+          <CardContent className="p-4 md:p-6">
+            <div className="space-y-4">
               {/* Search */}
-              <div className="flex-1">
+              <div className="w-full">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
@@ -297,46 +297,55 @@ export default function TripsManagePage() {
                 </div>
               </div>
 
-              {/* Filter Type */}
-              <div className="flex gap-2">
-                <Button
-                  variant={filterType === 'all' ? 'default' : 'outline'}
-                  onClick={() => setFilterType('all')}
-                  className="flex items-center gap-2"
-                >
-                  <Filter className="w-4 h-4" />
-                  Tất cả ({totalTrips})
-                </Button>
-                <Button
-                  variant={filterType === 'personal' ? 'default' : 'outline'}
-                  onClick={() => setFilterType('personal')}
-                  className="flex items-center gap-2"
-                >
-                  <MapPin className="w-4 h-4" />
-                  Cá nhân ({personalTrips})
-                </Button>
-                <Button
-                  variant={filterType === 'group' ? 'default' : 'outline'}
-                  onClick={() => setFilterType('group')}
-                  className="flex items-center gap-2"
-                >
-                  <Users className="w-4 h-4" />
-                  Nhóm ({groupTrips})
-                </Button>
-              </div>
+              {/* Filter and Sort Row */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Filter Type - Mobile: Stack vertically, Desktop: Horizontal */}
+                <div className="flex flex-col sm:flex-row gap-2 flex-1">
+                  <Button
+                    variant={filterType === 'all' ? 'default' : 'outline'}
+                    onClick={() => setFilterType('all')}
+                    className="flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span className="hidden sm:inline">Tất cả</span>
+                    <span className="sm:hidden">Tất cả ({totalTrips})</span>
+                    <span className="hidden sm:inline">({totalTrips})</span>
+                  </Button>
+                  <Button
+                    variant={filterType === 'personal' ? 'default' : 'outline'}
+                    onClick={() => setFilterType('personal')}
+                    className="flex items-center justify-center gap-2 text-sm"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    <span className="hidden sm:inline">Cá nhân</span>
+                    <span className="sm:hidden">Cá nhân ({personalTrips})</span>
+                    <span className="hidden sm:inline">({personalTrips})</span>
+                  </Button>
+                  <Button
+                    variant={filterType === 'group' ? 'default' : 'outline'}
+                    onClick={() => setFilterType('group')}
+                    className="flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span className="hidden sm:inline">Nhóm</span>
+                    <span className="sm:hidden">Nhóm ({groupTrips})</span>
+                    <span className="hidden sm:inline">({groupTrips})</span>
+                  </Button>
+                </div>
 
-              {/* Sort */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 whitespace-nowrap">Sắp xếp:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name' | 'createdAt' | 'startDate')}
-                  className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="createdAt">Mới nhất</option>
-                  <option value="name">Tên A-Z</option>
-                  <option value="startDate">Ngày đi</option>
-                </select>
+                {/* Sort - Mobile: Full width, Desktop: Auto width */}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <span className="text-sm text-gray-600 whitespace-nowrap">Sắp xếp:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'name' | 'createdAt' | 'startDate')}
+                    className="flex-1 sm:w-auto px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="createdAt">Mới nhất</option>
+                    <option value="name">Tên A-Z</option>
+                    <option value="startDate">Ngày đi</option>
+                  </select>
+                </div>
               </div>
             </div>
           </CardContent>

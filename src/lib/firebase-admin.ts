@@ -3,16 +3,33 @@ import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
 console.log('Firebase Admin SDK: Starting initialization...');
 
-// Try to import service account key file
+// Try to load from environment variables first, then fallback to service account key file
 let serviceAccount;
-try {
-  serviceAccount = require('./firebase-service-account.json');
-  console.log('Service account key file loaded successfully');
+
+// First try environment variables (preferred method)
+if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+  console.log('Environment variables found');
+  serviceAccount = {
+    project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'chuotbeo8x-229',
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n').replace(/"/g, ''),
+  };
   console.log('Service account project ID:', serviceAccount.project_id);
   console.log('Service account client email:', serviceAccount.client_email);
-} catch (error) {
-  console.log('Service account key file not found, using environment variables');
-  console.log('Error loading service account:', error);
+} else {
+  console.log('Environment variables not found, trying service account key file...');
+  
+  // Fallback to service account key file
+  try {
+    serviceAccount = require('../../serviceAccountKey.json');
+    console.log('Service account key file loaded successfully');
+    console.log('Service account project ID:', serviceAccount.project_id);
+    console.log('Service account client email:', serviceAccount.client_email);
+  } catch (error) {
+    console.log('Service account key file not found, using environment variables');
+    console.log('Error loading service account:', error);
+    throw new Error('Firebase Admin SDK requires service account or environment variables');
+  }
 }
 
 // Get project ID

@@ -85,7 +85,9 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+    <>
+      {/* Desktop Header */}
+      <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 hidden lg:block">
       {/* Locked account banner */}
       {profile && (profile as any).disabled === true && (
         <div className="w-full bg-red-600 text-white text-sm">
@@ -394,6 +396,8 @@ export default function Header() {
           )}
         </div>
       </div>
-    </header>
+      </header>
+
+    </>
   );
 }

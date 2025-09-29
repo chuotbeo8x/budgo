@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Toaster } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { ProfileProvider } from "@/components/auth/ProfileProvider";
 import NotificationProvider from "@/components/NotificationProvider";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
@@ -32,8 +33,11 @@ export default function RootLayout({
 }>) {
   return (
         <html lang="vi">
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+          </head>
           <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            className={`${geistSans.variable} ${geistMono.variable} antialiased pb-mobile-nav`}
             suppressHydrationWarning={true}
           >
                     <AuthProvider>
@@ -45,6 +49,7 @@ export default function RootLayout({
                             {children}
                           </MaintenanceGuard>
                           <Footer />
+                          <MobileBottomNav />
                               <Toaster position="top-right" />
                         </NotificationProvider>
                       </ProfileProvider>
