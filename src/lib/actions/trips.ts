@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin-new';
+import { adminDb } from '../firebase-admin';
 import { CreateTripSchema, AddTripMemberSchema, AddExpenseSchema, AddAdvanceSchema, CloseTripSchema } from '../schemas';
 import { Trip, TripMember, Expense, Advance } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';

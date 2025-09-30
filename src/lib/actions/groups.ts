@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin-new';
+import { adminDb } from '../firebase-admin';
 import { CreateGroupSchema } from '../schemas';
 import { Group, GroupMember, JoinRequest } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';

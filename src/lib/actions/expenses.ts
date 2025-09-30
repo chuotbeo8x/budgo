@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '../firebase-admin-new';
+import { adminDb } from '../firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { AddExpenseSchema, AddAdvanceSchema } from '../schemas';
 import { Expense, Advance, TripMember } from '../types';
