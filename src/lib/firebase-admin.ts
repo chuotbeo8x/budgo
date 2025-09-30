@@ -17,19 +17,8 @@ if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
   console.log('Service account project ID:', serviceAccount.project_id);
   console.log('Service account client email:', serviceAccount.client_email);
 } else {
-  console.log('Environment variables not found, trying service account key file...');
-  
-  // Fallback to service account key file
-  try {
-    serviceAccount = require('../../serviceAccountKey.json');
-    console.log('Service account key file loaded successfully');
-    console.log('Service account project ID:', serviceAccount.project_id);
-    console.log('Service account client email:', serviceAccount.client_email);
-  } catch (error) {
-    console.log('Service account key file not found, using environment variables');
-    console.log('Error loading service account:', error);
-    throw new Error('Firebase Admin SDK requires service account or environment variables');
-  }
+  console.error('Environment variables not found');
+  throw new Error('Firebase Admin SDK requires FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY environment variables');
 }
 
 // Get project ID
@@ -42,9 +31,8 @@ let adminApp;
 let adminDb: Firestore | null;
 
 try {
-  // Force use service account if available
   if (serviceAccount) {
-    console.log('Initializing Firebase Admin SDK with service account key file');
+    console.log('Initializing Firebase Admin SDK with service account');
     console.log('Service account project_id:', serviceAccount.project_id);
     console.log('Service account client_email:', serviceAccount.client_email);
     
@@ -52,22 +40,9 @@ try {
       credential: cert(serviceAccount),
       projectId: serviceAccount.project_id,
     }) : getApps()[0];
-  } else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-    console.log('Initializing Firebase Admin SDK with environment variables');
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY
-      .replace(/\\n/g, '\n')
-      .replace(/"/g, '');
-    
-    adminApp = getApps().length === 0 ? initializeApp({
-      credential: cert({
-        projectId: projectId,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    }) : getApps()[0];
   } else {
-    console.log('No service account or environment variables found');
-    throw new Error('Firebase Admin SDK requires service account or environment variables');
+    console.log('No service account found');
+    throw new Error('Firebase Admin SDK requires FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY environment variables');
   }
   
   if (adminApp) {

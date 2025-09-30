@@ -18,19 +18,8 @@ if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
   console.log('📧 Client Email:', serviceAccount.client_email);
   console.log('🔑 Has Private Key:', !!serviceAccount.private_key);
 } else {
-  console.log('⚠️ Environment variables not found, trying service account key file...');
-  
-  // Fallback to service account key file
-  try {
-    serviceAccount = require('../../serviceAccountKey.json');
-    console.log('✅ Service account key file loaded successfully');
-    console.log('📋 Project ID:', serviceAccount.project_id);
-    console.log('📧 Client Email:', serviceAccount.client_email);
-    console.log('🔑 Has Private Key:', !!serviceAccount.private_key);
-  } catch (error) {
-    console.error('❌ No service account key file or environment variables found');
-    throw new Error('Firebase Admin SDK requires service account or environment variables');
-  }
+  console.error('❌ Environment variables not found');
+  throw new Error('Firebase Admin SDK requires FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY environment variables');
 }
 
 // Initialize Firebase Admin SDK with service account
