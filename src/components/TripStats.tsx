@@ -69,52 +69,52 @@ export default function TripStats({ trip, members, expenses, advances }: TripSta
   const averageDailySpending = Object.values(dailySpending).reduce((sum, amount) => sum + amount, 0) / Object.keys(dailySpending).length || 0;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4">
       {/* Overview Stats */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Tổng chi phí</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {formatCurrency(totalExpenses, trip.currency)}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="shadow-sm">
+          <CardContent className="p-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-red-600">
+                {formatCurrency(totalExpenses, trip.currency)}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Tổng chi phí</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Tổng tạm ứng</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {formatCurrency(totalAdvances, trip.currency)}
+        <Card className="shadow-sm">
+          <CardContent className="p-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-blue-600">
+                {formatCurrency(totalAdvances, trip.currency)}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Tổng tạm ứng</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Số giao dịch</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {expenses.length + advances.length}
+        <Card className="shadow-sm">
+          <CardContent className="p-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-purple-600">
+                {expenses.length + advances.length}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Số giao dịch</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {expenses.length} chi phí, {advances.length} tạm ứng
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {expenses.length} chi phí, {advances.length} tạm ứng
-            </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Chi phí TB/ngày</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(averageDailySpending, trip.currency)}
+        <Card className="shadow-sm">
+          <CardContent className="p-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-green-600">
+                {formatCurrency(averageDailySpending, trip.currency)}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Chi phí TB/ngày</p>
             </div>
           </CardContent>
         </Card>
@@ -125,29 +125,29 @@ export default function TripStats({ trip, members, expenses, advances }: TripSta
 
       {/* Trip Duration Stats */}
       {trip.startDate && trip.endDate && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Thống kê thời gian</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold">Thống kê thời gian</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-lg font-bold text-orange-600">
                   {Math.ceil((new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / (1000 * 60 * 60 * 24))} ngày
                 </div>
-                <p className="text-sm text-muted-foreground">Thời gian chuyến đi</p>
+                <p className="text-xs text-gray-600 mt-1">Thời gian chuyến đi</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-lg font-bold text-indigo-600">
                   {formatCurrency(totalExpenses / members.length, trip.currency)}
                 </div>
-                <p className="text-sm text-muted-foreground">Chi phí TB/người</p>
+                <p className="text-xs text-gray-600 mt-1">Chi phí TB/người</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-lg font-bold text-teal-600">
                   {formatCurrency(totalExpenses / Math.max(1, Object.keys(dailySpending).length), trip.currency)}
                 </div>
-                <p className="text-sm text-muted-foreground">Chi phí TB/ngày</p>
+                <p className="text-xs text-gray-600 mt-1">Chi phí TB/ngày</p>
               </div>
             </div>
           </CardContent>

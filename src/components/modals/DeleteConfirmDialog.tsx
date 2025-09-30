@@ -48,7 +48,7 @@ export default function DeleteConfirmDialog({
       <AlertDialogTrigger asChild>
         {trigger}
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="p-4 sm:p-6">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-red-500" />

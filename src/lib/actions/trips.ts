@@ -659,6 +659,7 @@ export async function getUserTrips(userId: string) {
           closedAt: safeToDate(tripData.closedAt),
           startDate: safeToDate(tripData.startDate),
           endDate: safeToDate(tripData.endDate),
+          paymentStatusUpdatedAt: safeToDate(tripData.paymentStatusUpdatedAt),
           memberCount: memberCount,
           statsCache: tripData.statsCache ? {
             ...tripData.statsCache,
@@ -703,6 +704,7 @@ export async function getUserTrips(userId: string) {
               closedAt: safeToDate(tripData.closedAt),
               startDate: safeToDate(tripData.startDate),
               endDate: safeToDate(tripData.endDate),
+              paymentStatusUpdatedAt: safeToDate(tripData.paymentStatusUpdatedAt),
               memberCount: memberCount,
               statsCache: tripData.statsCache ? {
                 ...tripData.statsCache,

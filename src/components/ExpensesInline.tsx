@@ -656,7 +656,7 @@ export default function ExpensesInline({
                                         Thêm chi phí
                                     </Button>
                                 </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                     <DialogTitle>Thêm chi phí mới</DialogTitle>
                                     <DialogDescription>
@@ -664,9 +664,9 @@ export default function ExpensesInline({
                                     </DialogDescription>
                                 </DialogHeader>
                                 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="amount">Số tiền *</Label>
                                             <Input
                                                 id="amount"
@@ -692,7 +692,7 @@ export default function ExpensesInline({
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="description">Mô tả *</Label>
                                             <Input
                                                 id="description"
@@ -707,7 +707,7 @@ export default function ExpensesInline({
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="paidBy">Người chi *</Label>
                                             <select
                                                 id="paidBy"
@@ -728,7 +728,7 @@ export default function ExpensesInline({
                                             </select>
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="category">Danh mục</Label>
                                             <select
                                                 id="category"
@@ -766,7 +766,7 @@ export default function ExpensesInline({
                                     {/* Split Method */}
                                     <div className="space-y-3">
                                         <Label>Cách chia tiền *</Label>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <label className="flex items-center">
                                                 <input
                                                     type="radio"
@@ -802,7 +802,7 @@ export default function ExpensesInline({
                                     {!formData.isEqualSplit && (
                                         <div className="space-y-3">
                                             <Label>Quản lý trọng số</Label>
-                                            <div className="space-y-2">
+                                            <div className="space-y-1 sm:space-y-2">
                                                 {members.map((member) => (
                                                     <div key={member.id} className="flex items-center gap-2">
                                                         <span className="text-sm text-gray-600 min-w-0 flex-1">
@@ -859,7 +859,7 @@ export default function ExpensesInline({
                                     Thêm tạm ứng
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-lg max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                     <DialogTitle>Thêm tạm ứng mới</DialogTitle>
                                     <DialogDescription>
@@ -867,9 +867,9 @@ export default function ExpensesInline({
                                     </DialogDescription>
                                 </DialogHeader>
                                 
-                                <form onSubmit={handleSubmitAdvance} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                <form onSubmit={handleSubmitAdvance} className="space-y-3 sm:space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advanceAmount">Số tiền *</Label>
                                             <Input
                                                 id="advanceAmount"
@@ -895,7 +895,7 @@ export default function ExpensesInline({
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advanceDescription">Mô tả *</Label>
                                             <Input
                                                 id="advanceDescription"
@@ -910,7 +910,7 @@ export default function ExpensesInline({
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advancePaidBy">Người ứng *</Label>
                                             <select
                                                 id="advancePaidBy"
@@ -931,7 +931,7 @@ export default function ExpensesInline({
                                             </select>
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label>Người nhận</Label>
                                             <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-600">
                                                 Chủ chuyến đi (tự động)
@@ -966,7 +966,7 @@ export default function ExpensesInline({
 
             {/* Expenses Tab */}
             {activeTab === 'expenses' && (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                     {/* Add Expense Button - Mobile Only */}
                     {showAddButton && !isTripClosed && members.length > 0 && (
                         <div className="md:hidden">
@@ -977,7 +977,7 @@ export default function ExpensesInline({
                                         Thêm chi phí mới
                                     </Button>
                                 </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                     <DialogTitle>Thêm chi phí mới</DialogTitle>
                                     <DialogDescription>
@@ -985,9 +985,9 @@ export default function ExpensesInline({
                                     </DialogDescription>
                                 </DialogHeader>
                                 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="amount">Số tiền *</Label>
                                             <Input
                                                 id="amount"
@@ -1008,7 +1008,7 @@ export default function ExpensesInline({
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="paidBy">Người chi *</Label>
                                             <select
                                                 id="paidBy"
@@ -1025,7 +1025,7 @@ export default function ExpensesInline({
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="createdAt">Ngày tạo *</Label>
                                             <Input
                                                 id="createdAt"
@@ -1038,7 +1038,7 @@ export default function ExpensesInline({
                                                 disabled={submitting}
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="category">Danh mục</Label>
                                             <select
                                                 id="category"
@@ -1057,7 +1057,7 @@ export default function ExpensesInline({
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1 sm:space-y-2">
                                         <Label htmlFor="description">Mô tả</Label>
                                         <Input
                                             id="description"
@@ -1176,7 +1176,7 @@ export default function ExpensesInline({
                     {/* Edit Expense Modal */}
                     {editingExpense && (
                         <Dialog open={!!editingExpense} onOpenChange={(open) => !open && setEditingExpense(null)}>
-                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                     <DialogTitle>Chỉnh sửa chi phí</DialogTitle>
                                     <DialogDescription>
@@ -1184,9 +1184,9 @@ export default function ExpensesInline({
                                     </DialogDescription>
                                 </DialogHeader>
                                 
-                                <form onSubmit={handleUpdateExpense} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                <form onSubmit={handleUpdateExpense} className="space-y-3 sm:space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="editAmount">Số tiền *</Label>
                                             <Input
                                                 id="editAmount"
@@ -1202,7 +1202,7 @@ export default function ExpensesInline({
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="editPaidBy">Người chi *</Label>
                                             <select
                                                 id="editPaidBy"
@@ -1219,7 +1219,7 @@ export default function ExpensesInline({
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="editCreatedAt">Ngày tạo *</Label>
                                             <Input
                                                 id="editCreatedAt"
@@ -1230,7 +1230,7 @@ export default function ExpensesInline({
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="editCategory">Danh mục *</Label>
                                             <select
                                                 id="editCategory"
@@ -1249,7 +1249,7 @@ export default function ExpensesInline({
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1 sm:space-y-2">
                                         <Label htmlFor="editDescription">Mô tả *</Label>
                                         <Input
                                             id="editDescription"
@@ -1398,7 +1398,7 @@ export default function ExpensesInline({
 
             {/* Advances Tab */}
             {activeTab === 'advances' && (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                     {/* Add Advance Button - Mobile Only */}
                     {showAddButton && !isTripClosed && members.length > 0 && (
                         <div className="md:hidden">
@@ -1409,7 +1409,7 @@ export default function ExpensesInline({
                                         Thêm tạm ứng mới
                                     </Button>
                                 </DialogTrigger>
-                            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-lg max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                     <DialogTitle>Thêm tạm ứng mới</DialogTitle>
                                     <DialogDescription>
@@ -1417,9 +1417,9 @@ export default function ExpensesInline({
                                     </DialogDescription>
                                 </DialogHeader>
                                 
-                                <form onSubmit={handleSubmitAdvance} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                <form onSubmit={handleSubmitAdvance} className="space-y-3 sm:space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advanceAmount">Số tiền *</Label>
                                             <Input
                                                 id="advanceAmount"
@@ -1440,7 +1440,7 @@ export default function ExpensesInline({
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advancePaidBy">Người ứng *</Label>
                                             <select
                                                 id="advancePaidBy"
@@ -1470,7 +1470,7 @@ export default function ExpensesInline({
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1 sm:space-y-2">
                                         <Label htmlFor="advanceDescription">Mô tả</Label>
                                         <Input
                                             id="advanceDescription"

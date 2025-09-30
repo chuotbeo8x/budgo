@@ -36,7 +36,8 @@ import {
   Home,
   Eye,
   Share2,
-  BarChart3
+  BarChart3,
+  Crown
 } from 'lucide-react';
 
 interface TripViewPageProps {
@@ -331,13 +332,13 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
                 <TabsContent value="members" className="mt-3">
                   <div className="space-y-2">
                     {members.map((member) => (
-                      <div key={member.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs sm:text-sm">
-                        <div className="flex items-center gap-2">
+                      <Card key={member.id} className="p-3">
+                        <div className="flex items-center gap-2.5">
                           {member.avatar ? (
                             <img 
                               src={member.avatar} 
                               alt={member.name || member.ghostName || 'User'} 
-                              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                               onError={(e) => {
                                 // Fallback to icon if image fails to load
                                 const target = e.target as HTMLImageElement;
@@ -348,21 +349,34 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
                             />
                           ) : null}
                           <div 
-                            className={`w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium ${member.avatar ? 'hidden' : 'flex'}`}
+                            className={`w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${member.avatar ? 'hidden' : 'flex'}`}
                           >
                             {(member.name || member.ghostName || member.userId || 'U').slice(0, 2).toUpperCase()}
                           </div>
-                          <span className="font-medium">
-                            {member.userId === user?.uid ? 'Bạn' : (member.name || member.ghostName || (member.userId ? `User ${member.userId.slice(0, 8)}` : 'Unknown User'))}
-                          </span>
-                          <span className="text-gray-500">
-                            {member.role === 'owner' ? '(Chủ)' : '(Thành viên)'}
-                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="font-medium text-gray-900 truncate text-sm">
+                                {member.userId === user?.uid ? 'Bạn' : (member.name || member.ghostName || (member.userId ? `User ${member.userId.slice(0, 8)}` : 'Unknown User'))}
+                              </h3>
+                              {member.role === 'owner' && (
+                                <Crown className="w-3 h-3 text-yellow-600 flex-shrink-0" />
+                              )}
+                              {paymentStatus && paymentStatus[member.id] && (
+                                <CheckCircle className="w-3 h-3 text-green-600 flex-shrink-0" />
+                              )}
+                            </div>
+                            <div className="mt-1">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                member.role === 'owner' 
+                                  ? 'bg-yellow-100 text-yellow-800' 
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {member.role === 'owner' ? 'Người tổ chức' : 'Thành viên'}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        {paymentStatus && paymentStatus[member.id] && (
-                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                        )}
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </TabsContent>

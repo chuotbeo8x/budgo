@@ -389,116 +389,192 @@ export default function MembersInline({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
       {/* Members List */}
-      <Card className="shadow-lg">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-1.5">
+            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-600" />
               Danh sách thành viên
             </CardTitle>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-500">
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-gray-500">
                 {localMembers.length} thành viên
               </div>
               {showAddButton && !isTripClosed && (
                 <Button 
                   onClick={() => setShowAddForm(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  size="sm"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-8 px-3 text-xs"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-3 h-3 mr-1" />
                   Thêm thành viên
                 </Button>
               )}
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3">
           {localMembers.length === 0 ? (
-            <div className="text-center py-12">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có thành viên nào</h3>
-              <p className="text-gray-600 mb-6">Bắt đầu thêm thành viên cho chuyến đi</p>
+            <div className="text-center py-8">
+              <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-lg font-medium text-gray-900 mb-1">Chưa có thành viên nào</h3>
+              <p className="text-sm text-gray-600 mb-4">Bắt đầu thêm thành viên cho chuyến đi</p>
               {showAddButton && !isTripClosed && (
                 <Button 
                   onClick={() => setShowAddForm(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-8 px-3 text-xs"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-3 h-3 mr-1" />
                   Thêm thành viên đầu tiên
                 </Button>
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Thành viên</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Số điện thoại</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Vai trò</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Tham gia</th>
-                    <th className="text-right py-3 px-4 font-semibold text-gray-900">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {localMembers.map((member) => {
-                    const isOwnerMember = member.role === 'creator' || member.userId === trip.ownerId;
-                    const canRemove = canDelete && !isOwnerMember && !isTripClosed;
-                    
-                    return (
-                      <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">
-                                {(member.name || 'U').charAt(0).toUpperCase()}
-                              </span>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Thành viên</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Email</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Số điện thoại</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Vai trò</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Tham gia</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {localMembers.map((member) => {
+                      const isOwnerMember = member.role === 'creator' || member.userId === trip.ownerId;
+                      const canRemove = canDelete && !isOwnerMember && !isTripClosed;
+                      
+                      return (
+                        <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">
+                                  {(member.name || 'U').charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900">{member.name}</div>
+                                {isOwnerMember && (
+                                  <div className="flex items-center gap-1 text-yellow-600 mt-1">
+                                    <Crown className="w-3 h-3" />
+                                    <span className="text-xs font-medium">Người tổ chức</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{member.name}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Mail className="w-4 h-4" />
+                              <span>{member.optionalEmail || 'Chưa có email'}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Phone className="w-4 h-4" />
+                              <span>{(member as any).optionalPhone || 'Chưa có số điện thoại'}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              isOwnerMember 
+                                ? 'bg-yellow-100 text-yellow-800' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {isOwnerMember ? 'Người tổ chức' : 'Thành viên'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <Calendar className="w-4 h-4" />
+                              <span>{formatDate(member.joinedAt)}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            {canRemove && (
+                              <DeleteConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                }
+                                title="Xóa thành viên"
+                                description="Bạn có chắc chắn muốn xóa thành viên này?"
+                                confirmText="Xóa"
+                                cancelText="Hủy"
+                                onConfirm={() => handleRemoveMember(member.id)}
+                                loadingText="Đang xóa..."
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-2">
+                {localMembers.map((member) => {
+                  const isOwnerMember = member.role === 'creator' || member.userId === trip.ownerId;
+                  const canRemove = canDelete && !isOwnerMember && !isTripClosed;
+                  
+                  return (
+                    <Card key={member.id} className="p-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2.5 flex-1">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">
+                              {(member.name || 'U').charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="font-medium text-gray-900 truncate text-sm">{member.name}</h3>
                               {isOwnerMember && (
-                                <div className="flex items-center gap-1 text-yellow-600 mt-1">
-                                  <Crown className="w-3 h-3" />
-                                  <span className="text-xs font-medium">Người tổ chức</span>
-                                </div>
+                                <Crown className="w-3 h-3 text-yellow-600 flex-shrink-0" />
                               )}
                             </div>
+                            <div className="mt-0.5 space-y-0.5">
+                              <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                <Mail className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{member.optionalEmail || 'Chưa có email'}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                <Phone className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{(member as any).optionalPhone || 'Chưa có số điện thoại'}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                <Calendar className="w-3 h-3 flex-shrink-0" />
+                                <span>{formatDate(member.joinedAt)}</span>
+                              </div>
+                            </div>
+                            <div className="mt-1.5">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                isOwnerMember 
+                                  ? 'bg-yellow-100 text-yellow-800' 
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {isOwnerMember ? 'Người tổ chức' : 'Thành viên'}
+                              </span>
+                            </div>
                           </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Mail className="w-4 h-4" />
-                            <span>{member.optionalEmail || 'Chưa có email'}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Phone className="w-4 h-4" />
-                            <span>{(member as any).optionalPhone || 'Chưa có số điện thoại'}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            isOwnerMember 
-                              ? 'bg-yellow-100 text-yellow-800' 
-                              : 'bg-blue-100 text-blue-800'
-                          }`}>
-                            {isOwnerMember ? 'Người tổ chức' : 'Thành viên'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(member.joinedAt)}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          {canRemove && (
+                        </div>
+                        {canRemove && (
+                          <div className="ml-2 flex-shrink-0">
                             <DeleteConfirmDialog
                               trigger={
                                 <Button
@@ -516,14 +592,14 @@ export default function MembersInline({
                               onConfirm={() => handleRemoveMember(member.id)}
                               loadingText="Đang xóa..."
                             />
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -531,7 +607,7 @@ export default function MembersInline({
       {/* Add Member Form Modal */}
       {showAddForm && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[10000]"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowAddForm(false);
@@ -543,57 +619,58 @@ export default function MembersInline({
             }
           }}
         >
-          <Card ref={modalRef} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Thêm thành viên</h2>
+          <Card ref={modalRef} className="w-full max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto">
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold">Thêm thành viên</h2>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowAddForm(false)}
+                  className="p-2"
                 >
                   <XCircle className="w-5 h-5" />
                 </Button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
                 {/* Method Selection */}
-                <div className="flex gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     type="button"
                     variant={addMethod === 'search' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setAddMethod('search')}
-                    className="flex-1"
+                    className="flex items-center justify-center gap-2 py-2 px-2 text-xs sm:text-sm"
                   >
-                    <Search className="w-4 h-4 mr-2" />
-                    Tìm kiếm
+                    <Search className="w-4 h-4" />
+                    <span className="hidden sm:inline">Tìm kiếm</span>
                   </Button>
                   <Button
                     type="button"
                     variant={addMethod === 'group' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setAddMethod('group')}
-                    className="flex-1"
+                    className="flex items-center justify-center gap-2 py-2 px-2 text-xs sm:text-sm"
                   >
-                    <Users className="w-4 h-4 mr-2" />
-                    Từ nhóm
+                    <Users className="w-4 h-4" />
+                    <span className="hidden sm:inline">Từ nhóm</span>
                   </Button>
                   <Button
                     type="button"
                     variant={addMethod === 'ghost' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setAddMethod('ghost')}
-                    className="flex-1"
+                    className="flex items-center justify-center gap-2 py-2 px-2 text-xs sm:text-sm"
                   >
-                    <Ghost className="w-4 h-4 mr-2" />
-                    Thành viên ảo
+                    <Ghost className="w-4 h-4" />
+                    <span className="hidden sm:inline">Thành viên ảo</span>
                   </Button>
                 </div>
 
                 {/* Search Method */}
                 {addMethod === 'search' && (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tìm kiếm người dùng
@@ -606,7 +683,7 @@ export default function MembersInline({
                           setSearchQuery(e.target.value);
                           handleSearch(e.target.value);
                         }}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                       />
                     </div>
 
@@ -618,27 +695,27 @@ export default function MembersInline({
                     )}
 
                     {searchResults.length > 0 && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                      <div className="space-y-1 sm:space-y-2 max-h-48 sm:max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
                         {searchResults.map((user) => (
                           <div
                             key={user.id}
-                            className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            className="p-2 sm:p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                             onClick={() => handleSelectUser(user)}
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                                <span className="text-white font-bold">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="text-white font-bold text-sm sm:text-base">
                                   {(user.name || 'U').charAt(0).toUpperCase()}
                                 </span>
                               </div>
-                              <div className="flex-1">
-                                <div className="font-medium text-gray-900">{user.name}</div>
-                                <div className="text-sm text-gray-600">{user.email}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{user.name}</div>
+                                <div className="text-xs sm:text-sm text-gray-600 truncate">{user.email}</div>
                                 {user.username && (
                                   <div className="text-xs text-gray-500">@{user.username}</div>
                                 )}
                               </div>
-                              <CheckCircle className="w-5 h-5 text-blue-600" />
+                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
                             </div>
                           </div>
                         ))}
@@ -646,22 +723,23 @@ export default function MembersInline({
                     )}
 
                     {selectedUser && (
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">
+                      <div className="p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-bold text-sm sm:text-base">
                               {(selectedUser.name || 'U').charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900">{selectedUser.name}</div>
-                            <div className="text-sm text-gray-600">{selectedUser.email}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{selectedUser.name}</div>
+                            <div className="text-xs sm:text-sm text-gray-600 truncate">{selectedUser.email}</div>
                           </div>
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedUser(null)}
+                            className="p-1 sm:p-2 flex-shrink-0"
                           >
                             <XCircle className="w-4 h-4" />
                           </Button>
@@ -673,7 +751,7 @@ export default function MembersInline({
 
                 {/* Group Method */}
                 {addMethod === 'group' && (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Chọn nhóm
@@ -683,22 +761,22 @@ export default function MembersInline({
                           <Loader2 className="w-5 h-5 animate-spin mx-auto text-blue-600" />
                         </div>
                       ) : (
-                        <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                        <div className="grid grid-cols-1 gap-2 max-h-32 sm:max-h-40 overflow-y-auto">
                           {userGroups.map((group) => (
                             <div
                               key={group.id}
-                              className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                              className={`p-2 sm:p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
                                 selectedGroup?.id === group.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                               }`}
                               onClick={() => handleGroupSelect(group)}
                             >
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                                  <Users className="w-4 h-4 text-white" />
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <Users className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                                 </div>
-                                <div>
-                                  <div className="font-medium text-gray-900">{group.name}</div>
-                                  <div className="text-sm text-gray-600">{group.memberCount} thành viên</div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{group.name}</div>
+                                  <div className="text-xs sm:text-sm text-gray-600">{group.memberCount} thành viên</div>
                                 </div>
                               </div>
                             </div>
@@ -719,28 +797,28 @@ export default function MembersInline({
                             <Loader2 className="w-5 h-5 animate-spin mx-auto text-blue-600" />
                           </div>
                         ) : (
-                          <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                          <div className="space-y-1 sm:space-y-2 max-h-36 sm:max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
                             {groupMembers.map((member) => {
                               const isSelected = selectedGroupMembers.some(m => m.id === member.id);
                               return (
                                 <div
                                   key={member.id}
-                                  className={`p-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                                  className={`p-2 sm:p-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${
                                     isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                                   }`}
                                   onClick={() => handleGroupMemberToggle(member)}
                                 >
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                                      <span className="text-white font-bold text-sm">
+                                  <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                      <span className="text-white font-bold text-xs sm:text-sm">
                                         {(member.name || 'U').charAt(0).toUpperCase()}
                                       </span>
                                     </div>
-                                    <div className="flex-1">
-                                      <div className="font-medium text-gray-900">{member.name}</div>
-                                      <div className="text-sm text-gray-600">{member.email}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{member.name}</div>
+                                      <div className="text-xs sm:text-sm text-gray-600 truncate">{member.email}</div>
                                     </div>
-                                    {isSelected && <CheckCircle className="w-5 h-5 text-blue-600" />}
+                                    {isSelected && <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />}
                                   </div>
                                 </div>
                               );
@@ -763,7 +841,7 @@ export default function MembersInline({
 
                 {/* Ghost Method */}
                 {addMethod === 'ghost' && (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tên thành viên ảo *
@@ -773,7 +851,7 @@ export default function MembersInline({
                         placeholder="Nhập tên thành viên ảo"
                         value={formData.name}
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                         required
                       />
                     </div>
@@ -786,7 +864,7 @@ export default function MembersInline({
                         placeholder="Nhập email"
                         value={formData.email}
                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                       />
                     </div>
                     <div>
@@ -798,37 +876,39 @@ export default function MembersInline({
                         placeholder="Nhập số điện thoại"
                         value={formData.phone}
                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                       />
                     </div>
                   </div>
                 )}
 
                 {/* Submit Buttons */}
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4 border-t">
                   <Button
                     type="button"
                     onClick={() => setShowAddForm(false)}
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base py-2 sm:py-3"
                   >
                     Hủy
                   </Button>
                   <Button
                     type="button"
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base py-2 sm:py-3"
                     disabled={submitting}
                     onClick={handleSubmit}
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Đang thêm...
+                        <Loader2 className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
+                        <span className="hidden sm:inline">Đang thêm...</span>
+                        <span className="sm:hidden">Thêm...</span>
                       </>
                     ) : (
                       <>
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Thêm thành viên
+                        <UserPlus className="w-4 h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Thêm thành viên</span>
+                        <span className="sm:hidden">Thêm</span>
                       </>
                     )}
                   </Button>
