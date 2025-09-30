@@ -605,7 +605,10 @@ export default function ExpensesInline({
                 isEqualSplit: false,
             });
             
-            // Note: Removed onExpenseUpdated callback to prevent reload
+            // Call onExpenseUpdated callback to trigger parent refresh
+            if (onExpenseUpdated) {
+                onExpenseUpdated();
+            }
         } catch (error) {
             console.error('Error updating expense:', error);
             toast.error('Có lỗi xảy ra khi cập nhật chi phí');

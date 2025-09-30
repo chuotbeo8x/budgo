@@ -463,10 +463,11 @@ export async function updateExpense(expenseId: string, formData: FormData) {
     // Update trip stats cache
     try {
       const { updateTripStatsCache } = await import('../actions/trips');
-      await updateTripStatsCache(tripId);
-      console.log('Updated statsCache after expense update');
+      console.log(`🔄 Updating statsCache for trip ${tripId} after expense update...`);
+      const result = await updateTripStatsCache(tripId);
+      console.log('✅ Updated statsCache after expense update:', result);
     } catch (error) {
-      console.error('Failed to update statsCache:', error);
+      console.error('❌ Failed to update statsCache:', error);
     }
 
     return { success: true };

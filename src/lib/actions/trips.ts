@@ -847,7 +847,7 @@ export async function updateTripStatsCache(tripId: string) {
       }
     });
 
-    console.log(`Updated statsCache for trip ${tripId}: totalExpense=${totalExpense}, totalAdvance=${totalAdvance}`);
+    console.log(`✅ Updated statsCache for trip ${tripId}: totalExpense=${totalExpense}, totalAdvance=${totalAdvance}`);
     
     return {
       success: true,
