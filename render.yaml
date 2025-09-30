@@ -1,48 +1,28 @@
 services:
   - type: web
-            name: budgo
+    name: budgo
     env: node
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: npm run start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: FIREBASE_PROJECT_ID
-        value: budgo-aae32
       - key: NEXT_PUBLIC_FIREBASE_API_KEY
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_api_key
+        sync: false
       - key: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_auth_domain
+        sync: false
       - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_project_id
+        sync: false
       - key: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_storage_bucket
+        sync: false
       - key: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_messaging_sender_id
+        sync: false
       - key: NEXT_PUBLIC_FIREBASE_APP_ID
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_app_id
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
       - key: FIREBASE_CLIENT_EMAIL
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_client_email
+        sync: false
       - key: FIREBASE_PRIVATE_KEY
-        fromDatabase:
-            name: budgo-secrets
-          property: firebase_private_key
-
-databases:
-  - name: budgo-secrets
-    plan: free
+        sync: false
