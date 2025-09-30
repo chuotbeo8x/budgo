@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   // Fix routesManifest issue
   // output: 'standalone', // Comment out for Render
   trailingSlash: false,
+  // Optimize for Render free plan
+  compress: true,
+  poweredByHeader: false,
   images: {
     domains: [
       'lh3.googleusercontent.com',
