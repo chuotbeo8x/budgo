@@ -647,10 +647,22 @@ export async function getUserTrips(userId: string) {
         
         // Get member count for this trip
         const memberCountQuery = adminDb.collection('tripMembers')
-          .where('tripId', '==', doc.id)
-          .where('leftAt', '==', null);
+          .where('tripId', '==', doc.id);
         const memberCountSnapshot = await memberCountQuery.get();
-        const memberCount = memberCountSnapshot.docs.length;
+        // Filter out members who have left (leftAt is not null)
+        const activeMembers = memberCountSnapshot.docs.filter(doc => {
+          const data = doc.data();
+          return !data.leftAt; // leftAt is null or undefined
+        });
+        
+        // Check if owner is in tripMembers, if not, add 1 for owner
+        const ownerInMembers = activeMembers.some(doc => {
+          const data = doc.data();
+          return data.userId === tripData.ownerId;
+        });
+        
+        const memberCount = activeMembers.length + (ownerInMembers ? 0 : 1);
+        console.log(`Trip ${doc.id}: activeMembers=${activeMembers.length}, ownerInMembers=${ownerInMembers}, finalCount=${memberCount}`);
         
         // Convert Firestore Timestamps to Date if needed
         const processedTripData = {
@@ -687,10 +699,22 @@ export async function getUserTrips(userId: string) {
             
             // Get member count for this trip
             const memberCountQuery = adminDb.collection('tripMembers')
-              .where('tripId', '==', tripId)
-              .where('leftAt', '==', null);
+              .where('tripId', '==', tripId);
             const memberCountSnapshot = await memberCountQuery.get();
-            const memberCount = memberCountSnapshot.docs.length;
+            // Filter out members who have left (leftAt is not null)
+            const activeMembers = memberCountSnapshot.docs.filter(doc => {
+              const data = doc.data();
+              return !data.leftAt; // leftAt is null or undefined
+            });
+            
+            // Check if owner is in tripMembers, if not, add 1 for owner
+            const ownerInMembers = activeMembers.some(doc => {
+              const data = doc.data();
+              return data.userId === tripData.ownerId;
+            });
+            
+            const memberCount = activeMembers.length + (ownerInMembers ? 0 : 1);
+            console.log(`Member trip ${tripId}: activeMembers=${activeMembers.length}, ownerInMembers=${ownerInMembers}, finalCount=${memberCount}`);
             
             if (!tripData) {
               console.error(`Trip data is null for trip ${tripSnap.id}`);
