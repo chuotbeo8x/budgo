@@ -399,10 +399,11 @@ export async function getTripBySlug(slug: string, groupId?: string, userId?: str
       closedAt: tripData.closedAt?.toDate ? tripData.closedAt.toDate() : tripData.closedAt,
       startDate: tripData.startDate?.toDate ? tripData.startDate.toDate() : tripData.startDate,
       endDate: tripData.endDate?.toDate ? tripData.endDate.toDate() : tripData.endDate,
-      statsCache: {
+      paymentStatusUpdatedAt: tripData.paymentStatusUpdatedAt?.toDate ? tripData.paymentStatusUpdatedAt.toDate() : tripData.paymentStatusUpdatedAt,
+      statsCache: tripData.statsCache ? {
         ...tripData.statsCache,
         computedAt: tripData.statsCache?.computedAt?.toDate ? tripData.statsCache.computedAt.toDate() : tripData.statsCache?.computedAt
-      }
+      } : undefined
     };
     
     return processedTripData as Trip;
@@ -481,11 +482,21 @@ export async function getTripById(tripId: string) {
       closedAt: tripData.closedAt?.toDate ? tripData.closedAt.toDate() : tripData.closedAt,
       startDate: tripData.startDate?.toDate ? tripData.startDate.toDate() : tripData.startDate,
       endDate: tripData.endDate?.toDate ? tripData.endDate.toDate() : tripData.endDate,
-      statsCache: {
+      paymentStatusUpdatedAt: tripData.paymentStatusUpdatedAt?.toDate ? tripData.paymentStatusUpdatedAt.toDate() : tripData.paymentStatusUpdatedAt,
+      statsCache: tripData.statsCache ? {
         ...tripData.statsCache,
         computedAt: tripData.statsCache?.computedAt?.toDate ? tripData.statsCache.computedAt.toDate() : tripData.statsCache?.computedAt
-      }
+      } : undefined
     };
+
+    // Debug: Check for any remaining Timestamp objects
+    console.log('🔍 getTripById - Checking for Timestamp objects in processedTripData:');
+    Object.keys(processedTripData).forEach(key => {
+      const value = processedTripData[key as keyof typeof processedTripData];
+      if (value && typeof value === 'object' && ('_seconds' in value || '_nanoseconds' in value)) {
+        console.log(`❌ Found Timestamp object in field: ${key}`, value);
+      }
+    });
     
     return { id: tripSnap.id, ...processedTripData } as Trip;
   } catch (error) {
@@ -777,7 +788,8 @@ export async function getTripMembers(tripId: string) {
             name: userData.name,
             email: userData.email,
             username: userData.username,
-            phone: userData.phone || ''
+            phone: userData.phone || '',
+            avatar: userData.avatar || ''
           });
         });
       } catch (error) {
@@ -800,6 +812,7 @@ export async function getTripMembers(tripId: string) {
       
       // Derive name and contact info from user or ghost
       let displayName = processedData.name;
+      let avatarForDisplay = processedData.avatar;
       let emailForDisplay = processedData.optionalEmail;
       let phoneForDisplay = (processedData as any).optionalPhone;
       if (!displayName) {
@@ -807,9 +820,10 @@ export async function getTripMembers(tripId: string) {
           // For user members, get name from fetched user data
           const userData = userDataMap.get(processedData.userId);
           displayName = userData?.name || 'Unknown User';
-          // Backfill email/phone for user members if missing
+          // Backfill email/phone/avatar for user members if missing
           if (!emailForDisplay) emailForDisplay = userData?.email;
           if (!phoneForDisplay) phoneForDisplay = userData?.phone;
+          if (!avatarForDisplay) avatarForDisplay = userData?.avatar;
         } else if (processedData.ghostName) {
           displayName = processedData.ghostName;
         }
@@ -819,6 +833,7 @@ export async function getTripMembers(tripId: string) {
         id: doc.id,
         ...processedData,
         name: displayName,
+        avatar: avatarForDisplay,
         optionalEmail: emailForDisplay,
         optionalPhone: phoneForDisplay
       };
@@ -1139,9 +1154,9 @@ export async function isTripMember(tripId: string, userId: string) {
             tripId,
             userId: userId,
             name: 'Bạn', // Will be replaced with actual user name
-            weight: 1,
             role: 'creator',
             joinedAt: new Date(),
+            paymentStatus: 'unpaid', // Add default payment status
           };
 
           const cleanedMemberData = prepareFirestoreData(memberData);
@@ -1513,27 +1528,27 @@ export async function getTripPaymentStatus(tripId: string) {
       throw new Error('Database chưa được khởi tạo');
     }
 
-    const membersQuery = adminDb.collection('tripMembers')
-      .where('tripId', '==', tripId);
+    console.log('=== getTripPaymentStatus DEBUG (NEW APPROACH) ===');
+    console.log('Trip ID:', tripId);
+
+    // Get payment status from trip document instead of tripMembers
+    const tripRef = adminDb.collection('trips').doc(tripId);
+    const tripSnap = await tripRef.get();
     
-    const membersSnap = await membersQuery.get();
+    if (!tripSnap.exists) {
+      console.log('Trip not found, returning empty payment status');
+      return {};
+    }
+
+    const tripData = tripSnap.data();
+    if (!tripData) {
+      console.log('Trip data not found, returning empty payment status');
+      return {};
+    }
+
+    const paymentStatus = tripData.paymentStatus || {};
+    console.log('Payment status from trip document:', paymentStatus);
     
-    // Filter out members who have left
-    const activeMembers = membersSnap.docs.filter(doc => {
-      const data = doc.data();
-      return !data.leftAt; // Only include members who haven't left
-    });
-    
-    const paymentStatus: Record<string, boolean> = {};
-    activeMembers.forEach(doc => {
-      const data = doc.data();
-      // Use the full memberId (doc.id) as the key
-      if (data.paymentStatus === 'paid') {
-        paymentStatus[doc.id] = true;
-      } else {
-        paymentStatus[doc.id] = false;
-      }
-    });
     return paymentStatus;
   } catch (error) {
     console.error('Error getting trip payment status:', error);
@@ -1552,6 +1567,13 @@ export async function updateMemberPaymentStatus(
   userId: string
 ) {
   try {
+    console.log('🔄 updateMemberPaymentStatus - Parameters:', {
+      tripId,
+      memberId,
+      paymentStatus,
+      userId
+    });
+
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
@@ -1559,6 +1581,11 @@ export async function updateMemberPaymentStatus(
 
     if (!userId) {
       throw new Error('Chưa đăng nhập');
+    }
+
+    if (!tripId || tripId.trim() === '') {
+      console.error('🔄 updateMemberPaymentStatus - Invalid tripId:', tripId);
+      throw new Error('Trip ID không hợp lệ');
     }
 
     // Check if user is trip owner
@@ -1577,28 +1604,28 @@ export async function updateMemberPaymentStatus(
       throw new Error('Chỉ chủ chuyến đi mới có thể cập nhật trạng thái thanh toán');
     }
 
-    // Update member payment status in tripMembers collection
-    const memberRef = adminDb.collection('tripMembers').doc(memberId);
-    const memberSnap = await memberRef.get();
-    
-    if (!memberSnap.exists) {
-      throw new Error('Thành viên không tồn tại trong chuyến đi');
-    }
+    // Update payment status in trip document (new approach)
+    const currentPaymentStatus = tripData.paymentStatus || {};
+    const newPaymentStatus = {
+      ...currentPaymentStatus,
+      [memberId]: paymentStatus === 'paid'
+    };
 
-    // Verify this member belongs to the trip
-    const memberData = memberSnap.data();
-    if (!memberData) {
-      throw new Error('Member data not found');
-    }
-    if (memberData.tripId !== tripId) {
-      throw new Error('Thành viên không thuộc chuyến đi này');
-    }
-
-    await memberRef.update({
+    console.log('Updating payment status in trip document:', {
+      memberId,
       paymentStatus,
+      userId,
+      currentPaymentStatus,
+      newPaymentStatus
+    });
+
+    await tripRef.update({
+      paymentStatus: newPaymentStatus,
       paymentStatusUpdatedAt: new Date(),
       paymentStatusUpdatedBy: userId,
     });
+
+    console.log('Payment status updated successfully in trip document');
 
     return { success: true, message: 'Cập nhật trạng thái thanh toán thành công!' };
   } catch (error) {

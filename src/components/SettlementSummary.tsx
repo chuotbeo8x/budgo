@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { AlertMessage } from '@/components/ui/AlertMessage';
 import { useState } from 'react';
+import { updateMemberPaymentStatus } from '@/lib/actions/trips';
+import { toast } from 'sonner';
 
 interface Settlement {
   memberId: string;
@@ -35,6 +37,9 @@ interface SettlementSummaryProps {
   onPaymentStatusUpdate?: (memberId: string, status: boolean) => void;
   updating?: boolean;
   loading?: boolean;
+  // New props for trip-based payment status
+  tripId?: string;
+  userId?: string;
 }
 
 export default function SettlementSummary({ 
@@ -49,23 +54,65 @@ export default function SettlementSummary({
   paymentStatuses,
   onPaymentStatusUpdate,
   updating = false,
-  loading = false
+  loading = false,
+  // New props
+  tripId,
+  userId
 }: SettlementSummaryProps) {
   const [internalPaymentStatus, setInternalPaymentStatus] = useState<Record<string, boolean>>({});
+  const [isUpdating, setIsUpdating] = useState(false);
   
   // Use external payment status if provided, otherwise use internal state
   const paymentStatus = externalPaymentStatus || paymentStatuses || internalPaymentStatus;
   const paymentStatusCallback = onPaymentStatusChange || onPaymentStatusUpdate;
 
+  // Debug logging
+  console.log('SettlementSummary - Payment status:', paymentStatus);
+  console.log('SettlementSummary - Settlements:', settlements.map(s => ({ memberId: s.memberId, balance: s.balance })));
+
   const debtors = settlements.filter(s => s.balance < -0.01);
   const creditors = settlements.filter(s => s.balance > 0.01);
 
-  const togglePaymentStatus = (memberId: string) => {
+  const togglePaymentStatus = async (memberId: string) => {
     const newStatus = !paymentStatus[memberId];
     
-    if (paymentStatusCallback) {
+    // If we have tripId and userId, use the new trip-based approach
+    if (tripId && userId) {
+      setIsUpdating(true);
+      
+      try {
+        // Optimistic update
+        setInternalPaymentStatus(prev => ({
+          ...prev,
+          [memberId]: newStatus
+        }));
+        
+        // Call server action
+        await updateMemberPaymentStatus(tripId, memberId, newStatus, userId);
+        
+        // Call parent callback if provided (parent will handle toast notification)
+        if (paymentStatusCallback) {
+          paymentStatusCallback(memberId, newStatus);
+        }
+      } catch (error) {
+        console.error('Error updating payment status:', error);
+        
+        // Revert optimistic update
+        setInternalPaymentStatus(prev => ({
+          ...prev,
+          [memberId]: !newStatus
+        }));
+        
+        // Show error toast (this is the only toast we keep in this component)
+        toast.error('Có lỗi xảy ra khi cập nhật trạng thái thanh toán');
+      } finally {
+        setIsUpdating(false);
+      }
+    } else if (paymentStatusCallback) {
+      // Fallback to legacy approach
       paymentStatusCallback(memberId, newStatus);
     } else {
+      // Internal state only
       setInternalPaymentStatus(prev => ({
         ...prev,
         [memberId]: newStatus
@@ -138,7 +185,7 @@ export default function SettlementSummary({
                                 variant={paymentStatus[settlement.memberId] ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => togglePaymentStatus(settlement.memberId)}
-                                disabled={updating}
+                                disabled={updating || isUpdating}
                                 className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
                                   paymentStatus[settlement.memberId]
                                     ? 'bg-green-600 hover:bg-green-700 text-white'
@@ -261,12 +308,19 @@ export default function SettlementSummary({
                                 <CheckCircle className="w-5 h-5" />
                                 <span className="text-sm font-medium">Đã cân bằng</span>
                               </div>
-                            ) : isOwner ? (
+                            ) : (isOwner && showToggle) ? (
                               <Button
                                 variant={paymentStatus[settlement.memberId] ? "default" : "outline"}
                                 size="sm"
-                                onClick={() => togglePaymentStatus(settlement.memberId)}
-                                disabled={updating}
+                                onClick={() => {
+                                  console.log('Button clicked for settlement:', {
+                                    settlementMemberId: settlement.memberId,
+                                    paymentStatusValue: paymentStatus[settlement.memberId],
+                                    allPaymentStatus: paymentStatus
+                                  });
+                                  togglePaymentStatus(settlement.memberId);
+                                }}
+                                disabled={updating || isUpdating}
                                 className={`flex items-center gap-2 min-w-[128px] justify-start ${
                                   paymentStatus[settlement.memberId] 
                                     ? 'bg-green-600 hover:bg-green-700 text-white' 

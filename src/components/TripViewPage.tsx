@@ -56,12 +56,22 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
   const [isMember, setIsMember] = useState(false);
 
   const { settlements } = useSettlement(expenses, advances, members);
-  const { paymentStatus, updatePaymentStatus } = usePaymentStatus(trip.id, user?.uid);
+  const { paymentStatus: hookPaymentStatus, loadPaymentStatus } = usePaymentStatus(trip?.id || '', user?.uid);
+  const [paymentStatus, setPaymentStatus] = useState<Record<string, boolean>>({});
+
+  // Sync paymentStatus with hook data
+  useEffect(() => {
+    console.log('🎯 TripViewPage - hookPaymentStatus received:', hookPaymentStatus);
+    setPaymentStatus(hookPaymentStatus || {});
+    console.log('🎯 TripViewPage - paymentStatus state updated:', hookPaymentStatus || {});
+  }, [hookPaymentStatus]);
 
   useEffect(() => {
     if (user) {
+      console.log('🔄 TripViewPage useEffect - user:', user.uid, 'tripId:', trip.id);
       loadData();
       checkMembership();
+      loadPaymentStatus(); // Load payment status when component mounts
     }
   }, [user, trip.id]);
 
@@ -94,16 +104,6 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
     }
   };
 
-  const handlePaymentStatusUpdate = async (memberId: string, paid: boolean) => {
-    if (!user) return;
-    try {
-      await updatePaymentStatus(memberId, paid);
-      toast.success(paid ? 'Đã đánh dấu đã thanh toán' : 'Đã đánh dấu chưa thanh toán');
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật trạng thái thanh toán');
-    }
-  };
 
   const isTripClosed = trip.status === 'closed';
   const canManage = user?.uid === trip.ownerId || isMember;
@@ -299,17 +299,15 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
                 </TabsList>
                 
                 <TabsContent value="settlement" className="mt-3">
-                  {settlements && settlements.length > 0 ? (
+                  {settlements && settlements.length > 0 && trip?.id ? (
                     <SettlementSummary 
                       settlements={settlements}
                       currency={trip.currency}
-                      showDetails={true}
-                      showToggle={false}
-                      isOwner={false}
+                      tripId={trip.id}
                       paymentStatus={paymentStatus}
-                      onPaymentStatusChange={handlePaymentStatusUpdate}
-                      updating={false}
-                      loading={false}
+                      isOwner={false}
+                      showToggle={false}
+                      userId={user?.uid}
                     />
                   ) : (
                     <div className="text-center py-4 text-sm text-gray-500">
@@ -335,11 +333,27 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
                     {members.map((member) => (
                       <div key={member.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs sm:text-sm">
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                            {(member.userId || 'U').slice(0, 2).toUpperCase()}
+                          {member.avatar ? (
+                            <img 
+                              src={member.avatar} 
+                              alt={member.name || member.ghostName || 'User'} 
+                              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                              onError={(e) => {
+                                // Fallback to icon if image fails to load
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className={`w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium ${member.avatar ? 'hidden' : 'flex'}`}
+                          >
+                            {(member.name || member.ghostName || member.userId || 'U').slice(0, 2).toUpperCase()}
                           </div>
                           <span className="font-medium">
-                            {member.userId === user?.uid ? 'Bạn' : (member.userId ? `User ${member.userId.slice(0, 8)}` : 'Unknown User')}
+                            {member.userId === user?.uid ? 'Bạn' : (member.name || member.ghostName || (member.userId ? `User ${member.userId.slice(0, 8)}` : 'Unknown User'))}
                           </span>
                           <span className="text-gray-500">
                             {member.role === 'owner' ? '(Chủ)' : '(Thành viên)'}

@@ -54,7 +54,9 @@ export interface Trip {
   costPerPersonPlanned?: number;
   category?: string;
   slug: string;
-  paymentStatus: 'paid' | 'unpaid';
+  paymentStatus?: Record<string, boolean>; // memberId -> isPaid mapping
+  paymentStatusUpdatedAt?: Date;
+  paymentStatusUpdatedBy?: string;
   memberCount?: number; // Added for display purposes
   statsCache: {
     totalAdvance: number;
@@ -88,6 +90,7 @@ export interface TripMember {
   leftAt?: Date;
   // Additional fields for UI/UX (not in spec but needed for functionality)
   name?: string; // display name (derived from userId or ghostName)
+  avatar?: string; // user avatar from Google or other sources
   weight?: number; // for weighted splitting (derived from user profile)
   optionalEmail?: string; // for ghost members
   paymentStatus?: 'paid' | 'unpaid';

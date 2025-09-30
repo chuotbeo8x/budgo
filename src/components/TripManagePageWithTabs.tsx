@@ -50,7 +50,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { settlements } = useSettlement(expenses, advances, members);
-  const { paymentStatus: hookPaymentStatuses, updatePaymentStatus, updating, loading: paymentStatusLoading } = usePaymentStatus(trip.id, user?.uid);
+  const { paymentStatus: hookPaymentStatuses, updatePaymentStatus, updating, loading: paymentStatusLoading } = usePaymentStatus(trip?.id || '', user?.uid);
 
   // Sync paymentStatuses with hook data
   useEffect(() => {
@@ -193,6 +193,15 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
   const isTripClosed = trip.status === 'closed';
   const canManage = user?.uid === trip.ownerId;
+  
+  // Debug logging
+  console.log('🔍 TripManagePageWithTabs - Debug canManage:', {
+    userUid: user?.uid,
+    tripOwnerId: trip.ownerId,
+    canManage,
+    tripId: trip.id,
+    fullTrip: trip
+  });
 
   // Calculate totals
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -357,37 +366,6 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
         </CardContent>
       </Card>
 
-      {/* Settlement Summary */}
-      {settlements && settlements.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-600" />
-              Quyết toán chi phí
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SettlementSummary 
-              settlements={settlements}
-              currency={trip.currency}
-              showDetails={true}
-              isOwner={canManage}
-              paymentStatus={hookPaymentStatuses}
-              onPaymentStatusChange={handlePaymentStatusUpdate}
-              updating={updating}
-              loading={paymentStatusLoading}
-            />
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
-            <FileText className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-            <p>Chưa có dữ liệu quyết toán</p>
-            <p className="text-sm">Thêm chi phí và tạm ứng để xem quyết toán</p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Trip Actions */}
       {canManage && (
@@ -513,6 +491,48 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
     </div>
   );
 
+  const SettlementTab = () => (
+    <div className="space-y-6">
+      {settlements && settlements.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-green-600" />
+              Quyết toán chi phí
+            </CardTitle>
+            <CardDescription>
+              Quản lý trạng thái thanh toán của các thành viên
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {trip?.id && (
+              <SettlementSummary 
+                settlements={settlements}
+                currency={trip.currency}
+                tripId={trip.id}
+                isOwner={canManage}
+                showToggle={true}
+                userId={user?.uid}
+                paymentStatus={hookPaymentStatuses}
+                onPaymentStatusChange={handlePaymentStatusUpdate}
+              />
+            )}
+            {/* Debug logging */}
+            {console.log('🔍 TripManagePageWithTabs - trip.id:', trip.id)}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="py-8 text-center text-gray-500">
+            <FileText className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p>Chưa có dữ liệu quyết toán</p>
+            <p className="text-sm">Thêm chi phí và tạm ứng để xem quyết toán</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+
   const ReportsTab = () => (
     <div className="space-y-6">
       <Card>
@@ -581,36 +601,14 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Header - Compact */}
+        {/* Back Button - Keep at original position */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <Link href={backUrl}>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  {backLabel}
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                  <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-                  <span className="hidden sm:inline">Quản lý chuyến đi</span>
-                  <span className="sm:hidden">Quản lý</span>
-                </h1>
-                <p className="text-sm sm:text-base text-gray-600 mt-1">{trip.name}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                  <Eye className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Xem thông tin</span>
-                  <span className="sm:hidden">Xem</span>
-                </Button>
-              </Link>
-            </div>
-          </div>
+          <Link href={backUrl}>
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {backLabel}
+            </Button>
+          </Link>
         </div>
 
         {/* Trip Status Banner */}
@@ -623,6 +621,34 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
         {/* Main Management Container */}
         <Card className="overflow-hidden">
           <CardContent className="p-0">
+            {/* Header - Inside Card */}
+            <div className="px-4 py-3 border-b bg-gray-50">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Settings className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <h1 className="text-lg font-bold text-gray-900">
+                      Quản lý chuyến đi
+                    </h1>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-sm text-gray-600">{trip.name}</span>
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span className="text-xs text-gray-500">
+                        {trip.status === 'open' ? 'Đang mở' : 'Đã đóng'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
+                  <Button variant="outline" size="sm">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Xem thông tin
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
             {/* Mobile Menu Button */}
             <div className="lg:hidden p-4 border-b">
               <Button
@@ -659,6 +685,17 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                     Thành viên
                   </Button>
                   <Button
+                    variant={activeTab === 'settlement' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setActiveTab('settlement');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full justify-start text-sm"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Quyết toán
+                  </Button>
+                  <Button
                     variant={activeTab === 'reports' ? 'default' : 'outline'}
                     onClick={() => {
                       setActiveTab('reports');
@@ -687,7 +724,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
             {/* Desktop Tabs / Mobile Content */}
             <div className="hidden lg:block">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-4 mx-4 mt-4 mb-0 gap-1">
+                <TabsList className="grid grid-cols-5 mx-4 mt-4 mb-0 gap-1">
               <TabsTrigger value="expenses" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm px-2">
                 <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="hidden sm:inline truncate">Chi phí</span>
@@ -697,6 +734,11 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 <Users className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="hidden sm:inline truncate">Thành viên</span>
                 <span className="sm:hidden truncate">TV</span>
+              </TabsTrigger>
+              <TabsTrigger value="settlement" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm px-2">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="hidden sm:inline truncate">Quyết toán</span>
+                <span className="sm:hidden truncate">QT</span>
               </TabsTrigger>
               <TabsTrigger value="reports" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm px-2">
                 <Download className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -722,6 +764,12 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                   </div>
                 </TabsContent>
                 
+                <TabsContent value="settlement" className="mt-0">
+                  <div className="p-4">
+                    <SettlementTab />
+                  </div>
+                </TabsContent>
+                
                 <TabsContent value="reports" className="mt-0">
                   <div className="p-4">
                     <ReportsTab />
@@ -741,6 +789,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               <div className="p-4">
                 {activeTab === 'expenses' && <ExpensesTab />}
                 {activeTab === 'members' && <MembersTab />}
+                {activeTab === 'settlement' && <SettlementTab />}
                 {activeTab === 'reports' && <ReportsTab />}
                 {activeTab === 'info' && <TripInfoTab />}
               </div>
