@@ -9,7 +9,8 @@
     "start": "next start",
     "start:beta": "copy .env.local .env.local.backup && copy env.beta .env.local && next start && copy .env.local.backup .env.local",
     "deploy:beta": "npm run build:beta && firebase deploy --only hosting --project budgo-aae32",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.11.3",
@@ -47,6 +48,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "sharp": "^0.34.4",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
