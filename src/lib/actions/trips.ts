@@ -661,7 +661,7 @@ export async function getUserTrips(userId: string) {
           return data.userId === tripData.ownerId;
         });
         
-        const memberCount = activeMembers.length + (ownerInMembers ? 0 : 1);
+        const memberCount = Math.max(activeMembers.length + (ownerInMembers ? 0 : 1), 1);
         console.log(`Trip ${doc.id}: activeMembers=${activeMembers.length}, ownerInMembers=${ownerInMembers}, finalCount=${memberCount}`);
         
         // Convert Firestore Timestamps to Date if needed
@@ -713,7 +713,7 @@ export async function getUserTrips(userId: string) {
               return data.userId === tripData.ownerId;
             });
             
-            const memberCount = activeMembers.length + (ownerInMembers ? 0 : 1);
+            const memberCount = Math.max(activeMembers.length + (ownerInMembers ? 0 : 1), 1);
             console.log(`Member trip ${tripId}: activeMembers=${activeMembers.length}, ownerInMembers=${ownerInMembers}, finalCount=${memberCount}`);
             
             if (!tripData) {
