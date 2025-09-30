@@ -57,7 +57,7 @@ export default function AddExpenseModal({
         amount: '',
         paidBy: '',
         category: 'food',
-        createdAt: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString().split('T')[0], // For display only
         isEqualSplit: false,
     });
 
@@ -89,14 +89,17 @@ export default function AddExpenseModal({
         try {
             setSubmitting(true);
             
-            const expenseData = {
-                ...formData,
-                amount: parseFloat(formData.amount),
-                createdAt: new Date(formData.createdAt),
-                memberIdsAtCreation: members.map(m => m.id),
-            };
+            // Create FormData to match server action signature
+            const formDataObj = new FormData();
+            formDataObj.append('amount', formData.amount);
+            formDataObj.append('description', formData.description);
+            formDataObj.append('paidBy', formData.paidBy);
+            formDataObj.append('category', formData.category);
+            formDataObj.append('splitMethod', formData.isEqualSplit ? 'equal' : 'weight');
+            formDataObj.append('createdAt', formData.createdAt); // Date string from form
+            formDataObj.append('tripId', trip.id);
 
-            const newExpense = await addExpense(trip.id, expenseData, user.uid);
+            const newExpense = await addExpense(formDataObj);
             toast.success('Thêm chi phí thành công');
             
             setFormData({

@@ -79,14 +79,63 @@ export default function TimelineView({
 
     const formatTime = (createdAt: any): string => {
         try {
-            const date = parseCreatedAt(createdAt);
-            const timeStr = date.toLocaleString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Asia/Ho_Chi_Minh'
-            });
-            return timeStr === '00:00' ? '--:--' : timeStr;
-        } catch {
+            // Handle null/undefined
+            if (!createdAt) {
+                return '--:--';
+            }
+            
+            // Handle Firestore Timestamp
+            if (createdAt.toDate && typeof createdAt.toDate === 'function') {
+                const date = createdAt.toDate();
+                const timeStr = date.toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Asia/Ho_Chi_Minh'
+                });
+                return timeStr;
+            }
+            
+            // Handle Date object
+            if (createdAt instanceof Date) {
+                const timeStr = createdAt.toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Asia/Ho_Chi_Minh'
+                });
+                return timeStr;
+            }
+            
+            // Handle string
+            if (typeof createdAt === 'string') {
+                // Check if it's a date-only string (old data format)
+                if (createdAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    return '--:--';
+                }
+                
+                const date = new Date(createdAt);
+                if (isNaN(date.getTime())) {
+                    return '--:--';
+                }
+                
+                // Check if it's midnight (old data with date-only input)
+                const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
+                if (isMidnight) {
+                    return '--:--';
+                }
+                
+                const timeStr = date.toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Asia/Ho_Chi_Minh'
+                });
+                return timeStr;
+            }
+            
+            // Fallback
+            return '--:--';
+            
+        } catch (error) {
+            console.error('Error formatting time:', error);
             return '--:--';
         }
     };
@@ -122,7 +171,7 @@ export default function TimelineView({
                                             {dateItems.length} giao dịch
                                         </span>
                                     </div>
-                                    <div className="text-sm font-bold text-green-600">
+                                    <div className="text-sm font-bold text-blue-600">
                                         {formatCurrency(totalAmount, trip.currency)}
                                     </div>
                                 </div>

@@ -640,7 +640,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       <span className="text-sm text-gray-600 truncate max-w-[200px]">{trip.name}</span>
                       <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                       <span className="text-xs text-gray-500">
-                        {trip.status === 'open' ? 'Đang mở' : 'Đã đóng'}
+                        {trip.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}
                       </span>
                     </div>
                   </div>

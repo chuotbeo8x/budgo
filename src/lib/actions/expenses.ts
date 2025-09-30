@@ -170,9 +170,26 @@ export async function addExpense(formData: FormData) {
     const expenseId = `${validatedData.tripId}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
     // Create expense
-    // Get createdAt from form (just store as string)
+    // Get createdAt from form - preserve full timestamp
     const createdAtFromForm = formData.get('createdAt') as string;
-    const createdAt = createdAtFromForm || new Date().toISOString().split('T')[0];
+    let createdAt;
+    
+    if (createdAtFromForm) {
+      // If form provides a date, use it with current time
+      const formDate = new Date(createdAtFromForm);
+      if (!isNaN(formDate.getTime())) {
+        // Valid date from form, use it with current time
+        const now = new Date();
+        formDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+        createdAt = formDate.toISOString();
+      } else {
+        // Invalid date from form, use current timestamp
+        createdAt = new Date().toISOString();
+      }
+    } else {
+      // No date from form, use current timestamp
+      createdAt = new Date().toISOString();
+    }
 
     const expenseData = {
       id: expenseId,
@@ -211,18 +228,18 @@ export async function addExpense(formData: FormData) {
 }
 
 // Get Expenses
-export async function getExpenses(tripId: string) {
+export async function getExpenses(tripId: string, limit?: number) {
   try {
-    console.log('🚀 getExpenses called with tripId:', tripId);
     if (!adminDb) {
-      console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
+    const queryLimit = limit || 100;
     const expensesQuery = adminDb.collection('expenses')
-      .where('tripId', '==', tripId);
+      .where('tripId', '==', tripId)
+      .limit(queryLimit);
+    
     const expensesSnap = await expensesQuery.get();
-    console.log('📋 Found expenses in DB:', expensesSnap.docs.length);
     
     const expenses = expensesSnap.docs.map(doc => {
       const data = doc.data();
@@ -243,11 +260,9 @@ export async function getExpenses(tripId: string) {
         convertedCreatedAt = data.createdAt;
       } else if (typeof data.createdAt === 'object' && Object.keys(data.createdAt).length === 0) {
         // Empty object - use document creation time as fallback
-        console.warn('🐛 Empty createdAt object detected for expense:', doc.id, 'using document creation time');
         convertedCreatedAt = doc.createTime ? doc.createTime.toDate() : new Date();
       } else {
         // Fallback to current date
-        console.warn('🐛 Invalid createdAt format for expense:', doc.id, 'using current date');
         convertedCreatedAt = new Date();
       }
       
@@ -267,7 +282,7 @@ export async function getExpenses(tripId: string) {
       } as Expense;
     });
 
-    // Sort by createdAt desc in JavaScript
+    // Sort by createdAt desc in JavaScript (fallback if orderBy fails)
     expenses.sort((a, b) => {
       const aTime = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
       const bTime = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
@@ -635,9 +650,26 @@ export async function addAdvance(formData: FormData) {
     // Generate advance ID
     const advanceId = `${validatedData.tripId}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
-    // Get createdAt from form (just store as string)
+    // Get createdAt from form - preserve full timestamp
     const createdAtFromForm = formData.get('createdAt') as string;
-    const createdAt = createdAtFromForm || new Date().toISOString().split('T')[0];
+    let createdAt;
+    
+    if (createdAtFromForm) {
+      // If form provides a date, use it with current time
+      const formDate = new Date(createdAtFromForm);
+      if (!isNaN(formDate.getTime())) {
+        // Valid date from form, use it with current time
+        const now = new Date();
+        formDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+        createdAt = formDate.toISOString();
+      } else {
+        // Invalid date from form, use current timestamp
+        createdAt = new Date().toISOString();
+      }
+    } else {
+      // No date from form, use current timestamp
+      createdAt = new Date().toISOString();
+    }
 
     // Create advance
     const advanceData = {
@@ -673,15 +705,17 @@ export async function addAdvance(formData: FormData) {
 }
 
 // Get Advances
-export async function getAdvances(tripId: string) {
+export async function getAdvances(tripId: string, limit?: number) {
   try {
     if (!adminDb) {
-      console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
+    const queryLimit = limit || 100;
     const advancesQuery = adminDb.collection('advances')
-      .where('tripId', '==', tripId);
+      .where('tripId', '==', tripId)
+      .limit(queryLimit);
+    
     const advancesSnap = await advancesQuery.get();
     
     const advances = advancesSnap.docs.map(doc => {

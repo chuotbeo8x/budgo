@@ -5,15 +5,20 @@ import { User } from '../types';
 import { CreateAccountSchema } from '../schemas';
 import { prepareFirestoreData } from '../utils/firestore';
 import { toDate } from '../utils/date';
+import { cache, CACHE_KEYS, CACHE_TTL } from '../utils/cache';
 
-// Get User by ID (Firebase Auth UID)
+// Get User by ID (Firebase Auth UID) with caching
 export async function getUserById(userId: string) {
   try {
-    console.log('getUserById: Looking for user ID:', userId);
-    
     if (!adminDb) {
-      console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
+    }
+
+    // Check cache first
+    const cacheKey = CACHE_KEYS.USER(userId);
+    const cachedUser = cache.get<User>(cacheKey);
+    if (cachedUser) {
+      return cachedUser;
     }
 
     // Direct lookup by document ID (Firebase Auth UID)
@@ -22,7 +27,6 @@ export async function getUserById(userId: string) {
     
     if (userSnap.exists) {
       const userData = userSnap.data();
-      console.log('getUserById: User found:', userData?.name || 'No name');
       
       // Convert Firestore Timestamps to Date if needed
       const processedUserData = {
@@ -32,10 +36,14 @@ export async function getUserById(userId: string) {
         birthday: userData?.birthday?.toDate ? userData.birthday.toDate() : (userData?.birthday ? toDate(userData.birthday) : undefined),
       };
       
-      return { id: userSnap.id, ...processedUserData } as any;
+      const user = { id: userSnap.id, ...processedUserData } as any;
+      
+      // Cache the result
+      cache.set(cacheKey, user, CACHE_TTL.USER);
+      
+      return user;
     }
 
-    console.log('getUserById: User not found, needs to create profile');
     return null;
   } catch (error) {
     console.error('Error getting user:', error);
@@ -83,73 +91,113 @@ export async function deleteUser(userId: string) {
 }
 
 // Get Users by IDs
+// Utility function to chunk array
+function chunkArray<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
 export async function getUserByIds(userIds: string[]) {
   try {
-    console.log('=== getUserByIds START ===');
-    console.log('User IDs:', userIds);
-    console.log('Admin DB available:', !!adminDb);
-    
     if (!adminDb) {
-      console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
     if (userIds.length === 0) {
-      console.log('No user IDs provided');
       return [];
     }
 
-    // Firestore has a limit of 10 items for 'in' queries
-    // So we need to batch them if there are more than 10
-    const batchSize = 10;
-    const batches = [];
+    // Remove duplicates and filter out empty strings
+    const uniqueUserIds = [...new Set(userIds.filter(id => id && id.trim()))];
     
-    for (let i = 0; i < userIds.length; i += batchSize) {
-      const batch = userIds.slice(i, i + batchSize);
-      batches.push(batch);
+    if (uniqueUserIds.length === 0) {
+      return [];
+    }
+
+    // Check cache first
+    const cacheKey = CACHE_KEYS.USERS(uniqueUserIds);
+    const cachedUsers = cache.get<User[]>(cacheKey);
+    if (cachedUsers) {
+      return cachedUsers;
     }
 
     const allUsers: User[] = [];
+    const uncachedIds: string[] = [];
 
-    for (const batch of batches) {
-      // Use individual getDoc calls instead of 'in' query to avoid issues
-      const batchUsers: User[] = [];
-      
-      for (const userId of batch) {
-        try {
-          const userRef = adminDb.collection('users').doc(userId);
-          const userSnap = await userRef.get();
+    // Check individual cache for each user
+    for (const userId of uniqueUserIds) {
+      const userCacheKey = CACHE_KEYS.USER(userId);
+      const cachedUser = cache.get<User>(userCacheKey);
+      if (cachedUser) {
+        allUsers.push(cachedUser);
+      } else {
+        uncachedIds.push(userId);
+      }
+    }
+
+    // Fetch uncached users from database
+    if (uncachedIds.length > 0) {
+      // Use Firestore 'in' query for better performance (limit 10)
+      if (uncachedIds.length <= 10) {
+        const snapshot = await adminDb.collection('users')
+          .where('__name__', 'in', uncachedIds)
+          .get();
+        
+        const dbUsers = snapshot.docs.map(doc => {
+          const userData = doc.data();
+          const user = {
+            id: doc.id,
+            ...userData,
+            createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData.createdAt),
+            updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData.updatedAt),
+            birthday: userData.birthday?.toDate ? userData.birthday.toDate() : (userData.birthday ? toDate(userData.birthday) : undefined),
+          } as any;
+
+          // Cache individual user
+          cache.set(CACHE_KEYS.USER(doc.id), user, CACHE_TTL.USER);
           
-          if (userSnap.exists) {
-            const userData = userSnap.data();
-            
-            if (!userData) {
-              console.error(`User data is null for user ${userId}`);
-              continue;
-            }
-            
-            // Convert Firestore Timestamps to Date if needed
-            const processedUserData = {
+          return user;
+        });
+
+        allUsers.push(...dbUsers);
+      } else {
+        // For more than 10 users, batch the queries
+        const chunks = chunkArray(uncachedIds, 10);
+        
+        // Process chunks in parallel for better performance
+        const chunkPromises = chunks.map(async (chunk) => {
+          const snapshot = await adminDb.collection('users')
+            .where('__name__', 'in', chunk)
+            .get();
+          
+          return snapshot.docs.map(doc => {
+            const userData = doc.data();
+            const user = {
+              id: doc.id,
               ...userData,
               createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : toDate(userData.createdAt),
               updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : toDate(userData.updatedAt),
               birthday: userData.birthday?.toDate ? userData.birthday.toDate() : (userData.birthday ? toDate(userData.birthday) : undefined),
-            };
+            } as any;
+
+            // Cache individual user
+            cache.set(CACHE_KEYS.USER(doc.id), user, CACHE_TTL.USER);
             
-            batchUsers.push({ id: userSnap.id, ...processedUserData } as any);
-          }
-        } catch (error) {
-          console.error(`Error getting user ${userId}:`, error);
-        }
+            return user;
+          });
+        });
+
+        const chunkResults = await Promise.all(chunkPromises);
+        allUsers.push(...chunkResults.flat());
       }
-      
-      allUsers.push(...batchUsers);
     }
 
-    console.log('=== getUserByIds SUCCESS ===');
-    console.log('Found users:', allUsers.length);
-    console.log('Users:', allUsers.map(u => ({ id: u.id, name: u.name, email: u.email })));
-    
+    // Cache the complete result
+    cache.set(cacheKey, allUsers, CACHE_TTL.USERS);
+
     return allUsers;
   } catch (error) {
     console.error('Error getting users by IDs:', error);
