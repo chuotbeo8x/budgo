@@ -27,6 +27,7 @@ import {
   Settings,
   UserPlus
 } from 'lucide-react';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 
 
 export default function GroupTripsPage() {
@@ -339,13 +340,22 @@ export default function GroupTripsPage() {
               </div>
 
               <div className="flex items-end">
-                <Button
-                  onClick={() => router.push(`/g/${group.slug}/trips/create`)}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tạo chuyến đi mới
-                </Button>
+                <TripCreateModal
+                  trigger={
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tạo chuyến đi mới
+                    </Button>
+                  }
+                  groups={[group]} // Pass current group in array to preselect it
+                  onSuccess={(tripId, groupId, tripSlug) => {
+                    toast.success('Chuyến đi đã được tạo thành công!');
+                    if (tripSlug) {
+                      router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
+                    }
+                    loadTrips();
+                  }}
+                />
               </div>
             </div>
           </CardContent>
@@ -462,13 +472,22 @@ export default function GroupTripsPage() {
                     : 'Tạo chuyến đi đầu tiên để bắt đầu quản lý chi phí cùng nhóm'
                   }
                 </p>
-                <Button
-                  onClick={() => router.push(`/g/${group.slug}/trips/create`)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tạo chuyến đi mới
-                </Button>
+                <TripCreateModal
+                  trigger={
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tạo chuyến đi mới
+                    </Button>
+                  }
+                  groups={[group]} // Pass current group in array to preselect it
+                  onSuccess={(tripId, groupId, tripSlug) => {
+                    toast.success('Chuyến đi đã được tạo thành công!');
+                    if (tripSlug) {
+                      router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
+                    }
+                    loadTrips();
+                  }}
+                />
               </div>
             </CardContent>
           </Card>

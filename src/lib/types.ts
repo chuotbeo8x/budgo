@@ -201,6 +201,71 @@ export interface Notification {
   readAt?: Date;
 }
 
+// Group Post types
+export interface GroupPost {
+  id: string;
+  groupId: string;
+  authorId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  likesCount: number;
+  commentsCount: number;
+  // UI fields (not stored in DB)
+  authorName?: string;
+  authorAvatar?: string;
+  isLiked?: boolean;
+}
+
+export interface GroupComment {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  // UI fields (not stored in DB)
+  authorName?: string;
+  authorAvatar?: string;
+}
+
+export interface PostLike {
+  id: string;
+  postId: string;
+  userId: string;
+  createdAt: Date;
+}
+
+// Group Activity types (non-post events shown in feed)
+export type GroupActivityType =
+  | 'trip_created'
+  | 'member_joined'
+  | 'member_left'
+  | 'expense_added'
+  | 'expense_updated'
+  | 'advance_added'
+  | 'settlement_ready';
+
+export interface GroupActivity {
+  id: string;
+  groupId: string;
+  type: GroupActivityType;
+  createdAt: Date;
+  actorId?: string;
+  // Optional rich data for rendering
+  payload?: {
+    tripId?: string;
+    tripName?: string;
+    amount?: number;
+    currency?: Currency;
+    memberName?: string;
+    expenseDescription?: string;
+  };
+  // UI fields
+  actorName?: string;
+  actorAvatar?: string;
+}
+
 // Audit Log types
 export interface AuditLog {
   id: string;

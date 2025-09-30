@@ -4,7 +4,7 @@
 
 1. Truy cập [Firebase Console](https://console.firebase.google.com/)
 2. Click "Create a project" hoặc "Add project"
-3. Nhập tên project (ví dụ: `qa-tracker-dev`)
+3. Nhập tên project (ví dụ: `budgo-dev`)
 4. Chọn "Enable Google Analytics" (tùy chọn)
 5. Click "Create project"
 
@@ -31,7 +31,7 @@
 1. Vào **Project Settings** (biểu tượng bánh răng)
 2. Scroll xuống phần "Your apps"
 3. Click "Add app" > chọn Web (biểu tượng `</>`)
-4. Nhập tên app (ví dụ: `qa-tracker-web`)
+4. Nhập tên app (ví dụ: `budgo-web`)
 5. Click "Register app"
 6. Copy config object:
 

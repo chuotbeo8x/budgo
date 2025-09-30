@@ -123,7 +123,7 @@ export default function ManagePage() {
       title: 'Tạo chuyến đi mới',
       description: 'Bắt đầu một chuyến đi mới',
       icon: MapPin,
-      href: '/trips/create',
+      href: '/trips/manage', // Changed to trips manage page which has modal
       color: 'text-blue-600',
       bgColor: 'bg-blue-50'
     },
@@ -318,7 +318,7 @@ export default function ManagePage() {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs sm:text-sm text-gray-600">
-            © 2024 QA Tracker. Quản lý chuyến đi và nhóm một cách thông minh.
+            © 2024 Budgo. Quản lý chuyến đi và nhóm một cách thông minh.
           </p>
         </div>
       </div>

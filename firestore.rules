@@ -139,5 +139,28 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(uid)).data.role == 'admin';
       allow write: if false; // chỉ server actions ghi
     }
+
+    // GROUP POSTS – chỉ thành viên nhóm đọc/ghi
+    match /groupPosts/{postId} {
+      allow read: if authed() && isGroupMember(resource.data.groupId);
+      allow create: if authed() && isGroupMember(request.resource.data.groupId) && request.resource.data.authorId == uid();
+      allow update: if authed() && resource.data.authorId == uid();
+      allow delete: if authed() && (resource.data.authorId == uid() || isGroupOwner(resource.data.groupId));
+    }
+
+    // GROUP COMMENTS – chỉ thành viên nhóm đọc/ghi
+    match /groupComments/{commentId} {
+      allow read: if authed() && isGroupMember(get(/databases/$(database)/documents/groupPosts/$(resource.data.postId)).data.groupId);
+      allow create: if authed() && isGroupMember(get(/databases/$(database)/documents/groupPosts/$(request.resource.data.postId)).data.groupId) && request.resource.data.authorId == uid();
+      allow update: if authed() && resource.data.authorId == uid();
+      allow delete: if authed() && (resource.data.authorId == uid() || isGroupOwner(get(/databases/$(database)/documents/groupPosts/$(resource.data.postId)).data.groupId));
+    }
+
+    // POST LIKES – chỉ thành viên nhóm đọc/ghi
+    match /postLikes/{likeId} {
+      allow read: if authed() && isGroupMember(get(/databases/$(database)/documents/groupPosts/$(resource.data.postId)).data.groupId);
+      allow create: if authed() && isGroupMember(get(/databases/$(database)/documents/groupPosts/$(request.resource.data.postId)).data.groupId) && request.resource.data.userId == uid();
+      allow delete: if authed() && resource.data.userId == uid();
+    }
   }
 }

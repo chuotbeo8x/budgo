@@ -134,16 +134,29 @@ export async function getGroupBySlug(slug: string) {
 export async function getUserGroups(userId: string) {
   try {
     if (!adminDb) {
-      throw new Error('Database chưa được khởi tạo');
+      console.error('Admin DB not available');
+      console.warn('Returning empty groups array - adminDb not initialized');
+      return [];
     }
     console.log('Getting groups for user:', userId);
+    
+    if (!userId || typeof userId !== 'string') {
+      console.error('Invalid userId:', userId);
+      return [];
+    }
     
     // First get group members
     const membersQuery = adminDb.collection('groupMembers')
       .where('userId', '==', userId);
     
-    const membersSnapshot = await membersQuery.get();
-    console.log('Found members:', membersSnapshot.docs.length);
+    let membersSnapshot;
+    try {
+      membersSnapshot = await membersQuery.get();
+      console.log('Found members:', membersSnapshot.docs.length);
+    } catch (queryError) {
+      console.error('Error querying group members:', queryError);
+      throw new Error('Không thể truy vấn thành viên nhóm');
+    }
     
     // Debug: Log all member data
     membersSnapshot.docs.forEach((doc, index) => {
@@ -180,7 +193,13 @@ export async function getUserGroups(userId: string) {
       try {
         console.log(`Getting group: ${groupId}`);
         const groupRef = adminDb.collection('groups').doc(groupId);
-        const groupSnap = await groupRef.get();
+        let groupSnap;
+        try {
+          groupSnap = await groupRef.get();
+        } catch (groupQueryError) {
+          console.error(`Error querying group ${groupId}:`, groupQueryError);
+          continue; // Skip this group and continue with others
+        }
         
         if (groupSnap.exists) {
           const groupData = groupSnap.data();
@@ -189,7 +208,14 @@ export async function getUserGroups(userId: string) {
           // Get member count for this group (all active members)
           const memberCountQuery = adminDb.collection('groupMembers')
             .where('groupId', '==', groupId);
-          const memberCountSnapshot = await memberCountQuery.get();
+          let memberCountSnapshot;
+          try {
+            memberCountSnapshot = await memberCountQuery.get();
+          } catch (memberCountError) {
+            console.error(`Error getting member count for group ${groupId}:`, memberCountError);
+            // Continue with memberCount = 0
+            memberCountSnapshot = { docs: [] };
+          }
           
           // Filter out members who have left (handle both null and empty object cases)
           const activeMembers = memberCountSnapshot.docs.filter(doc => {
@@ -235,7 +261,10 @@ export async function getUserGroups(userId: string) {
       userId,
       adminDbAvailable: !!adminDb
     });
-    throw new Error('Có lỗi xảy ra khi lấy danh sách nhóm');
+    
+    // Return empty array instead of throwing error to prevent app crash
+    console.warn('Returning empty groups array due to error');
+    return [];
   }
 }
 

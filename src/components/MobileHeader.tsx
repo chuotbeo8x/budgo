@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image'; // Removed to avoid image config issues
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
 import { logout, signInWithGoogle } from '@/lib/auth';
@@ -23,6 +23,7 @@ import {
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import Avatar from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -127,19 +128,12 @@ export default function MobileHeader() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="p-1">
-                    {user.photoURL ? (
-                      <Image 
-                        src={user.photoURL} 
-                        alt="Avatar" 
-                        width={32} 
-                        height={32} 
-                        className="rounded-full" 
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
-                      </div>
-                    )}
+                    <Avatar 
+                      src={user.photoURL} 
+                      alt="Avatar" 
+                      size={32}
+                      fallbackIcon={<User className="w-5 h-5 text-white" />}
+                    />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">

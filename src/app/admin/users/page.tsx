@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image'; // Removed to avoid image config issues
 import { Badge } from '@/components/ui/badge';
 import { Lock, Unlock, Trash2, Search } from 'lucide-react';
 

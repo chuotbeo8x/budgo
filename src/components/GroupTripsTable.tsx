@@ -8,6 +8,7 @@ import { Trip } from '@/lib/types';
 import { formatDate, formatDateTime } from '@/lib/utils/date';
 import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 import { 
   Plus, 
   MapPin, 
@@ -272,12 +273,19 @@ export default function GroupTripsTable({
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
                 {emptyStateDescription}
               </p>
-              <Link href={createTripUrl}>
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                  <Plus className="w-5 h-5 mr-2" />
-                  {createTripLabel}
-                </Button>
-              </Link>
+              <TripCreateModal
+                trigger={
+                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                    <Plus className="w-5 h-5 mr-2" />
+                    {createTripLabel}
+                  </Button>
+                }
+                groups={[{ slug: groupSlug, name: groupName } as any]} // Pass current group in array
+                onSuccess={() => {
+                  // Reload page or trigger parent refresh
+                  window.location.reload();
+                }}
+              />
             </div>
           </CardContent>
         </Card>

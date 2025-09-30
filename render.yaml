@@ -44,5 +44,5 @@ services:
           property: firebase_private_key
 
 databases:
-  - name: qa-tracker-secrets
+  - name: budgo-secrets
     plan: free

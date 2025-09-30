@@ -184,7 +184,7 @@ export default function HelpPage() {
                   Vui lòng liên hệ với chúng tôi qua:
                 </p>
                 <div className="space-y-2">
-                  <p>📧 Email: support@qa-tracker.com</p>
+                  <p>📧 Email: support@budgo.com</p>
                   <p>💬 Discord: Q&A Tracker Community</p>
                   <p>📱 Telegram: @qa_tracker_support</p>
                 </div>

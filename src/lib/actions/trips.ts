@@ -6,6 +6,7 @@ import { Trip, TripMember, Expense, Advance } from '../types';
 import { prepareFirestoreData } from '../utils/firestore';
 import { toDate, safeToDate } from '../utils/date';
 import { isGroupMember } from './groups';
+import { logGroupActivity } from './activities';
 
 
 
@@ -279,6 +280,18 @@ export async function createTrip(formDataOrObj: FormData | Record<string, unknow
 
     const cleanedMemberData = prepareFirestoreData(memberData);
     await adminDb.collection('tripMembers').doc(memberId).set(cleanedMemberData);
+
+    // Log activity for group trip creation
+    if (validatedData.groupId) {
+      try {
+        await logGroupActivity(validatedData.groupId, 'trip_created', userId, {
+          tripId,
+          tripName: validatedData.name,
+        });
+      } catch (e) {
+        console.warn('Failed to log trip_created activity', e);
+      }
+    }
 
     // Get group slug if groupId exists
     let groupSlug = undefined;

@@ -53,7 +53,7 @@ export const api = onRequest(
             data: [
               {
                 id: '1',
-                title: 'Chào mừng đến với QA Tracker!',
+                title: 'Chào mừng đến với Budgo!',
                 message: 'Đây là thông báo chào mừng đầu tiên.',
                 sentAt: new Date().toISOString(),
                 sentBy: 'admin',

@@ -1,7 +1,7 @@
-// QA Tracker Service Worker
-const CACHE_NAME = 'qa-tracker-v1';
-const STATIC_CACHE_NAME = 'qa-tracker-static-v1';
-const DYNAMIC_CACHE_NAME = 'qa-tracker-dynamic-v1';
+// Budgo Service Worker
+const CACHE_NAME = 'budgo-v1';
+const STATIC_CACHE_NAME = 'budgo-static-v1';
+const DYNAMIC_CACHE_NAME = 'budgo-dynamic-v1';
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -196,4 +196,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('QA Tracker Service Worker loaded');
+console.log('Budgo Service Worker loaded');

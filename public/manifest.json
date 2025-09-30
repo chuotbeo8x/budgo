@@ -1,6 +1,6 @@
 {
-  "name": "QA Tracker - Quản lý chuyến đi thông minh",
-  "short_name": "QA Tracker",
+  "name": "Budgo - Quản lý nhóm và chuyến đi",
+  "short_name": "Budgo",
   "description": "Ứng dụng quản lý chuyến đi, nhóm và chi phí một cách thông minh",
   "start_url": "/",
   "display": "standalone",

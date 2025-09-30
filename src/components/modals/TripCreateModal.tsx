@@ -176,25 +176,26 @@ export default function TripCreateModal({
             />
           </div>
 
-          {groups.length > 0 && (
-            <div className="space-y-2">
-              <Label>Loại chuyến đi</Label>
-              <Select 
-                value={formData.groupId} 
-                onChange={(e) => handleInputChange('groupId', e.target.value)}
-              >
-                <option value="">🏠 Chuyến đi cá nhân</option>
-                {groups.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    👥 {g.name}
-                  </option>
-                ))}
-              </Select>
-              <p className="text-xs text-gray-500">
-                Chọn nhóm để tạo chuyến đi nhóm, hoặc để trống để tạo chuyến đi cá nhân
-              </p>
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label>Loại chuyến đi</Label>
+            <Select 
+              value={formData.groupId} 
+              onChange={(e) => handleInputChange('groupId', e.target.value)}
+            >
+              <option value="">🏠 Chuyến đi cá nhân</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  👥 {g.name}
+                </option>
+              ))}
+            </Select>
+            <p className="text-xs text-gray-500">
+              {groups.length > 0 
+                ? 'Chọn nhóm để tạo chuyến đi nhóm, hoặc để trống để tạo chuyến đi cá nhân'
+                : 'Chuyến đi cá nhân (chưa có nhóm nào)'
+              }
+            </p>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Mô tả</Label>

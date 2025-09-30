@@ -5,10 +5,13 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { getGroupBySlug, joinGroup, leaveGroup, getGroupMembers, isGroupMember, removeGroupMember } from '@/lib/actions/groups';
 import { getGroupTrips } from '@/lib/actions/trips';
-import { Group, GroupMember } from '@/lib/types';
+import { createGroupPost, getGroupPosts, likeGroupPost, getPostLikes, createGroupComment, getGroupComments } from '@/lib/actions/posts';
+import { getGroupActivities } from '@/lib/actions/activities';
+import { Group, GroupMember, GroupPost, GroupActivity } from '@/lib/types';
 import { formatDate } from '@/lib/utils/date';
 import Link from 'next/link';
 import GroupTripsTable from '@/components/GroupTripsTable';
@@ -22,7 +25,6 @@ import {
   Globe, 
   Lock, 
   Plus,
-  BarChart3,
   Copy,
   Check,
   UserCheck,
@@ -76,14 +78,24 @@ export default function GroupPage() {
   const [group, setGroup] = useState<Group | null>(null);
   const [trips, setTrips] = useState<any[]>([]);
   const [members, setMembers] = useState<GroupMember[]>([]);
+  const [posts, setPosts] = useState<GroupPost[]>([]);
   const [isMember, setIsMember] = useState(false);
   const [loadingGroup, setLoadingGroup] = useState(true);
   const [loadingTrips, setLoadingTrips] = useState(true);
   const [loadingMembers, setLoadingMembers] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+  const [activities, setActivities] = useState<GroupActivity[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [joining, setJoining] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'trips' | 'members' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'feed' | 'trips' | 'members'>('feed');
+  const [postContent, setPostContent] = useState('');
+  const [posting, setPosting] = useState(false);
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [commentText, setCommentText] = useState('');
+  const [commenting, setCommenting] = useState(false);
 
   useEffect(() => {
     if (slug && user) {
@@ -96,6 +108,11 @@ export default function GroupPage() {
       checkMembership();
       loadTrips();
       loadMembers();
+      // Load posts and activities with small delay to avoid race conditions
+      setTimeout(() => {
+        loadPosts();
+        loadActivities();
+      }, 100);
     }
   }, [group, user]);
 
@@ -150,6 +167,104 @@ export default function GroupPage() {
       toast.error('Có lỗi xảy ra khi tải danh sách thành viên');
     } finally {
       setLoadingMembers(false);
+    }
+  };
+
+  const loadPosts = async () => {
+    if (!group) return;
+    
+    try {
+      console.log('Loading posts for group:', group.id);
+      setLoadingPosts(true);
+      const { posts: postsData } = await getGroupPosts(group.id);
+      console.log('Posts loaded:', postsData.length);
+      setPosts(postsData);
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      toast.error('Có lỗi xảy ra khi tải bài viết');
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  const handleCreatePost = async () => {
+    if (!group || !user || !postContent.trim()) return;
+    
+    try {
+      setPosting(true);
+      await createGroupPost(group.id, user.uid, postContent);
+      setPostContent('');
+      toast.success('Đã đăng bài viết');
+      loadPosts(); // Reload posts
+    } catch (error) {
+      console.error('Error creating post:', error);
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi đăng bài');
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const handleLikePost = async (postId: string) => {
+    if (!user) return;
+    
+    try {
+      console.log('Attempting to like post:', postId);
+      console.log('User ID:', user.uid);
+      console.log('User object:', user);
+      
+      const result = await likeGroupPost(postId, user.uid);
+      console.log('Like result:', result);
+      
+      if (result.success) {
+        loadPosts(); // Reload posts to update like count
+      } else if (result.message) {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+      console.error('Error details:', error);
+      toast.error('Có lỗi xảy ra khi thích bài viết');
+    }
+  };
+
+  const handleCommentPost = async (postId: string) => {
+    if (!user) return;
+    
+    setSelectedPostId(postId);
+    setCommentText('');
+    setCommentModalOpen(true);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!selectedPostId || !user || !commentText.trim()) return;
+    
+    try {
+      setCommenting(true);
+      // Temporarily disable comment functionality
+      toast.info('Chức năng bình luận đang được cập nhật, vui lòng thử lại sau');
+      setCommentModalOpen(false);
+      setCommentText('');
+    } catch (error) {
+      console.error('Error commenting on post:', error);
+      toast.error('Có lỗi xảy ra khi bình luận');
+    } finally {
+      setCommenting(false);
+    }
+  };
+
+  const loadActivities = async () => {
+    if (!group) return; // prevent if no group yet
+    try {
+      console.log('Loading activities for group:', group.id);
+      setLoadingActivities(true);
+      const { activities } = await getGroupActivities(group.id);
+      console.log('Activities loaded:', activities.length);
+      setActivities(activities);
+    } catch (error) {
+      console.error('Error loading activities:', error);
+      // Silent fail; activity feed is optional
+    } finally {
+      setLoadingActivities(false);
     }
   };
 
@@ -295,349 +410,273 @@ export default function GroupPage() {
   const completedTrips = trips.filter(trip => trip.status === 'closed').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-2xl mb-6 shadow-md">
-          {/* Cover Image or Background */}
-          {group.coverUrl ? (
-            <div className="relative h-64 md:h-80">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-4 max-w-6xl">
+        {/* Social Media Style Header */}
+        <div className="bg-white rounded-xl shadow-sm border mb-6 overflow-hidden">
+          {/* Cover Photo */}
+          <div className="h-40 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative">
+            {group.coverUrl && (
               <img 
                 src={group.coverUrl} 
                 alt={group.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/40"></div>
-            </div>
-          ) : (
-            <div className="h-64 md:h-80 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500"></div>
-          )}
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-0"></div>
+          </div>
           
-          {/* Content Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-white px-6">
-              {/* Group Icon */}
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg mx-auto mb-4">
-                <Users className="w-8 h-8 text-white" />
+          {/* Profile Section */}
+          <div className="px-6 pb-6 relative">
+            <div className="flex flex-col sm:flex-row gap-4 -mt-8">
+              {/* Group Avatar */}
+              <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center relative z-10">
+                <Users className="w-10 h-10 text-blue-600" />
               </div>
               
-              {/* Group Name */}
-              <h1 className="text-3xl md:text-4xl font-bold mb-3 drop-shadow-lg">
-                {group.name}
-              </h1>
-              
-              {/* Group Description */}
-              {group.description && (
-                <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6 drop-shadow-md">
-                  {group.description}
-                </p>
-              )}
-              
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 justify-center">
-                {!isMember ? (
-                  <Button 
-                    onClick={handleJoin} 
-                    disabled={joining}
-                    className="bg-white text-gray-900 hover:bg-white/90 font-medium px-6 py-2 rounded-lg shadow-lg"
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    {joining ? 'Đang tham gia...' : 'Tham gia'}
-                  </Button>
-                ) : (
-                  <>
-                    <Button 
-                      onClick={copyInviteLink} 
-                      className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-4 py-2 rounded-lg"
-                    >
-                      {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                      {copied ? 'Đã sao chép!' : 'Sao chép link'}
-                    </Button>
-                    
-                    {isOwner && (
-                      <Link href={`/g/${group.slug}/manage`}>
-                        <Button 
-                          className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-4 py-2 rounded-lg"
-                        >
-                          <Settings className="w-4 h-4 mr-2" />
-                          Quản lý
-                        </Button>
-                      </Link>
+              <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">{group.name}</h1>
+                    {group.description && (
+                      <p className="text-gray-600 mt-1">{group.description}</p>
                     )}
-                    
-                    <Button 
-                      onClick={handleLeave} 
-                      disabled={leaving}
-                      className="bg-red-500/80 hover:bg-red-600/80 text-white px-4 py-2 rounded-lg"
-                    >
-                      {leaving ? 'Đang rời...' : 'Rời nhóm'}
-                    </Button>
-                  </>
-                )}
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        {members.length} thành viên
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Plane className="w-4 h-4" />
+                        {trips.length} chuyến đi
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    {!isMember ? (
+                      <Button 
+                        onClick={handleJoin} 
+                        disabled={joining}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                      >
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        {joining ? 'Đang tham gia...' : 'Tham gia nhóm'}
+                      </Button>
+                    ) : (
+                      <>
+                        <Button 
+                          onClick={copyInviteLink} 
+                          variant="outline"
+                          className="px-4"
+                        >
+                          {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                          {copied ? 'Đã sao chép!' : 'Mời bạn bè'}
+                        </Button>
+                        
+                        {isOwner && (
+                          <Link href={`/g/${group.slug}/manage`}>
+                            <Button variant="outline" className="px-4">
+                              <Settings className="w-4 h-4 mr-2" />
+                              Quản lý
+                            </Button>
+                          </Link>
+                        )}
+                        
+                        <Button 
+                          onClick={handleLeave} 
+                          disabled={leaving}
+                          variant="outline"
+                          className="text-red-600 border-red-200 hover:bg-red-50 px-4"
+                        >
+                          {leaving ? 'Đang rời...' : 'Rời nhóm'}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex justify-center mb-6">
-          <div className="bg-white rounded-2xl p-2 shadow-md border">
-            <div className="flex gap-2">
-              {[
-                { id: 'overview', label: 'Tổng quan', icon: BarChart3 },
-                { id: 'trips', label: 'Chuyến đi', icon: Plane },
-                { id: 'members', label: 'Thành viên', icon: Users },
-                { id: 'analytics', label: 'Thống kê', icon: PieChart }
-              ].map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Button
-                    key={tab.id}
-                    variant={activeTab === tab.id ? 'default' : 'ghost'}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className="px-6 py-3 rounded-xl transition-all duration-200"
-                  >
-                    <Icon className="w-4 h-4 mr-2" />
-                    {tab.label}
-                  </Button>
-                );
-              })}
-            </div>
+        {/* Social Media Style Tab Navigation */}
+        <div className="bg-white rounded-lg shadow-sm border mb-6">
+          <div className="flex border-b">
+            {[
+              { id: 'feed', label: 'Bảng tin', icon: Activity },
+              { id: 'trips', label: 'Chuyến đi', icon: Plane },
+              { id: 'members', label: 'Thành viên', icon: Users }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Button
+                  key={tab.id}
+                  variant="ghost"
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex-1 rounded-none border-b-2 ${
+                    activeTab === tab.id 
+                      ? 'border-blue-500 text-blue-600 bg-blue-50' 
+                      : 'border-transparent hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 mr-2" />
+                  {tab.label}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-100 text-sm font-medium mb-1">Thành viên</p>
-                      <p className="text-3xl font-bold">{members.length}</p>
+        {activeTab === 'feed' && (
+          <div className="space-y-4">
+            {/* Create Post */}
+            {isMember && (
+              <Card className="bg-white border shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-blue-600" />
                     </div>
-                    <Users className="w-8 h-8 text-blue-200" />
+                    <div className="flex-1">
+                      <textarea 
+                        placeholder="Chia sẻ gì đó với nhóm..."
+                        className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={3}
+                        value={postContent}
+                        onChange={(e) => setPostContent(e.target.value)}
+                        disabled={posting}
+                      />
+                      <div className="flex justify-end mt-3">
+                        <Button 
+                          size="sm" 
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={handleCreatePost}
+                          disabled={posting || !postContent.trim()}
+                        >
+                          {posting ? 'Đang đăng...' : 'Đăng'}
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
+            )}
 
-              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-100 text-sm font-medium mb-1">Chuyến đi</p>
-                      <p className="text-3xl font-bold">{trips.length}</p>
-                    </div>
-                    <Plane className="w-8 h-8 text-green-200" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-100 text-sm font-medium mb-1">Tổng chi phí</p>
-                      <p className="text-3xl font-bold">{totalExpense.toLocaleString('vi-VN')}đ</p>
-                    </div>
-                    <DollarSign className="w-8 h-8 text-purple-200" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-orange-100 text-sm font-medium mb-1">Cấp độ</p>
-                      <p className="text-3xl font-bold">{groupLevel.level}</p>
-                      <p className="text-orange-200 text-xs mt-1">
-                        {groupLevel.level === 'Elite' && 'Nhóm chuyên nghiệp'}
-                        {groupLevel.level === 'Pro' && 'Nhóm nâng cao'}
-                        {groupLevel.level === 'Active' && 'Nhóm tích cực'}
-                        {groupLevel.level === 'Growing' && 'Nhóm phát triển'}
-                        {groupLevel.level === 'New' && 'Nhóm mới'}
-                      </p>
-                    </div>
-                    <LevelIcon className="w-8 h-8 text-orange-200" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Group Level Info */}
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-md">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <Award className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">Hệ thống cấp độ nhóm</h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Cấp độ được tính dựa trên: số thành viên, số chuyến đi, tổng chi phí và hoạt động gần đây
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-                      <div className="text-center p-2 bg-white rounded border">
-                        <div className="font-semibold text-gray-900">New</div>
-                        <div className="text-gray-500">0-19 điểm</div>
-                      </div>
-                      <div className="text-center p-2 bg-white rounded border">
-                        <div className="font-semibold text-orange-600">Growing</div>
-                        <div className="text-gray-500">20-39 điểm</div>
-                      </div>
-                      <div className="text-center p-2 bg-white rounded border">
-                        <div className="font-semibold text-green-600">Active</div>
-                        <div className="text-gray-500">40-59 điểm</div>
-                      </div>
-                      <div className="text-center p-2 bg-white rounded border">
-                        <div className="font-semibold text-blue-600">Pro</div>
-                        <div className="text-gray-500">60-79 điểm</div>
-                      </div>
-                      <div className="text-center p-2 bg-white rounded border">
-                        <div className="font-semibold text-purple-600">Elite</div>
-                        <div className="text-gray-500">80+ điểm</div>
-                      </div>
-                    </div>
-                  </div>
+            {/* Feed: Posts and Activities */}
+            <div className="space-y-4">
+              {loadingPosts || loadingActivities ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <p className="text-gray-500">Đang tải bài viết...</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Trip Statistics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
-                    Thống kê chuyến đi
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Chuyến đi đang hoạt động</span>
-                      <span className="font-semibold text-green-600">
-                        {trips.filter(t => t.status === 'active').length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Chuyến đi đã đóng</span>
-                      <span className="font-semibold text-gray-600">
-                        {trips.filter(t => t.status === 'closed').length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Chi phí trung bình</span>
-                      <span className="font-semibold text-blue-600">
-                        {trips.length > 0 ? Math.round(totalExpense / trips.length).toLocaleString('vi-VN') + 'đ' : '0đ'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Thành viên trung bình</span>
-                      <span className="font-semibold text-purple-600">
-                        {trips.length > 0 ? Math.round(trips.reduce((sum, trip) => sum + (trip.memberCount || 0), 0) / trips.length) : 0}
-                      </span>
-                    </div>
+              ) : posts.length === 0 && activities.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Activity className="w-8 h-8 text-gray-400" />
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Hoạt động tháng này
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Chuyến đi mới</span>
-                      <span className="font-semibold text-green-600">
-                        {trips.filter(trip => {
-                          const tripDate = new Date(trip.createdAt);
-                          const now = new Date();
-                          return tripDate.getMonth() === now.getMonth() && tripDate.getFullYear() === now.getFullYear();
-                        }).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Chi phí tháng này</span>
-                      <span className="font-semibold text-blue-600">
-                        {trips.filter(trip => {
-                          const tripDate = new Date(trip.createdAt);
-                          const now = new Date();
-                          return tripDate.getMonth() === now.getMonth() && tripDate.getFullYear() === now.getFullYear();
-                        }).reduce((sum, trip) => sum + (trip.totalExpense || 0), 0).toLocaleString('vi-VN')}đ
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Thành viên mới</span>
-                      <span className="font-semibold text-purple-600">
-                        {members.filter(member => {
-                          if (!member.joinedAt) return false;
-                          const joinDate = new Date(member.joinedAt);
-                          const now = new Date();
-                          return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear();
-                        }).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Tỷ lệ hoàn thành</span>
-                      <span className="font-semibold text-orange-600">
-                        {trips.length > 0 ? Math.round((trips.filter(t => t.status === 'closed').length / trips.length) * 100) : 0}%
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  Hoạt động gần đây
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {trips.slice(0, 5).map((trip) => (
-                    <div key={trip.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Plane className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{trip.name}</h4>
-                        <p className="text-sm text-gray-600">
-                          Tạo ngày {formatDate(trip.createdAt)} • {trip.memberCount || 0} thành viên
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">
-                          {trip.totalExpense ? trip.totalExpense.toLocaleString('vi-VN') + 'đ' : '0đ'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {trip.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  {trips.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <Plane className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>Chưa có hoạt động nào</p>
-                    </div>
-                  )}
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Chưa có bài viết nào</h3>
+                  <p className="text-gray-500">Hãy là người đầu tiên chia sẻ với nhóm!</p>
                 </div>
-              </CardContent>
-            </Card>
+              ) : (
+                // Merge posts and activities, sort by date
+                [...activities.map(a => ({ type: 'activity' as const, createdAt: a.createdAt, data: a })),
+                 ...posts.map(p => ({ type: 'post' as const, createdAt: p.createdAt, data: p }))]
+                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .map((item, index) => item.type === 'post' ? (
+                  // Post card
+                  <Card key={`post-${(item.data as GroupPost).id}`} className="bg-white border shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex gap-3 mb-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          {(item.data as GroupPost).authorAvatar ? (
+                            <img 
+                              src={(item.data as GroupPost).authorAvatar!} 
+                              alt={(item.data as GroupPost).authorName}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <Users className="w-5 h-5 text-blue-600" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-gray-900">{(item.data as GroupPost).authorName}</h4>
+                            <span className="text-xs text-gray-500">
+                              {formatDate((item.data as GroupPost).createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{(item.data as GroupPost).content}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mt-3 pt-3 border-t">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-gray-500"
+                          onClick={() => handleLikePost((item.data as GroupPost).id)}
+                        >
+                          <Heart className="w-4 h-4 mr-1" />
+                          {(item.data as GroupPost).likesCount} thích
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-gray-500"
+                          onClick={() => handleCommentPost((item.data as GroupPost).id)}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          {(item.data as GroupPost).commentsCount} bình luận
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  // Activity card
+                  <Card key={`activity-${(item.data as GroupActivity).id}`} className="bg-white border shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex gap-3 mb-1">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                          <Activity className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-gray-900">
+                              {(item.data as GroupActivity).type === 'trip_created' && 'Chuyến đi mới'}
+                              {(item.data as GroupActivity).type === 'member_joined' && 'Thành viên mới'}
+                              {(item.data as GroupActivity).type === 'expense_added' && 'Chi phí mới'}
+                              {(item.data as GroupActivity).type === 'advance_added' && 'Tạm ứng mới'}
+                              {(item.data as GroupActivity).type === 'settlement_ready' && 'Đối soát sẵn sàng'}
+                            </h4>
+                            <span className="text-xs text-gray-500">{formatDate((item.data as GroupActivity).createdAt)}</span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {(() => {
+                              const a = item.data as GroupActivity;
+                              switch (a.type) {
+                                case 'trip_created':
+                                  return <>Đã tạo chuyến đi "{a.payload?.tripName}"</>;
+                                case 'member_joined':
+                                  return <>{a.payload?.memberName} đã tham gia nhóm</>;
+                                case 'expense_added':
+                                  return <>Thêm chi phí: {a.payload?.expenseDescription} ({a.payload?.amount?.toLocaleString('vi-VN')} {a.payload?.currency})</>;
+                                case 'advance_added':
+                                  return <>Thêm tạm ứng: {a.payload?.amount?.toLocaleString('vi-VN')} {a.payload?.currency}</>;
+                                case 'settlement_ready':
+                                  return <>Đã tạo bảng đối soát</>;
+                                default:
+                                  return null;
+                              }
+                            })()}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </div>
         )}
 
@@ -647,7 +686,7 @@ export default function GroupPage() {
             loading={loadingTrips}
             groupSlug={group.slug}
             groupName={group.name}
-            createTripUrl={`/g/${group.slug}/trips/create`}
+            createTripUrl={`/g/${group.slug}/trips`}
             createTripLabel="Tạo chuyến đi mới"
             emptyStateTitle="Chưa có chuyến đi nào trong nhóm"
             emptyStateDescription="Tạo chuyến đi mới để bắt đầu quản lý chi phí cùng nhóm"
@@ -679,117 +718,42 @@ export default function GroupPage() {
           />
         )}
 
-        {activeTab === 'analytics' && (
-          <div className="space-y-6">
-            {/* Analytics Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-100 text-sm font-medium mb-1">Chuyến đi hoạt động</p>
-                      <p className="text-3xl font-bold">{activeTrips}</p>
-                    </div>
-                    <CheckCircle2 className="w-8 h-8 text-green-200" />
-                  </div>
-                </CardContent>
-              </Card>
+      </div>
 
-              <Card className="bg-gradient-to-br from-gray-500 to-gray-600 text-white border-0 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-100 text-sm font-medium mb-1">Chuyến đi hoàn thành</p>
-                      <p className="text-3xl font-bold">{completedTrips}</p>
-                    </div>
-                    <XCircle className="w-8 h-8 text-gray-200" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-100 text-sm font-medium mb-1">Chi phí trung bình</p>
-                      <p className="text-3xl font-bold">{averageExpense.toLocaleString('vi-VN')}đ</p>
-                    </div>
-                    <DollarSign className="w-8 h-8 text-blue-200" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Detailed Analytics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChart className="w-5 h-5" />
-                    Phân bố chi phí theo chuyến đi
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {trips.slice(0, 5).map((trip) => (
-                      <div key={trip.id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                          <span className="font-medium text-gray-900 truncate">{trip.name}</span>
-                        </div>
-                        <span className="font-semibold text-gray-900">
-                          {trip.totalExpense ? trip.totalExpense.toLocaleString('vi-VN') + 'đ' : '0đ'}
-                        </span>
-                      </div>
-                    ))}
-                    {trips.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <PieChart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                        <p>Chưa có dữ liệu phân tích</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Thống kê thành viên
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Tổng thành viên</span>
-                      <span className="font-semibold text-gray-900">{members.length}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Chủ nhóm</span>
-                      <span className="font-semibold text-gray-900">
-                        {members.filter(m => m.role === 'owner').length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Thành viên thường</span>
-                      <span className="font-semibold text-gray-900">
-                        {members.filter(m => m.role === 'member').length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Cấp độ nhóm</span>
-                      <span className={`font-semibold ${groupLevel.color}`}>
-                        {groupLevel.level}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Comment Modal */}
+      <Dialog open={commentModalOpen} onOpenChange={setCommentModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bình luận</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <textarea
+              placeholder="Nhập bình luận của bạn..."
+              className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={4}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              disabled={commenting}
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setCommentModalOpen(false)}
+                disabled={commenting}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={handleSubmitComment}
+                disabled={commenting || !commentText.trim()}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {commenting ? 'Đang gửi...' : 'Gửi bình luận'}
+              </Button>
             </div>
           </div>
-        )}
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

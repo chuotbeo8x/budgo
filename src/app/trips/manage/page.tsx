@@ -5,11 +5,13 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getUserTrips } from '@/lib/actions/trips';
-import { Trip } from '@/lib/types';
+import { getUserGroups } from '@/lib/actions/groups';
+import { Trip, Group } from '@/lib/types';
 import { formatDate, formatDateTime } from '@/lib/utils/date';
 import { toast } from 'sonner';
 import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 import { 
   Plus, 
   MapPin, 
@@ -33,6 +35,7 @@ import {
 export default function TripsManagePage() {
   const { user, loading } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [loadingTrips, setLoadingTrips] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'personal' | 'group'>('all');
@@ -43,6 +46,7 @@ export default function TripsManagePage() {
   useEffect(() => {
     if (!loading && user) {
       loadTrips();
+      loadGroups();
     }
   }, [loading, user]);
 
@@ -58,6 +62,18 @@ export default function TripsManagePage() {
       toast.error('Có lỗi xảy ra khi tải danh sách chuyến đi');
     } finally {
       setLoadingTrips(false);
+    }
+  };
+
+  const loadGroups = async () => {
+    if (!user) return;
+    
+    try {
+      const userGroups = await getUserGroups(user.uid);
+      setGroups(userGroups);
+      console.log('Loaded groups for trips manage:', userGroups.length);
+    } catch (error) {
+      console.error('Error loading groups:', error);
     }
   };
 
@@ -217,12 +233,19 @@ export default function TripsManagePage() {
               <p className="text-sm sm:text-base lg:text-lg text-gray-600">Quản lý tất cả chuyến đi cá nhân và nhóm của bạn</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <Link href="/trips/create">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 text-xs sm:text-sm">
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Tạo chuyến đi mới
-                </Button>
-              </Link>
+              <TripCreateModal
+                trigger={
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 text-xs sm:text-sm">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Tạo chuyến đi mới
+                  </Button>
+                }
+                groups={groups} // Load actual groups
+                onSuccess={(tripId, groupId, tripSlug) => {
+                  toast.success('Chuyến đi đã được tạo thành công!');
+                  loadTrips();
+                }}
+              />
               <Link href="/">
                 <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -346,12 +369,19 @@ export default function TripsManagePage() {
                    filterType === 'personal' ? 'Bạn chưa tạo chuyến đi cá nhân nào.' :
                    'Bạn chưa tạo chuyến đi nhóm nào.'}
                 </p>
-                <Link href="/trips/create">
-                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-8 sm:h-10 text-xs sm:text-sm">
-                    <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                    Tạo chuyến đi đầu tiên
-                  </Button>
-                </Link>
+                <TripCreateModal
+                  trigger={
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-8 sm:h-10 text-xs sm:text-sm">
+                      <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                      Tạo chuyến đi đầu tiên
+                    </Button>
+                  }
+                  groups={groups} // Load actual groups
+                  onSuccess={(tripId, groupId, tripSlug) => {
+                    toast.success('Chuyến đi đã được tạo thành công!');
+                    loadTrips();
+                  }}
+                />
               </div>
             </CardContent>
           </Card>

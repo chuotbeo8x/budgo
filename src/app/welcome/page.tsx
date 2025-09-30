@@ -5,6 +5,8 @@ import { useProfile } from '@/components/auth/ProfileProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { getUserGroups } from '@/lib/actions/groups';
+import { Group } from '@/lib/types';
 import { 
   Users, 
   MapPin, 
@@ -18,13 +20,15 @@ import {
   Heart
 } from 'lucide-react';
 import Link from 'next/link';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function WelcomePage() {
   const { user } = useAuth();
   const { profile } = useProfile();
   const router = useRouter();
+  const [groups, setGroups] = useState<Group[]>([]);
 
   // Redirect nếu chưa đăng nhập
   useEffect(() => {
@@ -39,6 +43,27 @@ export default function WelcomePage() {
       localStorage.setItem(`budgo_welcome_seen_${user.uid}`, 'true');
     }
   }, [user, profile]);
+
+  // Load groups for trip creation modal
+  useEffect(() => {
+    if (user) {
+      loadGroups();
+    }
+  }, [user]);
+
+  const loadGroups = async () => {
+    try {
+      if (!user?.uid) {
+        console.warn('No user ID available for loading groups');
+        return;
+      }
+      const userGroups = await getUserGroups(user.uid);
+      setGroups(userGroups);
+      console.log('Loaded groups for welcome page:', userGroups.length);
+    } catch (error) {
+      console.error('Error loading groups:', error);
+    }
+  };
 
   // Handle navigation to dashboard
   const handleGoToDashboard = () => {
@@ -179,12 +204,36 @@ export default function WelcomePage() {
                   <CardDescription>{action.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Link href={action.href}>
-                    <Button className={`w-full ${action.color} text-white`}>
-                      {action.action}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
+                  {action.href === '/trips/create' ? (
+                    <TripCreateModal
+                      trigger={
+                        <Button className={`w-full ${action.color} text-white`}>
+                          {action.action}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      }
+                      groups={groups}
+                      onSuccess={(tripId, groupId, tripSlug) => {
+                        if (groupId) {
+                          const group = groups.find(g => g.id === groupId);
+                          if (group) {
+                            router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
+                          } else {
+                            router.push(`/trips/${tripSlug}/manage`);
+                          }
+                        } else {
+                          router.push(`/trips/${tripSlug}/manage`);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Link href={action.href}>
+                      <Button className={`w-full ${action.color} text-white`}>
+                        {action.action}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  )}
                 </CardContent>
               </Card>
             ))}

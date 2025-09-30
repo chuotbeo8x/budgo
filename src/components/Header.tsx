@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image'; // Removed to avoid image config issues
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
 import { logout, signInWithGoogle } from '@/lib/auth';
 import NotificationBell from './NotificationBell';
+import PWAInstallButton from './PWAInstallButton';
 import { 
   Globe, 
   Sun, 
@@ -20,6 +21,7 @@ import {
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import Avatar from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -156,24 +158,25 @@ export default function Header() {
               {/* Notification Bell */}
               <NotificationBell />
               
+              {/* PWA Install Button */}
+              <PWAInstallButton 
+                variant="ghost" 
+                size="sm" 
+                showText={false}
+                className="hidden sm:flex"
+              />
+              
               {/* Desktop Profile Dropdown */}
               <div className="hidden md:block">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                      {user.photoURL ? (
-                        <Image 
-                          src={user.photoURL} 
-                          alt="Avatar" 
-                          width={32} 
-                          height={32} 
-                          className="rounded-full" 
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-white" />
-                        </div>
-                      )}
+                      <Avatar 
+                        src={user.photoURL} 
+                        alt="Avatar" 
+                        size={32}
+                        fallbackIcon={<User className="w-5 h-5 text-white" />}
+                      />
                       <span className="text-sm font-medium text-gray-700">
                         {profile?.name || 'Bạn'}
                       </span>
@@ -277,19 +280,12 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="p-1">
-                      {user.photoURL ? (
-                        <Image 
-                          src={user.photoURL} 
-                          alt="Avatar" 
-                          width={32} 
-                          height={32} 
-                          className="rounded-full" 
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-white" />
-                        </div>
-                      )}
+                      <Avatar 
+                        src={user.photoURL} 
+                        alt="Avatar" 
+                        size={32}
+                        fallbackIcon={<User className="w-5 h-5 text-white" />}
+                      />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">

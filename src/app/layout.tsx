@@ -23,30 +23,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QA Tracker - Quản lý chuyến đi thông minh",
+  title: "Budgo - Quản lý nhóm và chuyến đi",
   description: "Ứng dụng quản lý chuyến đi, nhóm và chi phí một cách thông minh",
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "QA Tracker",
+    title: "Budgo",
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: "website",
-    siteName: "QA Tracker",
-    title: "QA Tracker - Quản lý chuyến đi thông minh",
+    siteName: "Budgo",
+    title: "Budgo - Quản lý nhóm và chuyến đi",
     description: "Ứng dụng quản lý chuyến đi, nhóm và chi phí một cách thông minh",
   },
   twitter: {
     card: "summary",
-    title: "QA Tracker - Quản lý chuyến đi thông minh",
+    title: "Budgo - Quản lý nhóm và chuyến đi",
     description: "Ứng dụng quản lý chuyến đi, nhóm và chi phí một cách thông minh",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -57,11 +63,9 @@ export default function RootLayout({
   return (
         <html lang="vi">
           <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-            <meta name="theme-color" content="#2563eb" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
             <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-            <meta name="apple-mobile-web-app-title" content="QA Tracker" />
+            <meta name="apple-mobile-web-app-title" content="Budgo" />
             <meta name="format-detection" content="telephone=no" />
             <meta name="mobile-web-app-capable" content="yes" />
             <meta name="msapplication-config" content="/browserconfig.xml" />

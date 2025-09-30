@@ -334,18 +334,11 @@ export default function GroupsManagePage() {
                                     </p>
                                   </div>
                                   <div className="flex flex-col items-end gap-1 ml-2">
-                                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                                    <div className={`flex sm:inline-flex flex-wrap whitespace-normal items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
                                       <TypeIcon className="w-3 h-3" />
                                       <span className="hidden sm:inline">{typeInfo.label}</span>
-                                      <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
+                                      <span className="sm:hidden whitespace-normal">{typeInfo.label}</span>
                                     </div>
-                                    {isOwner && (
-                                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        <Crown className="w-3 h-3" />
-                                        <span className="hidden sm:inline">Chủ nhóm</span>
-                                        <span className="sm:hidden">Chủ</span>
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
 
@@ -416,10 +409,10 @@ export default function GroupsManagePage() {
                                     </p>
                                   </div>
                                   <div className="flex flex-col items-end gap-1 ml-2">
-                                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                                    <div className={`flex sm:inline-flex flex-wrap whitespace-normal items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
                                       <TypeIcon className="w-3 h-3" />
                                       <span className="hidden sm:inline">{typeInfo.label}</span>
-                                      <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
+                                      <span className="sm:hidden whitespace-normal">{typeInfo.label}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -521,18 +514,11 @@ export default function GroupsManagePage() {
                           </p>
                         </div>
                         <div className="flex flex-col items-end gap-1 ml-2">
-                          <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                          <div className={`flex sm:inline-flex flex-wrap whitespace-normal items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
                             <TypeIcon className="w-3 h-3" />
                             <span className="hidden sm:inline">{typeInfo.label}</span>
-                            <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
+                            <span className="sm:hidden whitespace-normal">{typeInfo.label}</span>
                           </div>
-                          {isOwner && (
-                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              <Crown className="w-3 h-3" />
-                              <span className="hidden sm:inline">Chủ nhóm</span>
-                              <span className="sm:hidden">Chủ</span>
-                            </div>
-                          )}
                         </div>
                       </div>
 

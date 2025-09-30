@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils/date';
 import { getGroupTrips } from '@/lib/actions/trips';
 import { Trip } from '@/lib/types';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 
 interface GroupTripsProps {
   groupId: string;
@@ -100,12 +101,19 @@ export default function GroupTrips({ groupId, groupSlug, isOwner, loading: exter
             <Calendar className="w-5 h-5 mr-2" />
             Chuyến đi ({trips.length})
           </CardTitle>
-          <Link href={`/trips/create?groupId=${groupId}`}>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Tạo chuyến đi
-            </Button>
-          </Link>
+          <TripCreateModal
+            trigger={
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Tạo chuyến đi
+              </Button>
+            }
+            groups={[{ id: groupId, slug: groupSlug } as any]} // Pass current group in array
+            onSuccess={() => {
+              // Reload trips
+              loadTrips();
+            }}
+          />
         </div>
         <CardDescription>
           Danh sách các chuyến đi trong nhóm
@@ -117,12 +125,19 @@ export default function GroupTrips({ groupId, groupSlug, isOwner, loading: exter
             <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg mb-2">Chưa có chuyến đi nào</p>
             <p className="text-gray-400 text-sm mb-6">Tạo chuyến đi đầu tiên để bắt đầu</p>
-            <Link href={`/trips/create?groupId=${groupId}`}>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Tạo chuyến đi
-              </Button>
-            </Link>
+            <TripCreateModal
+              trigger={
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tạo chuyến đi
+                </Button>
+              }
+              groups={[{ id: groupId, slug: groupSlug } as any]} // Pass current group in array
+              onSuccess={() => {
+                // Reload trips
+                loadTrips();
+              }}
+            />
           </div>
         ) : (
           <div className="space-y-6">
