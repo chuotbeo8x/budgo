@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUserProfile } from '@/lib/actions/users';
+import { withRateLimit } from '@/lib/utils/rate-limit';
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting
+  const rateLimitResponse = withRateLimit(10, 60 * 60 * 1000)(request); // 10 requests per hour
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const formData = await request.formData();
     

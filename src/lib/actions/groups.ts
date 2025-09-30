@@ -186,68 +186,96 @@ export async function getUserGroups(userId: string) {
       return [];
     }
 
-    // Get groups by individual queries to avoid 'in' operator issues
+    // Batch fetch all groups at once to avoid N+1 queries
     const groups: Group[] = [];
     
-    for (const groupId of groupIds) {
+    if (groupIds.length > 0) {
       try {
-        console.log(`Getting group: ${groupId}`);
-        const groupRef = adminDb.collection('groups').doc(groupId);
-        let groupSnap;
-        try {
-          groupSnap = await groupRef.get();
-        } catch (groupQueryError) {
-          console.error(`Error querying group ${groupId}:`, groupQueryError);
-          continue; // Skip this group and continue with others
-        }
-        
-        if (groupSnap.exists) {
-          const groupData = groupSnap.data();
-          console.log(`Group ${groupId} data:`, groupData);
+        // Use Firestore 'in' query to fetch all groups at once (limit 10)
+        if (groupIds.length <= 10) {
+          const groupsSnapshot = await adminDb.collection('groups')
+            .where('__name__', 'in', groupIds)
+            .get();
           
-          // Get member count for this group (all active members)
-          const memberCountQuery = adminDb.collection('groupMembers')
-            .where('groupId', '==', groupId);
-          let memberCountSnapshot;
-          try {
-            memberCountSnapshot = await memberCountQuery.get();
-          } catch (memberCountError) {
-            console.error(`Error getting member count for group ${groupId}:`, memberCountError);
-            // Continue with memberCount = 0
-            memberCountSnapshot = { docs: [] };
-          }
+          // Get all member counts in one batch query
+          const memberCountsSnapshot = await adminDb.collection('groupMembers')
+            .where('groupId', 'in', groupIds)
+            .get();
           
-          // Filter out members who have left (handle both null and empty object cases)
-          const activeMembers = memberCountSnapshot.docs.filter(doc => {
+          // Group member counts by groupId
+          const memberCountsMap = new Map<string, number>();
+          memberCountsSnapshot.docs.forEach(doc => {
             const data = doc.data();
-            return !data.leftAt || (typeof data.leftAt === 'object' && Object.keys(data.leftAt).length === 0);
+            const groupId = data.groupId;
+            if (!data.leftAt || (typeof data.leftAt === 'object' && Object.keys(data.leftAt).length === 0)) {
+              memberCountsMap.set(groupId, (memberCountsMap.get(groupId) || 0) + 1);
+            }
           });
           
-          const memberCount = activeMembers.length;
-          
-          console.log(`Group ${groupId} - Total members: ${memberCountSnapshot.docs.length}, Active members: ${memberCount}`);
-          
-          // Convert Firestore Timestamp to Date if needed
-          console.log(`Group ${groupId} - createdAt raw:`, groupData?.createdAt);
-          const createdAt = safeToDate(groupData?.createdAt) || new Date();
-          console.log(`Group ${groupId} - createdAt converted:`, createdAt);
-          
-          const processedGroupData = {
-            ...groupData,
-            createdAt: createdAt,
-            memberCount: memberCount
-          };
-          
-          groups.push({
-            id: groupSnap.id,
-            ...processedGroupData
-          } as Group & { memberCount: number });
+          groupsSnapshot.docs.forEach(doc => {
+            const groupData = doc.data();
+            const groupId = doc.id;
+            const memberCount = memberCountsMap.get(groupId) || 0;
+            
+            console.log(`Group ${groupId} - Active members: ${memberCount}`);
+            
+            // Convert Firestore Timestamp to Date if needed
+            const createdAt = safeToDate(groupData?.createdAt) || new Date();
+            
+            const processedGroupData = {
+              ...groupData,
+              createdAt,
+              memberCount
+            };
+            
+            const group = { id: groupId, ...processedGroupData } as Group;
+            groups.push(group);
+            console.log(`Added group: ${groupId}`);
+          });
         } else {
-          console.warn(`Group ${groupId} not found`);
+          // For more than 10 groups, batch the queries
+          const chunks = chunkArray(groupIds, 10);
+          for (const chunk of chunks) {
+            const groupsSnapshot = await adminDb.collection('groups')
+              .where('__name__', 'in', chunk)
+              .get();
+            
+            // Get member counts for this chunk
+            const memberCountsSnapshot = await adminDb.collection('groupMembers')
+              .where('groupId', 'in', chunk)
+              .get();
+            
+            // Group member counts by groupId
+            const memberCountsMap = new Map<string, number>();
+            memberCountsSnapshot.docs.forEach(doc => {
+              const data = doc.data();
+              const groupId = data.groupId;
+              if (!data.leftAt || (typeof data.leftAt === 'object' && Object.keys(data.leftAt).length === 0)) {
+                memberCountsMap.set(groupId, (memberCountsMap.get(groupId) || 0) + 1);
+              }
+            });
+            
+            groupsSnapshot.docs.forEach(doc => {
+              const groupData = doc.data();
+              const groupId = doc.id;
+              const memberCount = memberCountsMap.get(groupId) || 0;
+              
+              const createdAt = safeToDate(groupData?.createdAt) || new Date();
+              
+              const processedGroupData = {
+                ...groupData,
+                createdAt,
+                memberCount
+              };
+              
+              const group = { id: groupId, ...processedGroupData } as Group;
+              groups.push(group);
+            });
+          }
         }
-      } catch (groupError) {
-        console.error(`Error getting group ${groupId}:`, groupError);
-        // Continue with other groups even if one fails
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+        throw new Error('Không thể lấy danh sách nhóm');
       }
     }
     
