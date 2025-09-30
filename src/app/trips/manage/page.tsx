@@ -444,7 +444,7 @@ export default function TripsManagePage() {
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         <span>{trip.memberCount > 0 ? trip.memberCount : 1} thành viên</span>
-                        {trip.statsCache?.totalExpense && (
+                        {trip.statsCache?.totalExpense && trip.statsCache.totalExpense > 0 && (
                           <>
                             <span className="text-gray-400">•</span>
                             <DollarSign className="w-4 h-4 text-gray-400 flex-shrink-0" />
