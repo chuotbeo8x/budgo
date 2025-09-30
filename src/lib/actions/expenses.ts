@@ -191,6 +191,15 @@ export async function addExpense(formData: FormData) {
 
     await adminDb.collection('expenses').doc(expenseId).set(prepareFirestoreData(expenseData));
 
+    // Update trip stats cache
+    try {
+      const { updateTripStatsCache } = await import('../actions/trips');
+      await updateTripStatsCache(tripId);
+      console.log('Updated statsCache after expense creation');
+    } catch (error) {
+      console.error('Failed to update statsCache:', error);
+    }
+
     return { success: true, expenseId };
   } catch (error) {
     console.error('Error adding expense:', error);
@@ -451,6 +460,15 @@ export async function updateExpense(expenseId: string, formData: FormData) {
     await adminDb.collection('expenses').doc(expenseId).update(prepareFirestoreData(updateData));
     console.log('Expense updated successfully');
 
+    // Update trip stats cache
+    try {
+      const { updateTripStatsCache } = await import('../actions/trips');
+      await updateTripStatsCache(tripId);
+      console.log('Updated statsCache after expense update');
+    } catch (error) {
+      console.error('Failed to update statsCache:', error);
+    }
+
     return { success: true };
   } catch (error) {
     console.error('Error updating expense:', error);
@@ -497,6 +515,15 @@ export async function deleteExpense(expenseId: string, userId: string) {
     }
 
     await adminDb.collection('expenses').doc(expenseId).delete();
+
+    // Update trip stats cache
+    try {
+      const { updateTripStatsCache } = await import('../actions/trips');
+      await updateTripStatsCache(expenseData.tripId);
+      console.log('Updated statsCache after expense deletion');
+    } catch (error) {
+      console.error('Failed to update statsCache:', error);
+    }
 
     return { success: true };
   } catch (error) {
@@ -623,6 +650,15 @@ export async function addAdvance(formData: FormData) {
     };
 
     await adminDb.collection('advances').doc(advanceId).set(prepareFirestoreData(advanceData));
+
+    // Update trip stats cache
+    try {
+      const { updateTripStatsCache } = await import('../actions/trips');
+      await updateTripStatsCache(validatedData.tripId);
+      console.log('Updated statsCache after advance creation');
+    } catch (error) {
+      console.error('Failed to update statsCache:', error);
+    }
 
     return { success: true, advanceId };
   } catch (error) {
@@ -778,6 +814,15 @@ export async function updateAdvance(advanceId: string, formData: FormData) {
     // Clean data before saving to Firestore
     const cleanedUpdateData = prepareFirestoreData(updateData);
     await advanceRef.update(cleanedUpdateData);
+
+    // Update trip stats cache
+    try {
+      const { updateTripStatsCache } = await import('../actions/trips');
+      await updateTripStatsCache(tripId);
+      console.log('Updated statsCache after advance update');
+    } catch (error) {
+      console.error('Failed to update statsCache:', error);
+    }
 
     return { success: true, message: 'Cập nhật tạm ứng thành công!' };
   } catch (error) {
