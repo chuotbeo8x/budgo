@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack --port 3000",
     "build": "next build",
     "build:beta": "copy .env.local .env.local.backup && copy env.beta .env.local && set FIREBASE_PROJECT_ID=budgo-aae32 && set NODE_ENV=production && next build --turbopack --no-lint && copy .env.local.backup .env.local",
-    "start": "next start -p ${PORT:-3000}",
+    "start": "next start",
     "start:beta": "copy .env.local .env.local.backup && copy env.beta .env.local && next start && copy .env.local.backup .env.local",
     "deploy:beta": "npm run build:beta && firebase deploy --only hosting --project budgo-aae32",
     "lint": "eslint",
