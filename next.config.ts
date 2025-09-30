@@ -8,12 +8,8 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   // Fix routesManifest issue
-  output: 'standalone',
+  // output: 'standalone', // Comment out for Render
   trailingSlash: false,
-  // Ensure proper port binding for deployment
-  env: {
-    PORT: process.env.PORT || '3000',
-  },
   images: {
     domains: [
       'lh3.googleusercontent.com',
