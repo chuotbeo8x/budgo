@@ -115,6 +115,27 @@ const nextConfig: NextConfig = {
       };
     }
 
+    // Add fallbacks for Node.js modules
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      child_process: false,
+      os: false,
+      path: false,
+      crypto: false,
+      stream: false,
+      util: false,
+      buffer: false,
+      assert: false,
+      http: false,
+      https: false,
+      zlib: false,
+      querystring: false,
+      url: false,
+    };
+
     // Optimize imports
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -125,8 +146,6 @@ const nextConfig: NextConfig = {
   },
   // Enable compression
   compress: true,
-  // Enable SWC minification
-  swcMinify: true,
   // Optimize CSS
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
