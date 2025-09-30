@@ -125,14 +125,15 @@ export default function NotificationsPage() {
     switch (notification.type) {
       case 'group_request':
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
             <Link href={`/g/${notification.data.groupId}/requests`}>
-              <Button size="sm">Xem yêu cầu</Button>
+              <Button size="sm" className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto">Xem yêu cầu</Button>
             </Link>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleDeleteNotification(notification.id)}
+              className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
             >
               Xóa
             </Button>
@@ -141,14 +142,15 @@ export default function NotificationsPage() {
       case 'trip_created':
       case 'trip_updated':
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
             <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}`}>
-              <Button size="sm">Xem chuyến đi</Button>
+              <Button size="sm" className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto">Xem chuyến đi</Button>
             </Link>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleDeleteNotification(notification.id)}
+              className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
             >
               Xóa
             </Button>
@@ -157,14 +159,15 @@ export default function NotificationsPage() {
       case 'expense_added':
       case 'expense_updated':
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
             <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/expenses`}>
-              <Button size="sm">Xem chi phí</Button>
+              <Button size="sm" className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto">Xem chi phí</Button>
             </Link>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleDeleteNotification(notification.id)}
+              className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
             >
               Xóa
             </Button>
@@ -172,14 +175,15 @@ export default function NotificationsPage() {
         );
       case 'settlement_ready':
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
             <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/settlement`}>
-              <Button size="sm">Xem thanh toán</Button>
+              <Button size="sm" className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto">Xem thanh toán</Button>
             </Link>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleDeleteNotification(notification.id)}
+              className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
             >
               Xóa
             </Button>
@@ -187,14 +191,15 @@ export default function NotificationsPage() {
         );
       case 'admin_broadcast':
         return (
-          <div className="flex space-x-2">
-            <Button size="sm" variant="outline" disabled>
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
+            <Button size="sm" variant="outline" disabled className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto">
               Thông báo hệ thống
             </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleDeleteNotification(notification.id)}
+              className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
             >
               Xóa
             </Button>
@@ -206,6 +211,7 @@ export default function NotificationsPage() {
             size="sm"
             variant="outline"
             onClick={() => handleDeleteNotification(notification.id)}
+            className="h-7 sm:h-8 text-xs sm:text-sm w-full sm:w-auto"
           >
             Xóa
           </Button>
@@ -242,47 +248,50 @@ export default function NotificationsPage() {
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900">
                 Thông báo
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 {unreadCount > 0 && `${unreadCount} thông báo chưa đọc`}
               </p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
               {unreadCount > 0 && (
                 <Button
                   onClick={handleMarkAllAsRead}
                   variant="outline"
+                  className="h-8 sm:h-9 text-xs sm:text-sm"
                 >
                   Đánh dấu tất cả đã đọc
                 </Button>
               )}
               <Link href="/dashboard">
-                <Button variant="outline">Về trang chủ</Button>
+                <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">Về trang chủ</Button>
               </Link>
             </div>
           </div>
         </div>
 
         {/* Filter */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex space-x-4">
+        <Card className="mb-4 sm:mb-6">
+          <CardContent className="pt-3 sm:pt-6">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
               <Button
                 variant={filter === 'all' ? 'default' : 'outline'}
                 onClick={() => setFilter('all')}
+                className="h-8 sm:h-9 text-xs sm:text-sm"
               >
                 Tất cả ({notifications.length})
               </Button>
               <Button
                 variant={filter === 'unread' ? 'default' : 'outline'}
                 onClick={() => setFilter('unread')}
+                className="h-8 sm:h-9 text-xs sm:text-sm"
               >
                 Chưa đọc ({unreadCount})
               </Button>
@@ -292,67 +301,70 @@ export default function NotificationsPage() {
 
         {/* Notifications List */}
         <Card>
-          <CardHeader>
-            <CardTitle>Danh sách thông báo</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-base sm:text-lg">Danh sách thông báo</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {filter === 'all' 
                 ? `Hiển thị ${filteredNotifications.length} thông báo`
                 : `Hiển thị ${filteredNotifications.length} thông báo chưa đọc`
               }
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {filteredNotifications.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">
+              <div className="text-center py-6 sm:py-8">
+                <p className="text-sm sm:text-base text-gray-500">
                   {filter === 'all' ? 'Chưa có thông báo nào' : 'Không có thông báo chưa đọc'}
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {filteredNotifications.map((notification) => (
                   <div 
                     key={notification.id} 
-                    className={`flex items-start space-x-4 p-4 rounded-lg border ${
+                    className={`flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-lg border ${
                       notification.isRead 
                         ? 'bg-gray-50 border-gray-200' 
                         : 'bg-blue-50 border-blue-200'
                     }`}
                   >
-                    <div className="text-2xl">
+                    <div className="text-lg sm:text-2xl">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-0">
                         <div className="flex-1">
-                          <h3 className={`font-medium ${
+                          <h3 className={`text-sm sm:text-base font-medium ${
                             notification.isRead ? 'text-gray-900' : 'text-blue-900'
                           }`}>
                             {notification.title}
                           </h3>
-                          <p className={`text-sm mt-1 ${
+                          <p className={`text-xs sm:text-sm mt-1 ${
                             notification.isRead ? 'text-gray-600' : 'text-blue-700'
                           }`}>
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="text-xs text-gray-500 mt-1 sm:mt-2">
                             {formatDateTime(notification.createdAt)}
                             {notification.isRead && notification.readAt && (
                               <span> • Đã đọc {formatDateTime(notification.readAt)}</span>
                             )}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-2 ml-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 sm:ml-4">
                           {!notification.isRead && (
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleMarkAsRead(notification.id)}
+                              className="h-7 sm:h-8 text-xs sm:text-sm"
                             >
                               Đánh dấu đã đọc
                             </Button>
                           )}
-                          {getNotificationAction(notification)}
+                          <div className="w-full sm:w-auto">
+                            {getNotificationAction(notification)}
+                          </div>
                         </div>
                       </div>
                     </div>

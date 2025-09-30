@@ -193,13 +193,13 @@ export default function NotificationPanel({
       }`} />
       
       {/* Panel */}
-      <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed top-0 right-0 h-full w-full sm:w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
         isAnimating ? 'translate-x-full' : 'translate-x-0'
       }`}>
         <div className="flex flex-col h-full" ref={panelRef}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">Thông báo</h2>
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Thông báo</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -211,12 +211,12 @@ export default function NotificationPanel({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {/* Birthday Notifications */}
             {birthdayMembers.length > 0 && (
-              <div className="space-y-3 animate-in slide-in-from-bottom fade-in">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Cake className="w-4 h-4 text-pink-500" />
+              <div className="space-y-2 sm:space-y-3 animate-in slide-in-from-bottom fade-in">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+                  <Cake className="w-3 h-3 sm:w-4 sm:h-4 text-pink-500" />
                   Sinh nhật hôm nay
                 </div>
                 
@@ -226,24 +226,24 @@ export default function NotificationPanel({
                     className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200 animate-in slide-in-from-bottom fade-in"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <CardContent className="p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                    <CardContent className="p-2 sm:p-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
                           {member.avatar ? (
                             <img 
                               src={member.avatar} 
                               alt={member.name}
-                              className="w-8 h-8 rounded-full object-cover"
+                              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
                             />
                           ) : (
-                            <span className="text-white text-sm font-medium">
+                            <span className="text-white text-xs sm:text-sm font-medium">
                               {member.name.charAt(0)}
                             </span>
                           )}
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">
+                          <p className="text-sm sm:text-base font-medium text-gray-900 truncate">
                             {member.name}
                           </p>
                           {member.groupName && (
@@ -258,7 +258,7 @@ export default function NotificationPanel({
                             size="sm"
                             variant="ghost"
                             onClick={() => sendBirthdayWish(member.id, member.name)}
-                            className="h-8 w-8 p-0 hover:bg-pink-100"
+                            className="h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-pink-100"
                             title="Gửi lời chúc"
                           >
                             <Heart className="w-3 h-3 text-pink-500" />
@@ -267,7 +267,7 @@ export default function NotificationPanel({
                             size="sm"
                             variant="ghost"
                             onClick={() => sendBirthdayWish(member.id, member.name)}
-                            className="h-8 w-8 p-0 hover:bg-pink-100"
+                            className="h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-pink-100"
                             title="Gửi quà"
                           >
                             <Gift className="w-3 h-3 text-purple-500" />
@@ -281,14 +281,14 @@ export default function NotificationPanel({
             )}
 
             {/* Regular Notifications */}
-            <div className="space-y-3 animate-in slide-in-from-bottom fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="space-y-2 sm:space-y-3 animate-in slide-in-from-bottom fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Bell className="w-4 h-4 text-blue-500" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+                  <Bell className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                   Thông báo gần đây
                 </div>
                 <Link href="/notifications">
-                  <Button variant="ghost" size="sm" className="text-xs">
+                  <Button variant="ghost" size="sm" className="text-xs h-6 sm:h-8 px-2 sm:px-3">
                     Xem tất cả
                   </Button>
                 </Link>
@@ -298,27 +298,27 @@ export default function NotificationPanel({
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
-                        <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-gray-50">
+                        <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-200 rounded"></div>
+                        <div className="flex-1 space-y-1 sm:space-y-2">
+                          <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>Không có thông báo</p>
+                <div className="text-center py-6 sm:py-8 text-gray-500">
+                  <Bell className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-gray-300" />
+                  <p className="text-sm sm:text-base">Không có thông báo</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {notifications.slice(0, 5).map((notification) => (
                     <div 
                       key={notification.id} 
-                      className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+                      className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-colors ${
                         notification.isRead 
                           ? 'bg-gray-50 border-gray-200' 
                           : 'bg-blue-50 border-blue-200'
@@ -331,28 +331,28 @@ export default function NotificationPanel({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className={`text-sm font-medium ${
+                            <h4 className={`text-xs sm:text-sm font-medium ${
                               notification.isRead ? 'text-gray-900' : 'text-blue-900'
                             }`}>
                               {notification.title}
                             </h4>
-                            <p className={`text-xs mt-1 ${
+                            <p className={`text-xs mt-0.5 sm:mt-1 ${
                               notification.isRead ? 'text-gray-600' : 'text-blue-700'
                             }`}>
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 mt-0.5 sm:mt-1">
                               {formatDateTime(notification.createdAt)}
                             </p>
                           </div>
                           
-                          <div className="flex items-center gap-1 ml-2">
+                          <div className="flex items-center gap-1 ml-1 sm:ml-2">
                             {!notification.isRead && (
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleMarkAsRead(notification.id)}
-                                className="h-6 w-6 p-0"
+                                className="h-5 w-5 sm:h-6 sm:w-6 p-0"
                                 title="Đánh dấu đã đọc"
                               >
                                 <CheckCircle className="w-3 h-3" />
@@ -362,7 +362,7 @@ export default function NotificationPanel({
                               size="sm"
                               variant="ghost"
                               onClick={() => handleDeleteNotification(notification.id)}
-                              className="h-6 w-6 p-0 hover:bg-red-100"
+                              className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-red-100"
                               title="Xóa"
                             >
                               <Trash2 className="w-3 h-3 text-red-500" />
@@ -371,7 +371,7 @@ export default function NotificationPanel({
                         </div>
                         
                         {getNotificationAction(notification) && (
-                          <div className="mt-2">
+                          <div className="mt-1 sm:mt-2">
                             {getNotificationAction(notification)}
                           </div>
                         )}
@@ -380,9 +380,9 @@ export default function NotificationPanel({
                   ))}
                   
                   {notifications.length > 5 && (
-                    <div className="text-center pt-2">
+                    <div className="text-center pt-1 sm:pt-2">
                       <Link href="/notifications">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-3 sm:px-4">
                           Xem thêm {notifications.length - 5} thông báo
                         </Button>
                       </Link>
