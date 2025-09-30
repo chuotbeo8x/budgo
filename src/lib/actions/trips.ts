@@ -664,6 +664,27 @@ export async function getUserTrips(userId: string) {
         const memberCount = Math.max(activeMembers.length + (ownerInMembers ? 0 : 1), 1);
         console.log(`Trip ${doc.id}: activeMembers=${activeMembers.length}, ownerInMembers=${ownerInMembers}, finalCount=${memberCount}`);
         
+        // Check if statsCache needs updating (older than 1 hour)
+        let statsCache = tripData.statsCache;
+        const cacheAge = statsCache?.computedAt ? 
+          (new Date().getTime() - safeToDate(statsCache.computedAt)?.getTime()) : 
+          Infinity;
+        
+        if (!statsCache || cacheAge > 3600000) { // 1 hour = 3600000 ms
+          console.log(`Updating statsCache for trip ${doc.id} (age: ${cacheAge}ms)`);
+          try {
+            const updatedStats = await updateTripStatsCache(doc.id);
+            statsCache = {
+              totalAdvance: updatedStats.totalAdvance,
+              totalExpense: updatedStats.totalExpense,
+              computedAt: updatedStats.computedAt
+            };
+          } catch (error) {
+            console.error(`Failed to update statsCache for trip ${doc.id}:`, error);
+            // Keep existing statsCache if update fails
+          }
+        }
+        
         // Convert Firestore Timestamps to Date if needed
         const processedTripData = {
           ...tripData,
@@ -673,9 +694,9 @@ export async function getUserTrips(userId: string) {
           endDate: safeToDate(tripData.endDate),
           paymentStatusUpdatedAt: safeToDate(tripData.paymentStatusUpdatedAt),
           memberCount: memberCount,
-          statsCache: tripData.statsCache ? {
-            ...tripData.statsCache,
-            computedAt: safeToDate(tripData.statsCache.computedAt)
+          statsCache: statsCache ? {
+            ...statsCache,
+            computedAt: safeToDate(statsCache.computedAt)
           } : null
         };
         
@@ -721,6 +742,27 @@ export async function getUserTrips(userId: string) {
               continue;
             }
             
+            // Check if statsCache needs updating (older than 1 hour)
+            let statsCache = tripData.statsCache;
+            const cacheAge = statsCache?.computedAt ? 
+              (new Date().getTime() - safeToDate(statsCache.computedAt)?.getTime()) : 
+              Infinity;
+            
+            if (!statsCache || cacheAge > 3600000) { // 1 hour = 3600000 ms
+              console.log(`Updating statsCache for member trip ${tripId} (age: ${cacheAge}ms)`);
+              try {
+                const updatedStats = await updateTripStatsCache(tripId);
+                statsCache = {
+                  totalAdvance: updatedStats.totalAdvance,
+                  totalExpense: updatedStats.totalExpense,
+                  computedAt: updatedStats.computedAt
+                };
+              } catch (error) {
+                console.error(`Failed to update statsCache for member trip ${tripId}:`, error);
+                // Keep existing statsCache if update fails
+              }
+            }
+            
             // Convert Firestore Timestamps to Date if needed
             const processedTripData = {
               ...tripData,
@@ -730,9 +772,9 @@ export async function getUserTrips(userId: string) {
               endDate: safeToDate(tripData.endDate),
               paymentStatusUpdatedAt: safeToDate(tripData.paymentStatusUpdatedAt),
               memberCount: memberCount,
-              statsCache: tripData.statsCache ? {
-                ...tripData.statsCache,
-                computedAt: safeToDate(tripData.statsCache.computedAt)
+              statsCache: statsCache ? {
+                ...statsCache,
+                computedAt: safeToDate(statsCache.computedAt)
               } : null
             };
             
@@ -765,6 +807,57 @@ export async function getUserTrips(userId: string) {
       adminDbAvailable: !!adminDb
     });
     throw new Error('Có lỗi xảy ra khi lấy danh sách chuyến đi');
+  }
+}
+
+// Update Trip Stats Cache
+export async function updateTripStatsCache(tripId: string) {
+  try {
+    if (!adminDb) {
+      console.error('Admin DB not available');
+      throw new Error('Database not available');
+    }
+
+    // Get all expenses for this trip
+    const expensesQuery = adminDb.collection('expenses')
+      .where('tripId', '==', tripId)
+      .where('deletedAt', '==', null);
+    const expensesSnapshot = await expensesQuery.get();
+    
+    const totalExpense = expensesSnapshot.docs.reduce((sum, expenseDoc) => {
+      return sum + (expenseDoc.data().amount || 0);
+    }, 0);
+
+    // Get all advances for this trip
+    const advancesQuery = adminDb.collection('advances')
+      .where('tripId', '==', tripId);
+    const advancesSnapshot = await advancesQuery.get();
+    
+    const totalAdvance = advancesSnapshot.docs.reduce((sum, advanceDoc) => {
+      return sum + (advanceDoc.data().amount || 0);
+    }, 0);
+
+    // Update trip document with new statsCache
+    const tripRef = adminDb.collection('trips').doc(tripId);
+    await tripRef.update({
+      statsCache: {
+        totalAdvance: totalAdvance,
+        totalExpense: totalExpense,
+        computedAt: new Date()
+      }
+    });
+
+    console.log(`Updated statsCache for trip ${tripId}: totalExpense=${totalExpense}, totalAdvance=${totalAdvance}`);
+    
+    return {
+      success: true,
+      totalExpense,
+      totalAdvance,
+      computedAt: new Date()
+    };
+  } catch (error) {
+    console.error('Error updating trip stats cache:', error);
+    throw new Error('Failed to update trip stats cache');
   }
 }
 
