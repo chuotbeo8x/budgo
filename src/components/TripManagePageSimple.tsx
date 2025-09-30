@@ -48,8 +48,8 @@ export default function TripManagePageSimple({ trip, groupSlug, backUrl, backLab
       setSubmitting(true);
       await closeTrip(trip.id, user.uid);
       toast.success('Lưu trữ chuyến đi thành công');
-      // Reload the page to get updated data
-      window.location.reload();
+      // Refresh data instead of reloading page
+      router.refresh();
     } catch (error) {
       console.error('Error closing trip:', error);
       toast.error('Có lỗi xảy ra khi lưu trữ chuyến đi');

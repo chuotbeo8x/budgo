@@ -582,8 +582,11 @@ export default function ExpensesInline({
             toast.success('Cập nhật chi phí thành công!');
             
             // Call server action in background (don't await to prevent blocking)
-            updateExpense(editingExpense.id, formDataObj).catch((error) => {
-                console.error('Error updating expense:', error);
+            console.log('🚀 Calling updateExpense with:', editingExpense.id, formDataObj);
+            updateExpense(editingExpense.id, formDataObj).then((result) => {
+                console.log('✅ updateExpense completed:', result);
+            }).catch((error) => {
+                console.error('❌ Error updating expense:', error);
                 toast.error('Có lỗi xảy ra khi cập nhật chi phí');
                 // Revert optimistic update on error
                 if (originalExpense) {

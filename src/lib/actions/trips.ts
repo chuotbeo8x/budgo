@@ -820,12 +820,16 @@ export async function updateTripStatsCache(tripId: string) {
 
     // Get all expenses for this trip
     const expensesQuery = adminDb.collection('expenses')
-      .where('tripId', '==', tripId)
-      .where('deletedAt', '==', null);
+      .where('tripId', '==', tripId);
     const expensesSnapshot = await expensesQuery.get();
     
+    console.log(`📊 Found ${expensesSnapshot.docs.length} expenses for trip ${tripId}`);
+    
     const totalExpense = expensesSnapshot.docs.reduce((sum, expenseDoc) => {
-      return sum + (expenseDoc.data().amount || 0);
+      const data = expenseDoc.data();
+      const amount = data.amount || 0;
+      console.log(`💰 Expense ${expenseDoc.id}: amount=${amount}, deletedAt=${data.deletedAt}`);
+      return sum + amount;
     }, 0);
 
     // Get all advances for this trip
@@ -839,11 +843,14 @@ export async function updateTripStatsCache(tripId: string) {
 
     // Update trip document with new statsCache
     const tripRef = adminDb.collection('trips').doc(tripId);
+    const now = new Date();
+    console.log(`🕐 Current time: ${now.toISOString()}`);
+    
     await tripRef.update({
       statsCache: {
         totalAdvance: totalAdvance,
         totalExpense: totalExpense,
-        computedAt: new Date()
+        computedAt: now
       }
     });
 

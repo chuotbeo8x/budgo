@@ -26,7 +26,8 @@ import {
   BarChart3,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 export default function TripsManagePage() {
@@ -134,8 +135,8 @@ export default function TripsManagePage() {
     return {
       icon: MapPin,
       label: 'Cá nhân',
-      color: 'text-green-600',
-      bgColor: 'bg-green-100'
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100'
     };
   };
 
@@ -222,9 +223,9 @@ export default function TripsManagePage() {
                   Tạo chuyến đi mới
                 </Button>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/">
                 <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">
-                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Về trang chủ
                 </Button>
               </Link>
@@ -232,61 +233,26 @@ export default function TripsManagePage() {
           </div>
         </div>
 
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm">
-            <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-xs sm:text-sm font-medium">Tổng chuyến đi</p>
-                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold">{totalTrips}</p>
-                </div>
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-sm">
-            <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-xs sm:text-sm font-medium">Cá nhân</p>
-                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold">{personalTrips}</p>
-                </div>
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-sm">
-            <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-xs sm:text-sm font-medium">Nhóm</p>
-                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold">{groupTrips}</p>
-                </div>
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm">
-            <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-xs sm:text-sm font-medium">Đang hoạt động</p>
-                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold">{activeTrips}</p>
-                </div>
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-orange-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and Filter Section */}
+        {/* Search and Stats Section */}
         <Card className="mb-6 sm:mb-8 shadow-sm">
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="space-y-3 sm:space-y-4">
+              {/* Stats Row */}
+              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-gray-700">Tổng:</span>
+                    <span className="text-lg font-bold text-blue-600">{totalTrips}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm font-medium text-gray-700">Hoạt động:</span>
+                    <span className="text-lg font-bold text-orange-600">{activeTrips}</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Search */}
               <div className="w-full">
                 <div className="relative">

@@ -25,7 +25,8 @@ import {
   MoreVertical,
   ExternalLink,
   UserPlus,
-  BarChart3
+  BarChart3,
+  Home
 } from 'lucide-react';
 
 export default function GroupsManagePage() {
@@ -158,143 +159,116 @@ export default function GroupsManagePage() {
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
         {/* Header Section */}
-        <div className="mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Quản lý nhóm</h1>
-              <p className="text-lg text-gray-600">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Quản lý nhóm</h1>
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
                 Quản lý tất cả nhóm của bạn một cách dễ dàng
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Link href="/groups/create">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 text-xs sm:text-sm">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Tạo nhóm mới
+                </Button>
+              </Link>
+              <Link href="/">
+                <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">
+                  <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Về trang chủ
                 </Button>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium">Tổng nhóm</p>
-                  <p className="text-3xl font-bold">{groups.length}</p>
-                </div>
-                <Users className="w-8 h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium">Nhóm công khai</p>
-                  <p className="text-3xl font-bold">{groups.filter(g => g.type === 'public').length}</p>
-                </div>
-                <Globe className="w-8 h-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-yellow-100 text-sm font-medium">Nhóm đóng</p>
-                  <p className="text-3xl font-bold">{groups.filter(g => g.type === 'close').length}</p>
-                </div>
-                <EyeIcon className="w-8 h-8 text-yellow-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm font-medium">Nhóm bí mật</p>
-                  <p className="text-3xl font-bold">{groups.filter(g => g.type === 'secret').length}</p>
-                </div>
-                <Lock className="w-8 h-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and Filter Section */}
-        <Card className="mb-8 shadow-md">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {/* Search Input */}
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Tìm kiếm nhóm theo tên hoặc mô tả..."
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setShowPublicGroups(false);
-                      }}
-                      onKeyPress={async (e) => {
-                        if (e.key === 'Enter' && searchTerm.trim()) {
-                          // Search in both my groups and public groups
-                          await searchAllGroups();
-                        }
-                      }}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+        {/* Search and Stats Section */}
+        <Card className="mb-6 sm:mb-8 shadow-sm">
+          <CardContent className="p-3 sm:p-4 md:p-6">
+            <div className="space-y-3 sm:space-y-4">
+              {/* Stats Row */}
+              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-gray-700">Tổng:</span>
+                    <span className="text-lg font-bold text-blue-600">{groups.length}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-gray-700">Công khai:</span>
+                    <span className="text-lg font-bold text-green-600">{groups.filter(g => g.type === 'public').length}</span>
                   </div>
                 </div>
-                <Button
-                  onClick={searchAllGroups}
-                  disabled={!searchTerm.trim() || loadingPublic}
-                  className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap"
-                >
-                  {loadingPublic ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  ) : (
-                    <Search className="w-4 h-4 mr-2" />
-                  )}
-                  Tìm kiếm
-                </Button>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap gap-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span>Lọc và sắp xếp:</span>
+              {/* Search */}
+              <div className="w-full">
+                <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                      <input
+                        type="text"
+                        placeholder="Tìm kiếm nhóm theo tên hoặc mô tả..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setShowPublicGroups(false);
+                        }}
+                        onKeyPress={async (e) => {
+                          if (e.key === 'Enter' && searchTerm.trim()) {
+                            // Search in both my groups and public groups
+                            await searchAllGroups();
+                          }
+                        }}
+                        className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={searchAllGroups}
+                    disabled={!searchTerm.trim() || loadingPublic}
+                    className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap h-8 sm:h-9 text-xs sm:text-sm"
+                  >
+                    {loadingPublic ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1 sm:mr-2" />
+                    ) : (
+                      <Search className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    )}
+                    Tìm kiếm
+                  </Button>
                 </div>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">Tất cả loại</option>
-                  <option value="public">Công khai</option>
-                  <option value="close">Đóng</option>
-                  <option value="secret">Bí mật</option>
-                </select>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="created">Mới nhất</option>
-                  <option value="name">Tên A-Z</option>
-                  <option value="members">Nhiều thành viên</option>
-                </select>
+
+                {/* Filters */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                    <span>Lọc và sắp xếp:</span>
+                  </div>
+                  <select
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value as any)}
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
+                  >
+                    <option value="all">Tất cả loại</option>
+                    <option value="public">Công khai</option>
+                    <option value="close">Đóng</option>
+                    <option value="secret">Bí mật</option>
+                  </select>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
+                  >
+                    <option value="created">Mới nhất</option>
+                    <option value="name">Tên A-Z</option>
+                    <option value="members">Nhiều thành viên</option>
+                  </select>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -302,9 +276,9 @@ export default function GroupsManagePage() {
 
         {/* Groups List */}
         {loadingGroups ? (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-lg text-gray-600">Đang tải danh sách nhóm...</p>
+          <div className="text-center py-8 sm:py-12">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600">Đang tải danh sách nhóm...</p>
           </div>
         ) : (showPublicGroups || searchTerm.trim()) ? (
           // Combined Search Results
@@ -319,13 +293,13 @@ export default function GroupsManagePage() {
             </div>
             
             {(filteredAndSortedGroups.length === 0 && publicGroups.length === 0) ? (
-              <Card className="shadow-md">
-                <CardContent className="text-center py-16">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              <Card className="shadow-sm">
+                <CardContent className="text-center py-8 sm:py-12">
+                  <Search className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                     Không tìm thấy nhóm nào
                   </h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto">
                     Không có nhóm nào phù hợp với từ khóa "{searchTerm}". Thử từ khóa khác.
                   </p>
                 </CardContent>
@@ -339,7 +313,7 @@ export default function GroupsManagePage() {
                       <Users className="w-5 h-5 text-blue-600" />
                       Nhóm của tôi ({filteredAndSortedGroups.length})
                     </h3>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {filteredAndSortedGroups.map((group) => {
                         const typeInfo = getGroupTypeInfo(group.type);
                         const TypeIcon = typeInfo.icon;
@@ -347,41 +321,42 @@ export default function GroupsManagePage() {
                         
                         return (
                           <Card key={group.id} className="hover:shadow-md transition-all duration-300 bg-white">
-                            <CardHeader className="pb-4">
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="flex-1">
-                                  <CardTitle className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-                                    {group.name}
-                                  </CardTitle>
-                                  <CardDescription className="text-gray-600 line-clamp-2">
-                                    {group.description || 'Không có mô tả'}
-                                  </CardDescription>
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
-                                    <TypeIcon className="w-3 h-3" />
-                                    {typeInfo.label}
+                            <CardContent className="p-3 sm:p-4">
+                              <div className="space-y-3 sm:space-y-4">
+                                {/* Header */}
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                                      {group.name}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                      {group.description || 'Không có mô tả'}
+                                    </p>
                                   </div>
-                                  {isOwner && (
-                                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                      <Crown className="w-3 h-3" />
-                                      Chủ nhóm
+                                  <div className="flex flex-col items-end gap-1 ml-2">
+                                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                                      <TypeIcon className="w-3 h-3" />
+                                      <span className="hidden sm:inline">{typeInfo.label}</span>
+                                      <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
                                     </div>
-                                  )}
+                                    {isOwner && (
+                                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <Crown className="w-3 h-3" />
+                                        <span className="hidden sm:inline">Chủ nhóm</span>
+                                        <span className="sm:hidden">Chủ</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </CardHeader>
-                            
-                            <CardContent className="pt-0">
-                              <div className="space-y-4">
-                                {/* Group Stats */}
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="flex items-center gap-2 text-gray-600">
-                                    <Users className="w-4 h-4" />
+
+                                {/* Group Info */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                     <span>{group.memberCount || 0} thành viên</span>
                                   </div>
-                                  <div className="flex items-center gap-2 text-gray-600">
-                                    <Calendar className="w-4 h-4" />
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                     <span>{formatDateTime(group.createdAt)}</span>
                                   </div>
                                 </div>
@@ -389,16 +364,16 @@ export default function GroupsManagePage() {
                                 {/* Action Buttons */}
                                 <div className="flex gap-2">
                                   <Link href={`/g/${group.slug}`} className="flex-1">
-                                    <Button variant="outline" size="sm" className="w-full">
-                                      <Eye className="w-4 h-4 mr-2" />
-                                      Xem nhóm
+                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                                      <Eye className="w-3 h-3 mr-1" />
+                                      Xem
                                     </Button>
                                   </Link>
                                   
                                   {isOwner && (
                                     <Link href={`/g/${group.slug}/manage`} className="flex-1">
-                                      <Button variant="outline" size="sm" className="w-full">
-                                        <Settings className="w-4 h-4 mr-2" />
+                                      <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                                        <Settings className="w-3 h-3 mr-1" />
                                         Quản lý
                                       </Button>
                                     </Link>
@@ -420,7 +395,7 @@ export default function GroupsManagePage() {
                       <Globe className="w-5 h-5 text-green-600" />
                       Nhóm công khai ({publicGroups.length})
                     </h3>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {publicGroups.map((group) => {
                         const typeInfo = getGroupTypeInfo(group.type);
                         const TypeIcon = typeInfo.icon;
@@ -428,35 +403,35 @@ export default function GroupsManagePage() {
                         
                         return (
                           <Card key={group.id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white">
-                            <CardHeader className="pb-4">
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="flex-1">
-                                  <CardTitle className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-                                    {group.name}
-                                  </CardTitle>
-                                  <CardDescription className="text-gray-600 line-clamp-2">
-                                    {group.description || 'Không có mô tả'}
-                                  </CardDescription>
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
-                                    <TypeIcon className="w-3 h-3" />
-                                    {typeInfo.label}
+                            <CardContent className="p-3 sm:p-4">
+                              <div className="space-y-3 sm:space-y-4">
+                                {/* Header */}
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                                      {group.name}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                      {group.description || 'Không có mô tả'}
+                                    </p>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-1 ml-2">
+                                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                                      <TypeIcon className="w-3 h-3" />
+                                      <span className="hidden sm:inline">{typeInfo.label}</span>
+                                      <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </CardHeader>
-                            
-                            <CardContent className="pt-0">
-                              <div className="space-y-4">
-                                {/* Group Stats */}
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="flex items-center gap-2 text-gray-600">
-                                    <Users className="w-4 h-4" />
+
+                                {/* Group Info */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                     <span>{group.memberCount || 0} thành viên</span>
                                   </div>
-                                  <div className="flex items-center gap-2 text-gray-600">
-                                    <Calendar className="w-4 h-4" />
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                     <span>{formatDateTime(group.createdAt)}</span>
                                   </div>
                                 </div>
@@ -464,30 +439,30 @@ export default function GroupsManagePage() {
                                 {/* Action Buttons */}
                                 <div className="flex gap-2">
                                   <Link href={`/g/${group.slug}`} className="flex-1">
-                                    <Button variant="outline" size="sm" className="w-full">
-                                      <Eye className="w-4 h-4 mr-2" />
-                                      Xem nhóm
+                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                                      <Eye className="w-3 h-3 mr-1" />
+                                      Xem
                                     </Button>
                                   </Link>
                                   {!isAlreadyMember && (
                                     <Button 
                                       variant="outline" 
                                       size="sm" 
-                                      className="flex-1"
+                                      className="flex-1 h-8 text-xs"
                                       onClick={() => handleJoinGroup(group.id, group.name)}
                                       disabled={joiningGroups.has(group.id)}
                                     >
                                       {joiningGroups.has(group.id) ? (
-                                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
+                                        <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-1" />
                                       ) : (
-                                        <UserPlus className="w-4 h-4 mr-2" />
+                                        <UserPlus className="w-3 h-3 mr-1" />
                                       )}
                                       {joiningGroups.has(group.id) ? 'Đang tham gia...' : 'Tham gia'}
                                     </Button>
                                   )}
                                   {isAlreadyMember && (
-                                    <Button variant="outline" size="sm" className="flex-1" disabled>
-                                      <Users className="w-4 h-4 mr-2" />
+                                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" disabled>
+                                      <Users className="w-3 h-3 mr-1" />
                                       Đã tham gia
                                     </Button>
                                   )}
@@ -504,28 +479,28 @@ export default function GroupsManagePage() {
             )}
           </div>
         ) : filteredAndSortedGroups.length === 0 ? (
-              <Card className="shadow-md">
-            <CardContent className="text-center py-16">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              <Card className="shadow-sm">
+            <CardContent className="text-center py-8 sm:py-12">
+              <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 {searchTerm || filterType !== 'all' ? 'Không tìm thấy nhóm' : 'Chưa có nhóm nào'}
               </h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto">
                 {searchTerm || filterType !== 'all' 
                   ? 'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc'
                   : 'Bạn chưa tạo hoặc tham gia nhóm nào. Hãy tạo nhóm đầu tiên!'
                 }
               </p>
               <Link href="/groups/create">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-5 h-5 mr-2" />
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-8 sm:h-10 text-xs sm:text-sm">
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                   Tạo nhóm đầu tiên
                 </Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredAndSortedGroups.map((group) => {
               const typeInfo = getGroupTypeInfo(group.type);
               const TypeIcon = typeInfo.icon;
@@ -533,41 +508,42 @@ export default function GroupsManagePage() {
               
               return (
                 <Card key={group.id} className="hover:shadow-md transition-all duration-300 bg-white">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <CardTitle className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-                          {group.name}
-                        </CardTitle>
-                        <CardDescription className="text-gray-600 line-clamp-2">
-                          {group.description || 'Không có mô tả'}
-                        </CardDescription>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
-                          <TypeIcon className="w-3 h-3" />
-                          {typeInfo.label}
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                            {group.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            {group.description || 'Không có mô tả'}
+                          </p>
                         </div>
-                        {isOwner && (
-                          <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            <Crown className="w-3 h-3" />
-                            Chủ nhóm
+                        <div className="flex flex-col items-end gap-1 ml-2">
+                          <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                            <TypeIcon className="w-3 h-3" />
+                            <span className="hidden sm:inline">{typeInfo.label}</span>
+                            <span className="sm:hidden">{typeInfo.label.slice(0, 3)}</span>
                           </div>
-                        )}
+                          {isOwner && (
+                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <Crown className="w-3 h-3" />
+                              <span className="hidden sm:inline">Chủ nhóm</span>
+                              <span className="sm:hidden">Chủ</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0">
-                    <div className="space-y-4">
-                      {/* Group Stats */}
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Users className="w-4 h-4" />
+
+                      {/* Group Info */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           <span>{group.memberCount || 0} thành viên</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           <span>{formatDateTime(group.createdAt)}</span>
                         </div>
                       </div>
@@ -575,16 +551,16 @@ export default function GroupsManagePage() {
                       {/* Action Buttons */}
                       <div className="flex gap-2">
                         <Link href={`/g/${group.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Eye className="w-4 h-4 mr-2" />
-                            Xem nhóm
+                          <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                            <Eye className="w-3 h-3 mr-1" />
+                            Xem
                           </Button>
                         </Link>
                         
                         {isOwner && (
                           <Link href={`/g/${group.slug}/manage`} className="flex-1">
-                            <Button variant="outline" size="sm" className="w-full">
-                              <Settings className="w-4 h-4 mr-2" />
+                            <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                              <Settings className="w-3 h-3 mr-1" />
                               Quản lý
                             </Button>
                           </Link>
@@ -600,8 +576,8 @@ export default function GroupsManagePage() {
 
         {/* Footer Stats */}
         {!showPublicGroups && !searchTerm.trim() && (
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+          <div className="mt-6 sm:mt-8 text-center">
+            <p className="text-xs sm:text-sm text-gray-600">
               Hiển thị {filteredAndSortedGroups.length} trong tổng số {groups.length} nhóm
             </p>
           </div>

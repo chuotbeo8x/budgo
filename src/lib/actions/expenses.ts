@@ -288,6 +288,7 @@ export async function updateExpense(expenseId: string, formData: FormData) {
     console.log('expenseId:', expenseId);
     console.log('formData available:', !!formData);
     console.log('adminDb available:', !!adminDb);
+    console.log('formData entries:', Array.from(formData.entries()));
     
     if (!formData) {
       throw new Error('FormData không được cung cấp');

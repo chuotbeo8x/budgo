@@ -439,13 +439,13 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
         canDelete={!isTripClosed}
         canInvite={!isTripClosed}
         onMemberAdded={() => {
-          window.location.reload();
+          router.refresh();
         }}
         onMemberUpdated={() => {
-          window.location.reload();
+          router.refresh();
         }}
         onMemberDeleted={() => {
-          window.location.reload();
+          router.refresh();
         }}
       />
 
@@ -470,22 +470,28 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
         canEdit={!isTripClosed}
         canDelete={!isTripClosed}
         onExpenseAdded={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
         onExpenseUpdated={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
         onExpenseDeleted={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
         onAdvanceAdded={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
         onAdvanceUpdated={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
         onAdvanceDeleted={() => {
-          window.location.reload();
+          // Refresh trip data to update statsCache display
+          router.refresh();
         }}
       />
     </div>

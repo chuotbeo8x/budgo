@@ -136,8 +136,8 @@ export default function TripManagePageNew({ trip, groupSlug, backUrl, backLabel 
       await updateTrip(trip.id, updateData, user.uid);
       toast.success('Cập nhật chuyến đi thành công!');
       setEditing(false);
-      // Reload the page to get updated data
-      window.location.reload();
+      // Refresh data instead of reloading page
+      router.refresh();
     } catch (error) {
       console.error('Error updating trip:', error);
       toast.error('Có lỗi xảy ra khi cập nhật chuyến đi');
@@ -169,8 +169,8 @@ export default function TripManagePageNew({ trip, groupSlug, backUrl, backLabel 
       setSubmitting(true);
       await closeTrip(trip.id, user.uid);
       toast.success('Lưu trữ chuyến đi thành công');
-      // Reload the page to get updated data
-      window.location.reload();
+      // Refresh data instead of reloading page
+      router.refresh();
     } catch (error) {
       console.error('Error closing trip:', error);
       toast.error('Có lỗi xảy ra khi lưu trữ chuyến đi');

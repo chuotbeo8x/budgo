@@ -193,6 +193,13 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     
                     <DropdownMenuItem asChild>
+                      <Link href="/manage" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        <span>Quản lý</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
                       <Link href="/welcome" className="flex items-center gap-2">
                         <Heart className="w-4 h-4" />
                         <span>Giới thiệu</span>
