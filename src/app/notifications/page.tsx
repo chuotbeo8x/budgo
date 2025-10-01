@@ -13,6 +13,7 @@ import {
 } from '@/lib/actions/notifications';
 import { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/utils/date';
+import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import LoginPrompt from '@/components/auth/LoginPrompt';
 

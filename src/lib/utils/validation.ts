@@ -94,5 +94,4 @@ export function validateInput<T>(
     }
     return { success: false, error: 'Invalid input' };
   }
-  }
 }

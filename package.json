@@ -9,8 +9,7 @@
     "start": "next start",
     "start:beta": "copy .env.local .env.local.backup && copy env.beta .env.local && next start && copy .env.local.backup .env.local",
     "deploy:beta": "npm run build:beta && firebase deploy --only hosting --project budgo-aae32",
-    "lint": "eslint",
-    "generate-icons": "node scripts/generate-icons.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

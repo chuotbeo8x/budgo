@@ -34,32 +34,26 @@ export default function Avatar({
   };
 
   const handleError = () => {
-    console.error('Avatar load error:', src);
-    console.error('Full URL:', src);
-    console.error('URL length:', src?.length);
-    console.error('URL valid:', isValidUrl(src || ''));
-    console.error('Retry count:', retryCount);
-    console.error('Current URL index:', currentUrlIndex);
-    console.error('Display URL:', displayUrl);
-    
-    const variants = getGoogleAvatarVariants(src || '');
-    console.error('Available variants:', variants);
+    // Only log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Avatar load error:', src);
+    }
     
     // For Google avatars, try fewer retries and fail faster
     if (src?.includes('googleusercontent.com')) {
-      if (currentUrlIndex < 2) { // Only try 3 variants max
+      if (currentUrlIndex < 1) { // Only try 2 variants max
         setCurrentUrlIndex(prev => prev + 1);
         setImageLoaded(false);
       } else {
-        console.warn('Google avatar failed after 3 attempts, using fallback');
         setImageError(true);
       }
     } else {
       // For other URLs, use original retry logic
+      const variants = getGoogleAvatarVariants(src || '');
       if (currentUrlIndex < variants.length - 1) {
         setCurrentUrlIndex(prev => prev + 1);
         setImageLoaded(false);
-      } else if (retryCount < 2) {
+      } else if (retryCount < 1) {
         setRetryCount(prev => prev + 1);
         setCurrentUrlIndex(0);
         setImageLoaded(false);
@@ -95,13 +89,18 @@ export default function Avatar({
     if (!url || !url.includes('googleusercontent.com')) return url;
     
     // If URL seems truncated, try to reconstruct it
-    if (url.length < 100 && url.includes('googleusercontent.com')) {
-      console.warn('URL appears truncated:', url);
+    if (url.length < 150 && url.includes('googleusercontent.com')) {
       // Try to add common Google avatar parameters
       if (!url.includes('=s')) {
         return url + '=s96-c';
       }
     }
+    
+    // Ensure URL has proper format
+    if (url.includes('googleusercontent.com') && !url.includes('=s')) {
+      return url + '=s96-c';
+    }
+    
     return url;
   };
 
@@ -128,17 +127,6 @@ export default function Avatar({
   const variants = getGoogleAvatarVariants(src || '');
   const displayUrl = variants[currentUrlIndex] || src;
 
-  if (!src || imageError || !isValidUrl(displayUrl)) {
-    return (
-      <div 
-        className={`bg-blue-500 rounded-full flex items-center justify-center ${className}`}
-        style={{ width: size, height: size }}
-      >
-        {fallbackIcon || <User className="w-5 h-5 text-white" />}
-      </div>
-    );
-  }
-
   // For Google avatars, add a timeout to fail faster
   const isGoogleAvatar = src?.includes('googleusercontent.com');
   
@@ -153,6 +141,17 @@ export default function Avatar({
       return () => clearTimeout(timeout);
     }
   }, [isGoogleAvatar, imageLoaded, imageError]);
+
+  if (!src || imageError || !isValidUrl(displayUrl)) {
+    return (
+      <div 
+        className={`bg-blue-500 rounded-full flex items-center justify-center ${className}`}
+        style={{ width: size, height: size }}
+      >
+        {fallbackIcon || <User className="w-5 h-5 text-white" />}
+      </div>
+    );
+  }
 
   // Add a key to force re-render when URL changes
   const imageKey = `${displayUrl}-${currentUrlIndex}-${retryCount}`;

@@ -32,12 +32,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function Header() {
+  const [isHydrated, setIsHydrated] = useState(false);
   const { user, loading } = useAuth();
   const { profile } = useProfile();
   const pathname = usePathname();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('vi');
-  const [isHydrated, setIsHydrated] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
   const [siteName, setSiteName] = useState<string>('Budgo');
 
@@ -60,6 +60,21 @@ export default function Header() {
     };
     load();
   }, []);
+
+  // Prevent hydration mismatch by not rendering until hydrated
+  if (!isHydrated) {
+    return (
+      <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+            <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+        </div>
+      </header>
+    );
+  }
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -151,9 +166,10 @@ export default function Header() {
 
         {/* Right side - User actions */}
         <div className="flex items-center gap-2">
-          {loading ? (
+          {loading && (
             <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
-          ) : user ? (
+          )}
+          {!loading && user && (
             <>
               {/* Notification Bell */}
               <NotificationBell />
@@ -388,7 +404,8 @@ export default function Header() {
                 </DropdownMenu>
               </div>
             </>
-          ) : (
+          )}
+          {!loading && !user && (
             <Button
               onClick={() => signInWithGoogle()}
               size="sm"

@@ -269,7 +269,7 @@ export default function WelcomePage() {
                   <h3 className="font-semibold text-green-900">Chia sẻ chi phí thông minh</h3>
                 </div>
                 <p className="text-sm text-green-800">
-                  Sử dụng "Chia đều" khi mọi người tham gia đầy đủ, "Theo trọng số" khi có sự khác biệt.
+                  Sử dụng &quot;Chia đều&quot; khi mọi người tham gia đầy đủ, &quot;Theo trọng số&quot; khi có sự khác biệt.
                 </p>
               </CardContent>
             </Card>

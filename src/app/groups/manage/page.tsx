@@ -251,7 +251,7 @@ export default function GroupsManagePage() {
                   </div>
                   <select
                     value={filterType}
-                    onChange={(e) => setFilterType(e.target.value as any)}
+                    onChange={(e) => setFilterType(e.target.value as 'all' | 'public' | 'close' | 'secret')}
                     className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
                   >
                     <option value="all">Tất cả loại</option>
@@ -261,7 +261,7 @@ export default function GroupsManagePage() {
                   </select>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
+                    onChange={(e) => setSortBy(e.target.value as 'created' | 'name' | 'members')}
                     className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
                   >
                     <option value="created">Mới nhất</option>

@@ -1,22 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorAlert } from '@/components/ui/error-alert';
 import { signInWithGoogle } from '@/lib/auth';
-import { getUserById } from '@/lib/actions/users';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useProfile } from '@/components/auth/ProfileProvider';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  // const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { profile, profileLoading } = useProfile();
+  // const { profile, profileLoading } = useProfile();
 
 
   const handleGoogleSignIn = async () => {

@@ -7,8 +7,8 @@ const DYNAMIC_CACHE_NAME = 'budgo-dynamic-v1';
 const STATIC_FILES = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/icons/icon-192x192.svg',
+  '/icons/icon-512x512.svg',
   '/favicon.ico'
 ];
 
@@ -168,8 +168,8 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
     const options = {
       body: data.body,
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-192x192.png',
+      icon: '/icons/icon-192x192.svg',
+      badge: '/icons/icon-192x192.svg',
       vibrate: [200, 100, 200],
       data: data.data || {},
       actions: data.actions || []

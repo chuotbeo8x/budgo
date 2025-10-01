@@ -13,11 +13,11 @@ export const usePaymentStatus = (tripId?: string, userId?: string) => {
     if (!tripId) return;
     try {
       setLoading(true);
-      console.log('🔄 usePaymentStatus.loadPaymentStatus START - tripId:', tripId);
+      // console.log('🔄 usePaymentStatus.loadPaymentStatus START - tripId:', tripId);
       const dbPaymentStatus = await getTripPaymentStatus(tripId);
-      console.log('🔄 usePaymentStatus.loadPaymentStatus - loaded from DB:', dbPaymentStatus);
+      // console.log('🔄 usePaymentStatus.loadPaymentStatus - loaded from DB:', dbPaymentStatus);
       setPaymentStatus(dbPaymentStatus);
-      console.log('🔄 usePaymentStatus.loadPaymentStatus END');
+      // console.log('🔄 usePaymentStatus.loadPaymentStatus END');
     } catch (error) {
       console.error('Error loading payment status:', error);
     } finally {
@@ -54,8 +54,8 @@ export const usePaymentStatus = (tripId?: string, userId?: string) => {
 
     try {
       setUpdating(true);
-      console.log('=== usePaymentStatus.updatePaymentStatus START ===');
-      console.log('Updating payment status:', { memberId, status, tripId, userId });
+      // console.log('=== usePaymentStatus.updatePaymentStatus START ===');
+      // console.log('Updating payment status:', { memberId, status, tripId, userId });
 
       // Update in database
       await updateMemberPaymentStatus(
@@ -65,7 +65,7 @@ export const usePaymentStatus = (tripId?: string, userId?: string) => {
         userId
       );
 
-      console.log('Database updated successfully');
+      // console.log('Database updated successfully');
 
       // TEMPORARILY DISABLED OPTIMISTIC UPDATES FOR DEBUGGING - might cause modal conflicts
       // Optimistically update local state so UI reflects immediately
@@ -79,9 +79,9 @@ export const usePaymentStatus = (tripId?: string, userId?: string) => {
       // });
       
       // Reload payment status from database instead
-      console.log('Reloading payment status from database...');
+      // console.log('Reloading payment status from database...');
       await loadPaymentStatus();
-      console.log('=== usePaymentStatus.updatePaymentStatus END ===');
+      // console.log('=== usePaymentStatus.updatePaymentStatus END ===');
 
     } catch (error) {
       console.error('Error updating payment status:', error);

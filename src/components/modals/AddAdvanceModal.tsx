@@ -140,7 +140,11 @@ export default function AddAdvanceModal({
                 
                 {members.length === 0 ? (
                     <div className="text-center py-8">
-                        <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <div className="w-12 h-12 text-gray-400 mx-auto mb-4 flex items-center justify-center">
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                          </svg>
+                        </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Chưa có thành viên</h3>
                         <p className="text-gray-600 mb-4">
                             Vui lòng thêm thành viên vào chuyến đi trước khi thêm tạm ứng

@@ -24,6 +24,13 @@ export default function CreateGroupPage() {
   const [submitting, setSubmitting] = useState(false);
   const [generatedSlug, setGeneratedSlug] = useState('');
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -31,13 +38,6 @@ export default function CreateGroupPage() {
       </div>
     );
   }
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
 
   if (!user) {
     return null;
