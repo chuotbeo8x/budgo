@@ -15,26 +15,24 @@ import {
   Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { profile } = useProfile();
+  const [isClient, setIsClient] = useState(false);
+
+  // Fix hydration mismatch by ensuring client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Don't show on certain pages
   const hideOnPages = ['/login', '/onboarding', '/welcome'];
   if (hideOnPages.some(page => pathname.startsWith(page))) {
     return null;
   }
-
-  // Find which item is currently active
-  const activeItem = [
-    { href: '/', icon: Home, label: 'Trang chủ', active: pathname === '/' },
-    { href: '/groups/manage', icon: Users, label: 'Nhóm', active: pathname.startsWith('/groups') },
-    { href: '/trips/manage', icon: MapPin, label: 'Chuyến đi', active: pathname.startsWith('/trips') },
-    { href: '/notifications', icon: Bell, label: 'Thông báo', active: pathname.startsWith('/notifications'), showBadge: true },
-    { href: user ? `/profiles/${profile?.username || 'me'}` : '/login', icon: User, label: 'Cá nhân', active: pathname.startsWith('/profiles') || pathname.startsWith('/settings') }
-  ].find(item => item.active);
 
   const navItems = [
     {
@@ -63,12 +61,15 @@ export default function MobileBottomNav() {
       showBadge: false // Sẽ được set dynamic dựa trên thông báo thật
     },
     {
-      href: user ? `/profiles/${profile?.username || 'me'}` : '/login',
+      href: isClient && user ? `/profiles/${profile?.username || 'me'}` : '/login',
       icon: User,
       label: 'Cá nhân',
       active: pathname.startsWith('/profiles') || pathname.startsWith('/settings')
     }
   ];
+
+  // Find which item is currently active
+  const activeItem = navItems.find(item => item.active);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md lg:hidden" style={{ 

@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb, FieldValue } from '@/lib/firebase-admin';
 import { GroupPost, GroupComment, PostLike } from '@/lib/types';
 import { getUserById } from './users';
 
@@ -197,7 +197,7 @@ export async function likeGroupPost(postId: string, userId: string) {
       // Increment likes count
       const postRef = adminDb.collection('groupPosts').doc(postId);
       await postRef.update({
-        likesCount: adminDb.FieldValue.increment(1)
+        likesCount: FieldValue.increment(1)
       });
       console.log('Like count incremented');
 
@@ -333,7 +333,7 @@ export async function createGroupComment(postId: string, authorId: string, conte
     // Increment comments count
     const postRef = adminDb.collection('groupPosts').doc(postId);
     await postRef.update({
-      commentsCount: adminDb.FieldValue.increment(1)
+      commentsCount: FieldValue.increment(1)
     });
     console.log('Comment count incremented');
 

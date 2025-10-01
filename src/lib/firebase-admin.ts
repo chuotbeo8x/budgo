@@ -1,5 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore, Firestore } from 'firebase-admin/firestore';
+import { getFirestore, Firestore, FieldValue } from 'firebase-admin/firestore';
 
 // console.log('Firebase Admin SDK: Starting initialization...');
 
@@ -53,4 +53,4 @@ try {
   throw error;
 }
 
-export { adminDb };
+export { adminDb, FieldValue };
