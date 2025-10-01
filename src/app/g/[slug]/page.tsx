@@ -240,13 +240,14 @@ export default function GroupPage() {
     
     try {
       setCommenting(true);
-      // Temporarily disable comment functionality
-      toast.info('Chức năng bình luận đang được cập nhật, vui lòng thử lại sau');
+      await createGroupComment(selectedPostId, user.uid, commentText);
+      toast.success('Đã gửi bình luận');
       setCommentModalOpen(false);
       setCommentText('');
+      loadPosts(); // Reload posts to update comment count
     } catch (error) {
       console.error('Error commenting on post:', error);
-      toast.error('Có lỗi xảy ra khi bình luận');
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi bình luận');
     } finally {
       setCommenting(false);
     }
