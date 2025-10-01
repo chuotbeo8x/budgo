@@ -2,6 +2,8 @@
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
+import Footer from '@/components/Footer';
+import LoadingPage from '@/components/ui/loading-page';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,11 +31,7 @@ export default function AdminDashboardPage() {
   }, [user, profile]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingPage message="Đang tải trang quản trị..." />;
   }
 
   if (!user || (profile as any)?.role !== 'admin') {
@@ -174,6 +172,7 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
+        <Footer />
       </div>
     </div>
   );

@@ -105,7 +105,6 @@ export default function RootLayout({
                                 {children}
                               </MaintenanceGuard>
                             </main>
-                            <Footer />
                             <MobileBottomNav />
                             <Toaster position="top-right" />
                           </NotificationProvider>

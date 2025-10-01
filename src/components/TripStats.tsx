@@ -19,23 +19,23 @@ export default function TripStats({ trip, members, expenses, advances }: TripSta
   const safeMembers = members || [];
   
   // Calculate basic stats
-  const totalExpenses = safeExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalAdvances = safeAdvances.reduce((sum, advance) => sum + advance.amount, 0);
+  const totalExpenses = safeExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+  const totalAdvances = safeAdvances.reduce((sum, advance) => sum + (advance.amount || 0), 0);
   const netAmount = totalExpenses - totalAdvances;
 
   // Calculate per member stats
   const memberStats = safeMembers.map(member => {
     // Expenses paid by this member
     const paidExpenses = safeExpenses.filter(expense => expense.paidBy === member.id);
-    const totalPaid = paidExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalPaid = paidExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
     
     // Advances paid by this member
     const paidAdvances = safeAdvances.filter(advance => advance.paidBy === member.id);
-    const totalAdvancePaid = paidAdvances.reduce((sum, advance) => sum + advance.amount, 0);
+    const totalAdvancePaid = paidAdvances.reduce((sum, advance) => sum + (advance.amount || 0), 0);
     
     // Advances received by this member
     const receivedAdvances = safeAdvances.filter(advance => advance.paidTo === member.id);
-    const totalAdvanceReceived = receivedAdvances.reduce((sum, advance) => sum + advance.amount, 0);
+    const totalAdvanceReceived = receivedAdvances.reduce((sum, advance) => sum + (advance.amount || 0), 0);
     
     // For now, we'll use a simplified calculation
     // In a real app, you'd need to calculate the actual split amounts
@@ -102,7 +102,7 @@ export default function TripStats({ trip, members, expenses, advances }: TripSta
               </div>
               <p className="text-xs text-gray-600 mt-1">Số giao dịch</p>
               <p className="text-xs text-gray-500 mt-0.5">
-                {expenses.length} chi phí, {advances.length} tạm ứng
+                {expenses.length > 0 ? `${expenses.length} chi phí` : 'Chưa có chi phí'}, {advances.length > 0 ? `${advances.length} tạm ứng` : 'Chưa có tạm ứng'}
               </p>
             </div>
           </CardContent>
@@ -139,7 +139,7 @@ export default function TripStats({ trip, members, expenses, advances }: TripSta
               </div>
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-lg font-bold text-indigo-600">
-                  {formatCurrency(totalExpenses / members.length, trip.currency)}
+                  {formatCurrency(members.length > 0 ? totalExpenses / members.length : 0, trip.currency)}
                 </div>
                 <p className="text-xs text-gray-600 mt-1">Chi phí TB/người</p>
               </div>

@@ -98,20 +98,20 @@ export default function GroupCreateModal({
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600" />
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+            <Users className="w-5 h-5 text-primary-600" />
             Tạo nhóm mới
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-gray-600">
             Tạo nhóm để quản lý chuyến đi và chia sẻ chi phí với bạn bè.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Tên nhóm *</Label>
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700">Tên nhóm *</Label>
             <Input
               id="name"
               value={formData.name}
@@ -122,7 +122,7 @@ export default function GroupCreateModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
+            <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -133,37 +133,37 @@ export default function GroupCreateModal({
           </div>
 
           <div className="space-y-3">
-            <Label>Loại nhóm</Label>
+            <Label className="text-sm font-medium text-gray-700">Loại nhóm</Label>
             <RadioGroup
               value={formData.type}
               onValueChange={(value) => handleInputChange('type', value)}
-              className="space-y-2"
+              className="space-y-3"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="public" id="public" />
+              <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="public" id="public" className="text-primary-600" />
                 <Label htmlFor="public" className="flex-1 cursor-pointer">
-                  <div className="font-medium">Public</div>
+                  <div className="font-medium text-gray-900">Public</div>
                   <div className="text-sm text-gray-500">Ai cũng có thể tìm thấy và tham gia</div>
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="close" id="close" />
+              <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="close" id="close" className="text-primary-600" />
                 <Label htmlFor="close" className="flex-1 cursor-pointer">
-                  <div className="font-medium">Close</div>
+                  <div className="font-medium text-gray-900">Close</div>
                   <div className="text-sm text-gray-500">Chỉ thành viên mới có thể mời người khác</div>
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="secret" id="secret" />
+              <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="secret" id="secret" className="text-primary-600" />
                 <Label htmlFor="secret" className="flex-1 cursor-pointer">
-                  <div className="font-medium">Secret</div>
+                  <div className="font-medium text-gray-900">Secret</div>
                   <div className="text-sm text-gray-500">Chỉ thành viên mới biết sự tồn tại</div>
                 </Label>
               </div>
             </RadioGroup>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-3">
             <Button
               type="button"
               variant="outline"
@@ -172,7 +172,7 @@ export default function GroupCreateModal({
             >
               Hủy
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} variant="default">
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

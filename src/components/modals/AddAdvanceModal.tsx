@@ -127,13 +127,13 @@ export default function AddAdvanceModal({
             <DialogTrigger asChild>
                 {trigger || defaultTrigger}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-purple-600" />
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="pb-4">
+                    <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                        <CreditCard className="w-5 h-5 text-primary-600" />
                         Thêm tạm ứng mới
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-sm text-gray-600">
                         Thêm tạm ứng mới cho chuyến đi này
                     </DialogDescription>
                 </DialogHeader>
@@ -158,9 +158,9 @@ export default function AddAdvanceModal({
                         </Button>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Số tiền *</Label>
+                            <Label htmlFor="amount" className="text-sm font-medium text-gray-700">Số tiền *</Label>
                             <Input
                                 id="amount"
                                 name="amount"
@@ -170,57 +170,58 @@ export default function AddAdvanceModal({
                                 onChange={handleInputChange}
                                 placeholder="Nhập số tiền tạm ứng"
                                 required
+                                className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                             />
                         </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="description">Mô tả *</Label>
-                        <Input
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            placeholder="Nhập mô tả tạm ứng"
-                            required
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả *</Label>
+                            <Input
+                                id="description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                placeholder="Nhập mô tả tạm ứng"
+                                required
+                            />
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="paidBy">Người ứng *</Label>
-                        <select
-                            id="paidBy"
-                            name="paidBy"
-                            value={formData.paidBy}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-                            required
-                        >
-                            <option value="">Chọn người ứng</option>
-                            {members.map((member) => (
-                                <option key={member.id} value={member.id}>
-                                    {member.name || member.ghostName || 'Unknown'}
-                                </option>
-                            ))}
-                        </select>
-                        <p className="text-xs text-gray-500">
-                            Tạm ứng sẽ được ghi nhận cho chủ chuyến đi
-                        </p>
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="paidBy" className="text-sm font-medium text-gray-700">Người ứng *</Label>
+                            <select
+                                id="paidBy"
+                                name="paidBy"
+                                value={formData.paidBy}
+                                onChange={handleInputChange}
+                                className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 bg-white text-sm"
+                                required
+                            >
+                                <option value="">Chọn người ứng</option>
+                                {members.map((member) => (
+                                    <option key={member.id} value={member.id}>
+                                        {member.name || member.ghostName || 'Unknown'}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="text-xs text-gray-500">
+                                Tạm ứng sẽ được ghi nhận cho chủ chuyến đi
+                            </p>
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="createdAt">Ngày *</Label>
-                        <Input
-                            id="createdAt"
-                            name="createdAt"
-                            type="date"
-                            value={formData.createdAt}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="createdAt" className="text-sm font-medium text-gray-700">Ngày *</Label>
+                            <Input
+                                id="createdAt"
+                                name="createdAt"
+                                type="date"
+                                value={formData.createdAt}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
 
-                        <div className="flex space-x-2 pt-4">
-                            <Button type="submit" disabled={submitting} className="flex-1">
+                        <div className="flex gap-3 pt-4">
+                            <Button type="submit" disabled={submitting} className="flex-1" variant="default">
                                 {submitting ? 'Đang thêm...' : 'Thêm tạm ứng'}
                             </Button>
                             <Button

@@ -26,14 +26,18 @@ export default function NotificationPanel({
   userId
 }: NotificationPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Load notifications when panel opens
   useEffect(() => {
     if (isOpen && userId) {
       loadNotifications();
+      // Trigger slide-in animation
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 100);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, userId]);
 
@@ -110,25 +114,25 @@ export default function NotificationPanel({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'group_request':
-        return <Users className="w-4 h-4 text-blue-500" />;
+        return <Users className="w-4 h-4 text-green-600" />;
       case 'group_joined':
-        return <UserPlus className="w-4 h-4 text-green-500" />;
+        return <UserPlus className="w-4 h-4 text-green-600" />;
       case 'group_left':
-        return <UserMinus className="w-4 h-4 text-red-500" />;
+        return <UserMinus className="w-4 h-4 text-red-600" />;
       case 'trip_created':
       case 'trip_updated':
       case 'trip_deleted':
-        return <Plane className="w-4 h-4 text-purple-500" />;
+        return <Plane className="w-4 h-4 text-blue-600" />;
       case 'expense_added':
       case 'expense_updated':
       case 'expense_deleted':
-        return <DollarSign className="w-4 h-4 text-yellow-500" />;
+        return <DollarSign className="w-4 h-4 text-yellow-600" />;
       case 'settlement_ready':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'admin_broadcast':
-        return <Megaphone className="w-4 h-4 text-orange-500" />;
+        return <Megaphone className="w-4 h-4 text-orange-600" />;
       default:
-        return <Bell className="w-4 h-4 text-gray-500" />;
+        return <Bell className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -137,27 +141,35 @@ export default function NotificationPanel({
       case 'group_request':
         return (
           <Link href={`/g/${notification.data.groupId}/requests`}>
-            <Button size="sm" variant="outline">Xem yêu cầu</Button>
+            <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
+              Xem yêu cầu
+            </Button>
           </Link>
         );
       case 'trip_created':
       case 'trip_updated':
         return (
           <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}`}>
-            <Button size="sm" variant="outline">Xem chuyến đi</Button>
+            <Button size="sm" variant="default" className="bg-blue-600 hover:bg-blue-700">
+              Xem chuyến đi
+            </Button>
           </Link>
         );
       case 'expense_added':
       case 'expense_updated':
         return (
           <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/expenses`}>
-            <Button size="sm" variant="outline">Xem chi phí</Button>
+            <Button size="sm" variant="default" className="bg-yellow-600 hover:bg-yellow-700">
+              Xem chi phí
+            </Button>
           </Link>
         );
       case 'settlement_ready':
         return (
           <Link href={`/g/${notification.data.groupId}/trips/${notification.data.tripId}/settlement`}>
-            <Button size="sm" variant="outline">Xem thanh toán</Button>
+            <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
+              Xem thanh toán
+            </Button>
           </Link>
         );
       case 'admin_broadcast':
@@ -176,7 +188,7 @@ export default function NotificationPanel({
     setTimeout(() => {
       onClose();
       setIsAnimating(false);
-    }, 300); // Match animation duration
+    }, 300);
   };
 
   const sendBirthdayWish = (memberId: string, memberName: string) => {
@@ -193,18 +205,27 @@ export default function NotificationPanel({
       }`} />
       
       {/* Panel */}
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed top-0 right-0 h-full w-full sm:w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-out ${
         isAnimating ? 'translate-x-full' : 'translate-x-0'
       }`}>
         <div className="flex flex-col h-full" ref={panelRef}>
           {/* Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 border-b">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Thông báo</h2>
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50/50">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Thông báo</h2>
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 hover:bg-gray-100"
+              aria-label="Đóng thông báo"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -214,29 +235,28 @@ export default function NotificationPanel({
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {/* Birthday Notifications */}
             {birthdayMembers.length > 0 && (
-              <div className="space-y-2 sm:space-y-3 animate-in slide-in-from-bottom fade-in">
-                <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-                  <Cake className="w-3 h-3 sm:w-4 sm:h-4 text-pink-500" />
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Cake className="w-4 h-4 text-pink-500" />
                   Sinh nhật hôm nay
                 </div>
                 
                 {birthdayMembers.map((member, index) => (
                   <Card 
                     key={member.id} 
-                    className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200 animate-in slide-in-from-bottom fade-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200 shadow-sm"
                   >
-                    <CardContent className="p-2 sm:p-3">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-sm">
                           {member.avatar ? (
                             <img 
                               src={member.avatar} 
                               alt={member.name}
-                              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
+                              className="w-8 h-8 rounded-full object-cover"
                             />
                           ) : (
-                            <span className="text-white text-xs sm:text-sm font-medium">
+                            <span className="text-white text-sm font-medium">
                               {member.name.charAt(0)}
                             </span>
                           )}
@@ -281,10 +301,9 @@ export default function NotificationPanel({
             )}
 
             {/* Regular Notifications */}
-            <div className="space-y-2 sm:space-y-3 animate-in slide-in-from-bottom fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-                  <Bell className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                <div className="text-xs sm:text-sm font-medium text-gray-700">
                   Thông báo gần đây
                 </div>
                 <Link href="/notifications">

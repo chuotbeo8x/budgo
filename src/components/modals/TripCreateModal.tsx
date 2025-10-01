@@ -33,7 +33,7 @@ interface TripCreateModalProps {
 
 export default function TripCreateModal({ 
   trigger = (
-    <Button size="sm" className="flex items-center gap-2">
+    <Button variant="outline" size="sm" className="flex items-center gap-2">
       <Plus className="w-4 h-4" />
       Tạo chuyến đi
     </Button>
@@ -155,34 +155,36 @@ export default function TripCreateModal({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-green-600" />
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+            <MapPin className="w-5 h-5 text-primary-600" />
             Tạo chuyến đi
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-gray-600">
             Tạo chuyến đi cá nhân hoặc chuyến đi nhóm để quản lý chi phí một cách linh hoạt
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Tên chuyến đi *</Label>
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700">Tên chuyến đi *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="Nhập tên chuyến đi"
               required
+              className="focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Loại chuyến đi</Label>
+            <Label className="text-sm font-medium text-gray-700">Loại chuyến đi</Label>
             <Select 
               value={formData.groupId} 
               onChange={(e) => handleInputChange('groupId', e.target.value)}
+              className="focus:ring-primary-500 focus:border-primary-500"
             >
-              <option value="">🏠 Chuyến đi cá nhân</option>
+              <option key="personal" value="">🏠 Chuyến đi cá nhân</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>
                   👥 {g.name}
@@ -198,60 +200,65 @@ export default function TripCreateModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
+            <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Mô tả về chuyến đi (tùy chọn)"
               rows={3}
+              className="focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Địa điểm</Label>
+            <Label htmlFor="location" className="text-sm font-medium text-gray-700">Địa điểm</Label>
             <Input
               id="location"
               value={formData.location}
               onChange={(e) => handleInputChange('location', e.target.value)}
               placeholder="Nơi đến (tùy chọn)"
+              className="focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate">Ngày bắt đầu</Label>
+              <Label htmlFor="startDate" className="text-sm font-medium text-gray-700">Ngày bắt đầu</Label>
               <Input
                 id="startDate"
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => handleInputChange('startDate', e.target.value)}
+                className="focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate">Ngày kết thúc</Label>
+              <Label htmlFor="endDate" className="text-sm font-medium text-gray-700">Ngày kết thúc</Label>
               <Input
                 id="endDate"
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => handleInputChange('endDate', e.target.value)}
+                className="focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Tiền tệ</Label>
+            <Label className="text-sm font-medium text-gray-700">Tiền tệ</Label>
             <Select 
               value={formData.currency} 
               onChange={(e) => handleInputChange('currency', e.target.value)}
+              className="focus:ring-primary-500 focus:border-primary-500"
             >
-              <option value="VND">🇻🇳 VND (Việt Nam Đồng)</option>
-              <option value="USD">🇺🇸 USD (US Dollar)</option>
+              <option key="VND" value="VND">VND</option>
+              <option key="USD" value="USD">USD</option>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="estimatedCostPerPerson">Chi phí dự kiến cho mỗi người</Label>
+            <Label htmlFor="estimatedCostPerPerson" className="text-sm font-medium text-gray-700">Chi phí dự kiến cho mỗi người</Label>
             <div className="relative">
               <Input
                 id="estimatedCostPerPerson"
@@ -261,9 +268,9 @@ export default function TripCreateModal({
                 value={formData.estimatedCostPerPerson}
                 onChange={(e) => handleInputChange('estimatedCostPerPerson', e.target.value)}
                 placeholder="Nhập chi phí dự kiến (tùy chọn)"
-                className="pr-8"
+                className="pr-8 focus:ring-primary-500 focus:border-primary-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 font-medium">
                 {formData.currency}
               </span>
             </div>
@@ -272,16 +279,17 @@ export default function TripCreateModal({
             </p>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => setOpen(false)}
               disabled={loading}
             >
               Hủy
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" size="sm" disabled={loading}>
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

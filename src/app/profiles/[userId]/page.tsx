@@ -2,6 +2,8 @@
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +27,8 @@ import { formatDate, formatDateTime } from '@/lib/utils/date';
 import { getUserProfile, voteForUserTitle, getUserTitleVotes, getUserVotesForTarget } from '@/lib/actions/users';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { toast } from 'sonner';
+import LoadingPage from '@/components/ui/loading-page';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 // Danh hiệu có thể vote
 const AVAILABLE_TITLES = [
@@ -167,36 +171,27 @@ export default function UserProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <User className="w-8 h-8 text-gray-400 animate-pulse" />
-            </div>
-            <p className="text-lg text-gray-600">Đang tải thông tin người dùng...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingPage message="Đang tải thông tin người dùng..." />;
   }
 
   if (error || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <User className="w-8 h-8 text-gray-400" />
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
+                <User className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Không tìm thấy người dùng</h2>
+              <p className="text-gray-600 mb-8">{error || 'Người dùng không tồn tại hoặc đã bị xóa.'}</p>
+              <Link href="/dashboard">
+                <Button variant="outline">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Quay lại
+                </Button>
+              </Link>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-3">Không tìm thấy người dùng</h2>
-            <p className="text-gray-600 mb-8">{error || 'Người dùng không tồn tại hoặc đã bị xóa.'}</p>
-            <Link href="/dashboard">
-              <Button>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Quay lại
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -204,69 +199,93 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <>
+      <Head>
+        <title>{user.name} - Hồ sơ người dùng | Budgo</title>
+        <meta name="description" content={`Xem hồ sơ của ${user.name} trên Budgo. Khám phá thông tin, danh hiệu và hoạt động của người dùng này.`} />
+        <meta name="keywords" content={`${user.name}, hồ sơ người dùng, budgo, du lịch, nhóm`} />
+        <meta name="robots" content="noindex, nofollow" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${user.name} - Hồ sơ người dùng | Budgo`} />
+        <meta property="og:description" content={`Xem hồ sơ của ${user.name} trên Budgo. Khám phá thông tin, danh hiệu và hoạt động của người dùng này.`} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={`${typeof window !== 'undefined' ? window.location.href : ''}`} />
+        {user.avatar && <meta property="og:image" content={user.avatar} />}
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${user.name} - Hồ sơ người dùng | Budgo`} />
+        <meta name="twitter:description" content={`Xem hồ sơ của ${user.name} trên Budgo. Khám phá thông tin, danh hiệu và hoạt động của người dùng này.`} />
+        {user.avatar && <meta name="twitter:image" content={user.avatar} />}
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={`${typeof window !== 'undefined' ? window.location.href : ''}`} />
+      </Head>
+      
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-6">
+        <header className="mb-4 sm:mb-6 max-w-6xl mx-auto">
           <Link href="/dashboard">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <Button variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2"/>
               Quay lại
             </Button>
           </Link>
-        </div>
+        </header>
 
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-md mb-6 overflow-hidden">
-            <div className="relative h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600">
+          <Card className="bg-white border border-gray-200 shadow-sm mb-6 overflow-hidden">
+            <div className="relative h-24 sm:h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600">
               <div className="absolute inset-0 bg-black/20"></div>
-              <div className="relative h-full flex items-end pb-6 px-6">
-                <div className="flex items-end gap-4">
+              <div className="relative h-full flex items-end pb-4 sm:pb-6 px-4 sm:px-6">
+                <div className="flex items-end gap-3 sm:gap-4">
                   {/* Avatar */}
                   <div className="relative">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                       {user.avatar ? (
                         <img 
                           src={user.avatar} 
                           alt={user.name}
-                          className="w-14 h-14 rounded-full object-cover"
+                          className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="w-8 h-8 text-gray-400" />
+                        <User className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                       )}
                     </div>
                   </div>
                   
                   {/* User Info */}
                   <div className="text-white">
-                    <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
-                    <p className="text-base opacity-90">@{user.username}</p>
+                    <h1 className="text-lg sm:text-2xl font-bold mb-1">{user.name}</h1>
+                    <p className="text-sm sm:text-base opacity-90">@{user.username}</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Stats Grid */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">{user.totalTrips}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">{user.totalTrips}</div>
                   <div className="text-xs text-gray-600 flex items-center justify-center gap-1">
                     <Plane className="w-3 h-3" />
                     Chuyến đi
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 mb-1">{user.totalGroups}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-green-600 mb-1">{user.totalGroups}</div>
                   <div className="text-xs text-gray-600 flex items-center justify-center gap-1">
                     <Users className="w-3 h-3" />
                     Nhóm
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">
-                    {user.totalExpenses ? (user.totalExpenses / 1000000).toFixed(1) + 'M' : '0'}
+                  <div className="text-xl sm:text-2xl font-bold text-purple-600 mb-1">
+                    {user.totalExpenses ? (user.totalExpenses >= 1000000 ? (user.totalExpenses / 1000000).toFixed(1) + 'M' : (user.totalExpenses / 1000).toFixed(0) + 'K') : '0'}
                   </div>
                   <div className="text-xs text-gray-600 flex items-center justify-center gap-1">
                     <DollarSign className="w-3 h-3" />
@@ -274,7 +293,7 @@ export default function UserProfilePage() {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600 mb-1">{Object.values(titleVotes).reduce((sum, v) => sum + (v || 0), 0)}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-yellow-600 mb-1">{Object.values(titleVotes).reduce((sum, v) => sum + (v || 0), 0)}</div>
                   <div className="text-xs text-gray-600 flex items-center justify-center gap-1">
                     <Star className="w-3 h-3" />
                     Vote
@@ -284,7 +303,7 @@ export default function UserProfilePage() {
 
               {/* Tab Navigation */}
               <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8">
+                <nav className="-mb-px flex flex-wrap gap-2 sm:gap-0 sm:space-x-8">
                   {[
                     { id: 'overview', label: 'Tổng quan', icon: Activity },
                     { id: 'titles', label: 'Danh hiệu', icon: Star },
@@ -296,14 +315,15 @@ export default function UserProfilePage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
-                        className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                        className={`py-2 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 ${
                           activeTab === tab.id
                             ? 'border-blue-500 text-blue-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
-                        <Icon className="w-4 h-4" />
-                        {tab.label}
+                        <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">{tab.label}</span>
+                        <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                       </button>
                     );
                   })}
@@ -313,8 +333,8 @@ export default function UserProfilePage() {
           </Card>
 
           {/* Tab Content */}
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-md">
-            <CardContent className="p-6">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4 sm:p-6">
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Bio */}
@@ -449,7 +469,13 @@ export default function UserProfilePage() {
                               } ${isVoting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                               <div className="text-center">
-                                <div className="text-2xl mb-1">{title.icon}</div>
+                                {isVoting ? (
+                                  <div className="flex items-center justify-center mb-1">
+                                    <LoadingSpinner size="sm" color="primary" />
+                                  </div>
+                                ) : (
+                                  <div className="text-2xl mb-1">{title.icon}</div>
+                                )}
                                 <div className="text-sm font-medium mb-1">{title.name}</div>
                                 <div className="text-xs text-gray-500">{voteCount} vote{voteCount !== 1 ? 's' : ''}</div>
                               </div>
@@ -481,19 +507,21 @@ export default function UserProfilePage() {
                   {user.recentTrips && user.recentTrips.length > 0 ? (
                     <div className="space-y-4">
                       {user.recentTrips.slice(0, 5).map((trip: any, index: number) => (
-                        <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <Plane className="w-5 h-5 text-blue-600" />
+                        <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Plane className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-gray-900 truncate">{trip.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                {trip.startDate && formatDate(trip.startDate)} - {trip.endDate && formatDate(trip.endDate)}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{trip.name}</h4>
-                            <p className="text-sm text-gray-600">
-                              {trip.startDate && formatDate(trip.startDate)} - {trip.endDate && formatDate(trip.endDate)}
-                            </p>
-                          </div>
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <p className="text-sm font-medium text-gray-900">
-                              {trip.totalExpense ? (trip.totalExpense / 1000000).toFixed(1) + 'M' : '0'} VNĐ
+                              {trip.totalExpense ? (trip.totalExpense >= 1000000 ? (trip.totalExpense / 1000000).toFixed(1) + 'M' : (trip.totalExpense / 1000).toFixed(0) + 'K') : '0'} VNĐ
                             </p>
                           </div>
                         </div>
@@ -542,7 +570,9 @@ export default function UserProfilePage() {
             </CardContent>
           </Card>
         </div>
+        <Footer />
       </div>
     </div>
+    </>
   );
 }

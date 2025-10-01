@@ -103,12 +103,13 @@ export default function NotificationBell() {
           detail: { unreadCount, birthdayMembers }
         }));
       }}
-      className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+      className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200 relative focus:outline-none active:bg-transparent"
+      aria-label={`Thông báo${unreadCount > 0 ? ` (${unreadCount} chưa đọc)` : ''}`}
     >
-      <Bell className="w-6 h-6 text-gray-600" />
+      <Bell className="w-5 h-5 text-gray-600" />
       
       {!loading && (unreadCount > 0 || birthdayMembers.length > 0) && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium shadow-sm">
           {unreadCount + birthdayMembers.length > 99 ? '99+' : unreadCount + birthdayMembers.length}
         </span>
       )}

@@ -1,7 +1,10 @@
 'use client';
 
 import { useAuth } from '@/components/auth/AuthProvider';
+import Head from 'next/head';
 import { useRouter } from 'next/navigation';
+import Footer from '@/components/Footer';
+import LoadingPage from '@/components/ui/loading-page';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,13 +102,7 @@ export default function DashboardPage() {
 
 
   if (loading) {
-  return (
-    <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 lg:px-6 py-8 max-w-7xl">
-          <div className="text-center text-gray-600">Đang tải...</div>
-        </div>
-      </div>
-    );
+    return <LoadingPage message="Đang tải dashboard..." />;
   }
 
   if (!user) {
@@ -113,34 +110,54 @@ export default function DashboardPage() {
   }
 
   return (
-    // Design System: Mobile-first layout
-    // Padding: mobile 1rem (16px), desktop 2rem (32px)
-    // Max-width: 7xl (1280px)
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
-        {/* Header - Design System Typography */}
-        <div className="mb-6 lg:mb-8">
+    <>
+      <Head>
+        <title>Bảng điều khiển - Budgo</title>
+        <meta name="description" content="Quản lý chuyến đi và nhóm của bạn một cách thông minh. Theo dõi chi phí, lên kế hoạch chuyến đi và kết nối với bạn bè." />
+        <meta name="keywords" content="quản lý chuyến đi, nhóm du lịch, chia sẻ chi phí, lập kế hoạch du lịch, budgo" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta property="og:title" content="Bảng điều khiển - Budgo" />
+        <meta property="og:description" content="Quản lý chuyến đi và nhóm của bạn một cách thông minh" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Bảng điều khiển - Budgo" />
+        <meta name="twitter:description" content="Quản lý chuyến đi và nhóm của bạn một cách thông minh" />
+        <link rel="canonical" href="https://budgo.app/dashboard" />
+      </Head>
+      
+      {/* Design System: Mobile-first layout */}
+      {/* Padding: mobile 1rem (16px), desktop 2rem (32px) */}
+      {/* Max-width: 7xl (1280px) */}
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+        <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
+        {/* Header - Design System Typography with SEO optimization */}
+        <header className="mb-6 lg:mb-8">
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Bảng điều khiển</h1>
           <p className="text-sm text-gray-600 mt-1">Tổng quan chuyến đi và nhóm của bạn</p>
-        </div>
+        </header>
 
-        {/* Quick Stats Bar - Design System: Card spacing */}
-        <Card className="mb-6 lg:mb-8">
-          <CardContent className="p-4 lg:p-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        {/* Quick Stats Bar - Design System: Card spacing with semantic HTML */}
+        <section className="mb-6 lg:mb-8" aria-label="Thống kê tổng quan">
+          <Card>
+            <CardContent className="p-4 lg:p-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Stat Item */}
-              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="text-3xl font-bold text-primary-600">{trips.length}</p>
+              <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Tổng số chuyến đi">
+                <p className="text-3xl font-bold text-primary-600" aria-label={`${trips.length} chuyến đi`}>{trips.length}</p>
                 <p className="text-sm text-gray-600 mt-1">Tổng chuyến đi</p>
-              </div>
-              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="text-3xl font-bold text-success-600">
+              </article>
+              <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Chuyến đi sắp tới">
+                <p className="text-3xl font-bold text-success-600" aria-label={`${trips.filter(t => t.startDate && new Date(t.startDate) > new Date()).length} chuyến đi sắp tới`}>
                   {trips.filter(t => t.startDate && new Date(t.startDate) > new Date()).length}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">Sắp tới</p>
-              </div>
-              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="text-3xl font-bold text-warning-600">
+              </article>
+              <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Chuyến đi đang diễn ra">
+                <p className="text-3xl font-bold text-warning-600" aria-label={`${trips.filter(t => {
+                  const now = new Date().getTime();
+                  const s = t.startDate ? new Date(t.startDate).getTime() : 0;
+                  const e = t.endDate ? new Date(t.endDate).getTime() : Number.MAX_SAFE_INTEGER;
+                  return s <= now && now <= e;
+                }).length} chuyến đi đang diễn ra`}>
                   {trips.filter(t => {
                     const now = new Date().getTime();
                     const s = t.startDate ? new Date(t.startDate).getTime() : 0;
@@ -149,23 +166,24 @@ export default function DashboardPage() {
                   }).length}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">Đang diễn ra</p>
-              </div>
-              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="text-xl lg:text-2xl font-bold text-gray-700">
+              </article>
+              <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Tổng chi phí">
+                <p className="text-xl lg:text-2xl font-bold text-gray-700" aria-label={`${trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0).toLocaleString('vi-VN')} VND`}>
                   {trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0).toLocaleString('vi-VN')} ₫
                 </p>
                 <p className="text-sm text-gray-600 mt-1">Tổng chi phí</p>
-              </div>
+              </article>
             </div>
           </CardContent>
-        </Card>
+          </Card>
+        </section>
 
-        {/* Two-column content - Design System: Responsive gap */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
+        {/* Two-column content - Design System: Responsive gap with semantic HTML */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8" role="main" aria-label="Nội dung chính">
           {/* Trips Section */}
-          <div className="flex flex-col h-full">
+          <section className="flex flex-col h-full" aria-labelledby="trips-heading">
             <div className="flex items-center justify-between mb-3 md:mb-4 lg:mb-6">
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Chuyến đi của bạn</h2>
+              <h2 id="trips-heading" className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Chuyến đi của bạn</h2>
               <Link href="/trips/manage">
                 <Button size="sm" variant="outline">
                   Xem tất cả
@@ -183,7 +201,7 @@ export default function DashboardPage() {
             ) : trips.length === 0 ? (
               <Card className="border-dashed border-2 border-primary-200 bg-primary-50/30">
                 <CardContent className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4" aria-hidden="true">
                     <MapPin className="w-8 h-8 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Tạo chuyến đi đầu tiên</h3>
@@ -232,27 +250,27 @@ export default function DashboardPage() {
             ) : (
               <Card className="flex-1">
                 <CardContent className="p-0">
-                  <ul className="divide-y divide-gray-100">
+                  <ul className="divide-y divide-gray-100" role="list" aria-label="Danh sách chuyến đi">
                     {trips.slice(0, 6).map(trip => {
                       const isGroup = !!trip.groupId;
                       return (
-                        <li key={trip.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
+                        <li key={trip.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer" role="listitem">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
                               {isGroup ? (
-                                <Users className="w-4 h-4 text-primary-600" />
+                                <Users className="w-4 h-4 text-primary-600" aria-hidden="true" />
                               ) : (
-                                <MapPin className="w-4 h-4 text-success-600" />
+                                <MapPin className="w-4 h-4 text-success-600" aria-hidden="true" />
                               )}
                               <span className="font-semibold text-gray-900 truncate">{trip.name}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isGroup ? 'bg-primary-100 text-primary-700' : 'bg-success-100 text-success-700'}`}>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isGroup ? 'bg-primary-100 text-primary-700' : 'bg-success-100 text-success-700'}`} aria-label={isGroup ? 'Chuyến đi nhóm' : 'Chuyến đi cá nhân'}>
                                 {isGroup ? 'Nhóm' : 'Cá nhân'}
                               </span>
                             </div>
                             <div className="text-sm text-gray-500 flex items-center gap-1">
                               {trip.startDate ? (
                                 <>
-                                  <Plane className="w-3 h-3 text-primary-600" />
+                                  <Plane className="w-3 h-3 text-primary-600" aria-hidden="true" />
                                   <span>{formatDate(trip.startDate)}</span>
                                 </>
                               ) : (
@@ -260,15 +278,15 @@ export default function DashboardPage() {
                               )}
                               {trip.endDate && (
                                 <>
-                                  <span>•</span>
-                                  <Home className="w-3 h-3 text-warning-600" />
+                                  <span aria-hidden="true">•</span>
+                                  <Home className="w-3 h-3 text-warning-600" aria-hidden="true" />
                                   <span>{formatDate(trip.endDate)}</span>
                                 </>
                               )}
                               {trip.destination && (
                                 <>
-                                  <span>•</span>
-                                  <MapPin className="w-3 h-3 text-error-600" />
+                                  <span aria-hidden="true">•</span>
+                                  <MapPin className="w-3 h-3 text-error-600" aria-hidden="true" />
                                   <span>{trip.destination}</span>
                                 </>
                               )}
@@ -295,12 +313,12 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             )}
-          </div>
+          </section>
 
           {/* Groups Section */}
-          <div className="flex flex-col h-full">
+          <section className="flex flex-col h-full" aria-labelledby="groups-heading">
             <div className="flex items-center justify-between mb-3 md:mb-4 lg:mb-6">
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Nhóm của bạn</h2>
+              <h2 id="groups-heading" className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Nhóm của bạn</h2>
               <Link href="/groups/manage">
                 <Button size="sm" variant="outline">
                   Xem tất cả
@@ -342,23 +360,23 @@ export default function DashboardPage() {
             ) : (
               <Card className="flex-1">
                 <CardContent className="p-0">
-                  <ul className="divide-y divide-gray-100">
+                  <ul className="divide-y divide-gray-100" role="list" aria-label="Danh sách nhóm">
                     {groups.map((group) => (
-                      <li key={group.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
+                      <li key={group.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer" role="listitem">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             {group.type === 'public' ? (
-                              <Globe className="w-4 h-4 text-success-600" />
+                              <Globe className="w-4 h-4 text-success-600" aria-hidden="true" />
                             ) : (
-                              <Lock className="w-4 h-4 text-warning-600" />
+                              <Lock className="w-4 h-4 text-warning-600" aria-hidden="true" />
                             )}
                             <span className="font-semibold text-gray-900 truncate">{group.name}</span>
                           </div>
                           <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Users className="w-3 h-3 text-primary-600" />
+                            <Users className="w-3 h-3 text-primary-600" aria-hidden="true" />
                             <span>{group.memberCount || 0} thành viên</span>
-                            <span>•</span>
-                            <Calendar className="w-3 h-3 text-success-600" />
+                            <span aria-hidden="true">•</span>
+                            <Calendar className="w-3 h-3 text-success-600" aria-hidden="true" />
                             <span>{formatDate(group.createdAt)}</span>
                           </div>
                         </div>
@@ -382,9 +400,11 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             )}
-          </div>
+          </section>
         </div>
       </div>
+      <Footer />
     </div>
+    </>
   );
 }

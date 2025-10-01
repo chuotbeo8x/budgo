@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProfile } from '@/components/auth/ProfileProvider';
+import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -251,6 +252,7 @@ export default function AdminUsersPage() {
             )}
           </CardContent>
         </Card>
+        <Footer />
       </div>
     </div>
   );

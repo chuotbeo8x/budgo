@@ -29,7 +29,7 @@ export default function SettingsPage() {
 
   return (
     // Design System: Clean background, responsive spacing
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-4xl">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">

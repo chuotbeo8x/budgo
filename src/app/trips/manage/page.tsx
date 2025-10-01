@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import Footer from '@/components/Footer';
+import LoadingPage from '@/components/ui/loading-page';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getUserTrips } from '@/lib/actions/trips';
 import { getUserGroups } from '@/lib/actions/groups';
@@ -12,6 +15,7 @@ import { toast } from 'sonner';
 import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
 import TripCreateModal from '@/components/modals/TripCreateModal';
+import Head from 'next/head';
 import { 
   Plus, 
   MapPin, 
@@ -202,14 +206,7 @@ export default function TripsManagePage() {
   const averageExpense = totalTrips > 0 ? totalExpense / totalTrips : 0;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-lg text-gray-600">Đang tải...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage message="Đang tải thông tin chuyến đi..." />;
   }
 
   if (!user) {
@@ -223,46 +220,68 @@ export default function TripsManagePage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Header Section (aligned with Groups Manage) */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+    <>
+      <Head>
+        <title>Quản lý chuyến đi - Budgo</title>
+        <meta name="description" content="Quản lý tất cả chuyến đi cá nhân và nhóm của bạn. Theo dõi chi phí, thành viên và hoạt động chuyến đi một cách hiệu quả." />
+        <meta name="keywords" content="quản lý chuyến đi, chuyến đi cá nhân, chuyến đi nhóm, theo dõi chi phí, budgo" />
+        <meta name="robots" content="noindex, nofollow" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Quản lý chuyến đi - Budgo" />
+        <meta property="og:description" content="Quản lý tất cả chuyến đi cá nhân và nhóm của bạn. Theo dõi chi phí, thành viên và hoạt động chuyến đi một cách hiệu quả." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://budgo.app/trips/manage" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Quản lý chuyến đi - Budgo" />
+        <meta name="twitter:description" content="Quản lý tất cả chuyến đi cá nhân và nhóm của bạn. Theo dõi chi phí, thành viên và hoạt động chuyến đi một cách hiệu quả." />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://budgo.app/trips/manage" />
+      </Head>
+      
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+        {/* Header Section */}
+        <header className="mb-4 sm:mb-6 lg:mb-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Quản lý chuyến đi</h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600">Quản lý tất cả chuyến đi cá nhân và nhóm của bạn</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-2">Quản lý chuyến đi</h1>
+              <p className="text-sm text-gray-600">Quản lý tất cả chuyến đi cá nhân và nhóm của bạn</p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
               <TripCreateModal
                 trigger={
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 text-xs sm:text-sm">
-                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <Button size="sm" className="w-full sm:w-auto">
+                    <Plus className="w-4 h-4 mr-2" />
                     Tạo chuyến đi mới
                   </Button>
                 }
-                groups={groups} // Load actual groups
+                groups={groups}
                 onSuccess={(tripId, groupId, tripSlug) => {
                   toast.success('Chuyến đi đã được tạo thành công!');
                   loadTrips();
                 }}
               />
               <Link href="/">
-                <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">
-                  <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                  <Home className="w-4 h-4 mr-2" />
                   Về trang chủ
                 </Button>
               </Link>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Search and Stats Section */}
         <Card className="mb-6 sm:mb-8 shadow-sm">
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="space-y-3 sm:space-y-4">
               {/* Stats Row */}
-              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-200">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-blue-600" />
                     <span className="text-sm font-medium text-gray-700">Tổng:</span>
@@ -291,7 +310,7 @@ export default function TripsManagePage() {
               </div>
 
               {/* Filter and Sort Row */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
                 {/* Filter Type - Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row gap-2 flex-1">
                   <Button
@@ -349,7 +368,7 @@ export default function TripsManagePage() {
           <Card className="shadow-sm">
             <CardContent className="py-8 sm:py-12">
               <div className="text-center">
-                <div className="w-8 h-8 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
+                <LoadingSpinner size="lg" color="blue" className="mx-auto mb-3 sm:mb-4" />
                 <p className="text-sm sm:text-base lg:text-lg text-gray-600">Đang tải danh sách chuyến đi...</p>
               </div>
             </CardContent>
@@ -387,7 +406,7 @@ export default function TripsManagePage() {
           </Card>
         ) : (
           <>
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {paginatedTrips.map((trip) => {
               const typeInfo = getTripTypeInfo(trip);
               const statusInfo = getStatusInfo(trip.status);
@@ -395,15 +414,15 @@ export default function TripsManagePage() {
               const StatusIcon = statusInfo.icon;
 
               return (
-                <Card key={trip.id} className="group hover:shadow-md transition-all duration-300">
-                  <CardContent className="p-3 sm:p-4">
+                <Card key={trip.id} className="group">
+                  <CardContent className="p-4 lg:p-6">
                     {/* Header with title and status */}
-                    <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                           {trip.name}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
                           <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
                             <TypeIcon className="w-3 h-3" />
                             {typeInfo.label}
@@ -451,20 +470,20 @@ export default function TripsManagePage() {
                       </div>
                     </div>
 
-                    {/* Action Buttons - Compact */}
-                    <div className="flex gap-2">
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2">
                       {trip.groupId ? (
                         <Link href={`/g/${trip.groupId}/trips/${trip.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-700 h-8 text-xs">
-                            <Eye className="w-3 h-3 mr-1" />
-                            Xem
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Xem chuyến đi
                           </Button>
                         </Link>
                       ) : (
                         <Link href={`/trips/${trip.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-700 h-8 text-xs">
-                            <Eye className="w-3 h-3 mr-1" />
-                            Xem
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Xem chuyến đi
                           </Button>
                         </Link>
                       )}
@@ -473,15 +492,15 @@ export default function TripsManagePage() {
                         <>
                           {trip.groupId ? (
                             <Link href={`/g/${trip.groupId}/trips/${trip.slug}/manage`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full group-hover:bg-green-50 group-hover:border-green-200 group-hover:text-green-700 h-8 text-xs">
-                                <Settings className="w-3 h-3 mr-1" />
+                              <Button variant="outline" size="sm" className="w-full">
+                                <Settings className="w-4 h-4 mr-2" />
                                 Quản lý
                               </Button>
                             </Link>
                           ) : (
                             <Link href={`/trips/${trip.slug}/manage`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full group-hover:bg-green-50 group-hover:border-green-200 group-hover:text-green-700 h-8 text-xs">
-                                <Settings className="w-3 h-3 mr-1" />
+                              <Button variant="outline" size="sm" className="w-full">
+                                <Settings className="w-4 h-4 mr-2" />
                                 Quản lý
                               </Button>
                             </Link>
@@ -598,7 +617,9 @@ export default function TripsManagePage() {
             )}
           </p>
         </div>
+        </div>
+        <Footer />
       </div>
-    </div>
+    </>
   );
 }

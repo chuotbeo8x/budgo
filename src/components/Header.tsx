@@ -74,7 +74,7 @@ export default function Header() {
   // Prevent hydration mismatch by not rendering until hydrated
   if (!isHydrated) {
     return (
-      <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+      <header className="w-full border-b bg-white sticky top-0 z-50">
         <div className="container mx-auto px-4 lg:px-6 h-14 lg:h-16 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
@@ -89,7 +89,7 @@ export default function Header() {
   return (
     <>
       {/* Desktop Header - Design System Compliant */}
-      <header className="w-full border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 hidden lg:block shadow-sm">
+      <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-50 hidden lg:block shadow-sm">
       {/* Locked account banner */}
       {profile && (profile as any).disabled === true && (
         <div className="w-full bg-error-600 text-white text-sm">
@@ -122,8 +122,8 @@ export default function Header() {
             href="/groups/manage" 
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/groups') 
-                ? 'text-primary-600 bg-primary-50 shadow-sm' 
-                : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                ? 'text-green-600 bg-green-50 shadow-sm' 
+                : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
             }`}
           >
             <Users className={`w-5 h-5 transition-transform ${
@@ -137,8 +137,8 @@ export default function Header() {
             href="/trips/manage" 
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/trips') 
-                ? 'text-success-600 bg-success-50 shadow-sm' 
-                : 'text-gray-700 hover:text-success-600 hover:bg-gray-50'
+                ? 'text-blue-600 bg-blue-50 shadow-sm' 
+                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
             }`}
           >
             <MapPin className={`w-5 h-5 transition-transform ${

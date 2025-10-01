@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { getUserGroups } from '@/lib/actions/groups';
 import { Group } from '@/lib/types';
+import Footer from '@/components/Footer';
 import { 
   Users, 
   MapPin, 
@@ -387,6 +388,7 @@ export default function WelcomePage() {
             </CardContent>
           </Card>
         </div>
+        <Footer />
       </div>
     </div>
   );

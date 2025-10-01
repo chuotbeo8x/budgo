@@ -28,7 +28,7 @@ export default function ManagePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
         <div className="container mx-auto px-4 lg:px-6 py-8 max-w-7xl">
           <div className="text-center text-gray-600">Đang tải...</div>
         </div>
@@ -152,7 +152,7 @@ export default function ManagePage() {
 
   return (
     // Design System: Clean bg-gray-50, responsive spacing
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
         {/* Header Section - Design System Typography */}
         <div className="mb-6 lg:mb-8">

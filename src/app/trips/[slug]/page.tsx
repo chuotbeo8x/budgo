@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Head from 'next/head';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getTripBySlug } from '@/lib/actions/trips';
 import { Trip } from '@/lib/types';
@@ -61,10 +62,33 @@ export default function PersonalTripDetailPage() {
   }
 
   return (
-    <TripViewPage
-      trip={trip}
-      backUrl="/dashboard"
-      backLabel="Về trang chủ"
-    />
+    <>
+      <Head>
+        <title>{trip.name} - Chi tiết chuyến đi | Budgo</title>
+        <meta name="description" content={`Xem chi tiết chuyến đi ${trip.name}. Quản lý chi phí, thành viên và quyết toán cho chuyến đi của bạn.`} />
+        <meta name="keywords" content="chuyến đi, quản lý chi phí, du lịch, budgo, trip management" />
+        <meta name="robots" content="noindex, nofollow" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${trip.name} - Chi tiết chuyến đi | Budgo`} />
+        <meta property="og:description" content={`Xem chi tiết chuyến đi ${trip.name}. Quản lý chi phí, thành viên và quyết toán cho chuyến đi của bạn.`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${typeof window !== 'undefined' ? window.location.href : ''}`} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${trip.name} - Chi tiết chuyến đi | Budgo`} />
+        <meta name="twitter:description" content={`Xem chi tiết chuyến đi ${trip.name}. Quản lý chi phí, thành viên và quyết toán cho chuyến đi của bạn.`} />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={`${typeof window !== 'undefined' ? window.location.href : ''}`} />
+      </Head>
+      
+      <TripViewPage
+        trip={trip}
+        backUrl="/dashboard"
+        backLabel="Về trang chủ"
+      />
+    </>
   );
 }

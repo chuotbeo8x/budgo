@@ -2,6 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import Head from 'next/head';
+import Footer from '@/components/Footer';
+import LoadingPage from '@/components/ui/loading-page';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getUserGroups, searchPublicGroups, joinGroup } from '@/lib/actions/groups';
@@ -129,22 +133,18 @@ export default function GroupsManagePage() {
   const getGroupTypeInfo = (type: string) => {
     switch (type) {
       case 'public':
-        return { icon: Globe, label: 'Công khai', color: 'text-green-600', bgColor: 'bg-green-100' };
+        return { icon: Globe, label: 'Công khai', color: 'text-green-700', bgColor: 'bg-green-100' };
       case 'close':
-        return { icon: EyeIcon, label: 'Đóng', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+        return { icon: EyeIcon, label: 'Đóng', color: 'text-green-600', bgColor: 'bg-green-50' };
       case 'secret':
-        return { icon: Lock, label: 'Bí mật', color: 'text-red-600', bgColor: 'bg-red-100' };
+        return { icon: Lock, label: 'Bí mật', color: 'text-green-800', bgColor: 'bg-green-200' };
       default:
-        return { icon: Globe, label: 'Nhóm', color: 'text-gray-600', bgColor: 'bg-gray-100' };
+        return { icon: Globe, label: 'Nhóm', color: 'text-green-600', bgColor: 'bg-green-100' };
     }
   };
 
   if (loading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">Đang tải...</div>
-      </div>
-    );
+    return <LoadingPage message="Đang tải thông tin nhóm..." />;
   }
 
   if (!user) {
@@ -152,66 +152,81 @@ export default function GroupsManagePage() {
       <LoginPrompt
         title="Vui lòng đăng nhập"
         description="Đăng nhập để quản lý nhóm của bạn"
-        icon={<Users className="w-8 h-8 text-blue-600" />}
+        icon={<Users className="w-8 h-8 text-green-600" />}
       />
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Header Section */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+    <>
+      <Head>
+        <title>Quản lý nhóm - Budgo</title>
+        <meta name="description" content="Quản lý tất cả nhóm của bạn một cách dễ dàng. Tạo nhóm, tham gia nhóm công khai và quản lý thành viên." />
+        <meta name="keywords" content="quản lý nhóm, nhóm du lịch, tạo nhóm, tham gia nhóm, budgo" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta property="og:title" content="Quản lý nhóm - Budgo" />
+        <meta property="og:description" content="Quản lý tất cả nhóm của bạn một cách dễ dàng" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Quản lý nhóm - Budgo" />
+        <meta name="twitter:description" content="Quản lý tất cả nhóm của bạn một cách dễ dàng" />
+        <link rel="canonical" href="https://budgo.app/groups/manage" />
+      </Head>
+      
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+        {/* Header Section - SEO optimized */}
+        <header className="mb-4 sm:mb-6 lg:mb-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Quản lý nhóm</h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Quản lý nhóm</h1>
+              <p className="text-sm text-gray-600 mt-1">
                 Quản lý tất cả nhóm của bạn một cách dễ dàng
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
               <Link href="/groups/create">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 text-xs sm:text-sm">
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <Button size="sm" variant="success" className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
                   Tạo nhóm mới
                 </Button>
               </Link>
               <Link href="/">
-                <Button variant="outline" className="h-8 sm:h-9 text-xs sm:text-sm">
-                  <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                  <Home className="w-4 h-4 mr-2" />
                   Về trang chủ
                 </Button>
               </Link>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Search and Stats Section */}
-        <Card className="mb-6 sm:mb-8 shadow-sm">
-          <CardContent className="p-3 sm:p-4 md:p-6">
-            <div className="space-y-3 sm:space-y-4">
-              {/* Stats Row */}
-              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-700">Tổng:</span>
-                    <span className="text-lg font-bold text-blue-600">{groups.length}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-gray-700">Công khai:</span>
-                    <span className="text-lg font-bold text-green-600">{groups.filter(g => g.type === 'public').length}</span>
-                  </div>
+        {/* Search and Stats Section - SEO optimized */}
+        <section className="mb-6 lg:mb-8" aria-label="Thống kê và tìm kiếm nhóm">
+          <Card>
+            <CardContent className="p-4 lg:p-6">
+              <div className="space-y-4">
+                {/* Stats Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-200">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <article className="flex items-center gap-2" aria-label="Tổng số nhóm">
+                    <Users className="w-4 h-4 text-green-600" aria-hidden="true" />
+                    <span className="text-sm text-gray-600">Tổng:</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-green-600" aria-label={`${groups.length} nhóm`}>{groups.length}</span>
+                  </article>
+                  <article className="flex items-center gap-2" aria-label="Số nhóm công khai">
+                    <Globe className="w-4 h-4 text-green-500" aria-hidden="true" />
+                    <span className="text-sm text-gray-600">Công khai:</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-green-500" aria-label={`${groups.filter(g => g.type === 'public').length} nhóm công khai`}>{groups.filter(g => g.type === 'public').length}</span>
+                  </article>
                 </div>
               </div>
 
               {/* Search */}
               <div className="w-full">
-                <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="text"
                         placeholder="Tìm kiếm nhóm theo tên hoặc mô tả..."
@@ -226,60 +241,66 @@ export default function GroupsManagePage() {
                             await searchAllGroups();
                           }
                         }}
-                        className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                        className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                       />
                     </div>
                   </div>
                   <Button
                     onClick={searchAllGroups}
                     disabled={!searchTerm.trim() || loadingPublic}
-                    className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap h-8 sm:h-9 text-xs sm:text-sm"
+                    size="sm"
+                    variant="outline"
+                    className="whitespace-nowrap"
                   >
                     {loadingPublic ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1 sm:mr-2" />
+                      <LoadingSpinner size="sm" color="gray" className="mr-2" />
                     ) : (
-                      <Search className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <Search className="w-4 h-4 mr-2" />
                     )}
                     Tìm kiếm
                   </Button>
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mt-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span>Lọc và sắp xếp:</span>
                   </div>
-                  <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value as 'all' | 'public' | 'close' | 'secret')}
-                    className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
-                  >
-                    <option value="all">Tất cả loại</option>
-                    <option value="public">Công khai</option>
-                    <option value="close">Đóng</option>
-                    <option value="secret">Bí mật</option>
-                  </select>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'created' | 'name' | 'members')}
-                    className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
-                  >
-                    <option value="created">Mới nhất</option>
-                    <option value="name">Tên A-Z</option>
-                    <option value="members">Nhiều thành viên</option>
-                  </select>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value as 'all' | 'public' | 'close' | 'secret')}
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                    >
+                      <option value="all">Tất cả loại</option>
+                      <option value="public">Công khai</option>
+                      <option value="close">Đóng</option>
+                      <option value="secret">Bí mật</option>
+                    </select>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'created' | 'name' | 'members')}
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                    >
+                      <option value="created">Mới nhất</option>
+                      <option value="name">Tên A-Z</option>
+                      <option value="members">Nhiều thành viên</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
-        </Card>
+          </Card>
+        </section>
 
-        {/* Groups List */}
-        {loadingGroups ? (
-          <div className="text-center py-8 sm:py-12">
-            <div className="w-8 h-8 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
-            <p className="text-sm sm:text-base lg:text-lg text-gray-600">Đang tải danh sách nhóm...</p>
-          </div>
+        {/* Groups List - SEO optimized */}
+        <main role="main" aria-label="Danh sách nhóm">
+          {loadingGroups ? (
+            <div className="text-center py-8 sm:py-12">
+              <LoadingSpinner size="lg" color="green" className="mx-auto mb-3 sm:mb-4" />
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600">Đang tải danh sách nhóm...</p>
+            </div>
         ) : (showPublicGroups || searchTerm.trim()) ? (
           // Combined Search Results
           <div>
@@ -309,11 +330,11 @@ export default function GroupsManagePage() {
                 {/* My Groups Section */}
                 {filteredAndSortedGroups.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-green-600" aria-hidden="true" />
                       Nhóm của tôi ({filteredAndSortedGroups.length})
                     </h3>
-                    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                       {filteredAndSortedGroups.map((group) => {
                         const typeInfo = getGroupTypeInfo(group.type);
                         const TypeIcon = typeInfo.icon;
@@ -321,7 +342,7 @@ export default function GroupsManagePage() {
                         
                         return (
                           <Card key={group.id} className="hover:shadow-md transition-all duration-300 bg-white">
-                            <CardContent className="p-3 sm:p-4">
+                            <CardContent className="p-3 md:p-4 lg:p-6">
                               <div className="space-y-3 sm:space-y-4">
                                 {/* Header */}
                                 <div className="flex items-start justify-between">
@@ -355,18 +376,18 @@ export default function GroupsManagePage() {
                                 </div>
                                 
                                 {/* Action Buttons */}
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <Link href={`/g/${group.slug}`} className="flex-1">
-                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs">
-                                      <Eye className="w-3 h-3 mr-1" />
+                                    <Button variant="outline" size="sm" className="w-full">
+                                      <Eye className="w-4 h-4 mr-2" />
                                       Xem
                                     </Button>
                                   </Link>
                                   
                                   {isOwner && (
                                     <Link href={`/g/${group.slug}/manage`} className="flex-1">
-                                      <Button variant="outline" size="sm" className="w-full h-8 text-xs">
-                                        <Settings className="w-3 h-3 mr-1" />
+                                      <Button variant="outline" size="sm" className="w-full">
+                                        <Settings className="w-4 h-4 mr-2" />
                                         Quản lý
                                       </Button>
                                     </Link>
@@ -384,11 +405,11 @@ export default function GroupsManagePage() {
                 {/* Public Groups Section */}
                 {publicGroups.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-green-600" />
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6 flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-green-500" aria-hidden="true" />
                       Nhóm công khai ({publicGroups.length})
                     </h3>
-                    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                       {publicGroups.map((group) => {
                         const typeInfo = getGroupTypeInfo(group.type);
                         const TypeIcon = typeInfo.icon;
@@ -432,30 +453,30 @@ export default function GroupsManagePage() {
                                 {/* Action Buttons */}
                                 <div className="flex gap-2">
                                   <Link href={`/g/${group.slug}`} className="flex-1">
-                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs">
-                                      <Eye className="w-3 h-3 mr-1" />
+                                    <Button variant="outline" size="sm" className="w-full">
+                                      <Eye className="w-4 h-4 mr-2" />
                                       Xem
                                     </Button>
                                   </Link>
                                   {!isAlreadyMember && (
                                     <Button 
-                                      variant="outline" 
+                                      variant="success" 
                                       size="sm" 
-                                      className="flex-1 h-8 text-xs"
+                                      className="flex-1"
                                       onClick={() => handleJoinGroup(group.id, group.name)}
                                       disabled={joiningGroups.has(group.id)}
                                     >
                                       {joiningGroups.has(group.id) ? (
-                                        <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-1" />
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                                       ) : (
-                                        <UserPlus className="w-3 h-3 mr-1" />
+                                        <UserPlus className="w-4 h-4 mr-2" />
                                       )}
                                       {joiningGroups.has(group.id) ? 'Đang tham gia...' : 'Tham gia'}
                                     </Button>
                                   )}
                                   {isAlreadyMember && (
-                                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" disabled>
-                                      <Users className="w-3 h-3 mr-1" />
+                                    <Button variant="outline" size="sm" className="flex-1" disabled>
+                                      <Users className="w-4 h-4 mr-2" />
                                       Đã tham gia
                                     </Button>
                                   )}
@@ -485,7 +506,7 @@ export default function GroupsManagePage() {
                 }
               </p>
               <Link href="/groups/create">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-8 sm:h-10 text-xs sm:text-sm">
+                <Button size="lg" variant="success" className="h-8 sm:h-10 text-xs sm:text-sm">
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                   Tạo nhóm đầu tiên
                 </Button>
@@ -562,13 +583,16 @@ export default function GroupsManagePage() {
 
         {/* Footer Stats */}
         {!showPublicGroups && !searchTerm.trim() && (
-          <div className="mt-6 sm:mt-8 text-center">
-            <p className="text-xs sm:text-sm text-gray-600">
+          <div className="mt-6 lg:mt-8 text-center">
+            <p className="text-sm text-gray-600">
               Hiển thị {filteredAndSortedGroups.length} trong tổng số {groups.length} nhóm
             </p>
           </div>
         )}
+        </main>
+        </div>
+        <Footer />
       </div>
-    </div>
+    </>
   );
 }

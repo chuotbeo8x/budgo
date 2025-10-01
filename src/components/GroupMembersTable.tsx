@@ -150,7 +150,7 @@ export default function GroupMembersTable({
 
   if (members.length === 0) {
     return (
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="rounded-lg shadow-sm border border-gray-200">
         <CardContent className="text-center py-20">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
             <Users className="w-10 h-10 text-gray-400" />
@@ -162,12 +162,12 @@ export default function GroupMembersTable({
           <div className="flex gap-4 justify-center">
             <Button 
               onClick={onCopyInviteLink}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              size="sm"
             >
               <Copy className="w-4 h-4 mr-2" />
               Chia sẻ liên kết mời
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="sm">
               <Share2 className="w-4 h-4 mr-2" />
               Chia sẻ nhóm
             </Button>
@@ -178,28 +178,9 @@ export default function GroupMembersTable({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Thành viên nhóm</h2>
-          <p className="text-gray-600">Quản lý và theo dõi các thành viên trong nhóm</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
-            {members.length} thành viên
-          </div>
-          {isOwner && onInviteMember && (
-            <Button size="sm" variant="outline" onClick={onInviteMember}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              Mời thêm
-            </Button>
-          )}
-        </div>
-      </div>
-
+    <div className="space-y-4 lg:space-y-6">
       {/* Table */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="rounded-lg shadow-sm border border-gray-200">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -363,7 +344,7 @@ export default function GroupMembersTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-6 lg:mt-8">
           <div className="text-sm text-gray-700">
             Hiển thị {startIndex + 1} đến {Math.min(endIndex, members.length)} trong tổng số {members.length} thành viên
           </div>

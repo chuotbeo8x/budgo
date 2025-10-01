@@ -165,7 +165,7 @@ export default function GroupTripsTable({
       <Card>
         <CardContent className="py-12">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-lg text-gray-600">Đang tải danh sách chuyến đi...</p>
           </div>
         </CardContent>
@@ -174,61 +174,36 @@ export default function GroupTripsTable({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Stats Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Tổng chuyến đi</p>
-                <p className="text-3xl font-bold">{totalTrips}</p>
-              </div>
-              <MapPin className="w-8 h-8 text-blue-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">Đang hoạt động</p>
-                <p className="text-3xl font-bold">{activeTrips}</p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-green-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-red-100 text-sm font-medium">Đã đóng</p>
-                <p className="text-3xl font-bold">{closedTrips}</p>
-              </div>
-              <AlertCircle className="w-8 h-8 text-red-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm font-medium">Tổng chi phí</p>
-                <p className="text-3xl font-bold">{formatCurrency(totalExpense, 'VND')}</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-purple-200" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="space-y-4 lg:space-y-6">
+      {/* Stats Dashboard - Dashboard Style */}
+      <Card>
+        <CardContent className="p-4 lg:p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Tổng số chuyến đi">
+              <p className="text-3xl font-bold text-primary-600" aria-label={`${totalTrips} chuyến đi`}>{totalTrips}</p>
+              <p className="text-sm text-gray-600 mt-1">Tổng chuyến đi</p>
+            </article>
+            <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Chuyến đi đang hoạt động">
+              <p className="text-3xl font-bold text-success-600" aria-label={`${activeTrips} chuyến đi đang hoạt động`}>{activeTrips}</p>
+              <p className="text-sm text-gray-600 mt-1">Đang hoạt động</p>
+            </article>
+            <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Chuyến đi đã đóng">
+              <p className="text-3xl font-bold text-error-600" aria-label={`${closedTrips} chuyến đi đã đóng`}>{closedTrips}</p>
+              <p className="text-sm text-gray-600 mt-1">Đã đóng</p>
+            </article>
+            <article className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Tổng chi phí">
+              <p className="text-xl lg:text-2xl font-bold text-gray-700" aria-label={`${formatCurrency(totalExpense, 'VND')} tổng chi phí`}>
+                {formatCurrency(totalExpense, 'VND')}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Tổng chi phí</p>
+            </article>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Search and Filter Section */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -239,7 +214,7 @@ export default function GroupTripsTable({
                   placeholder="Tìm kiếm chuyến đi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -250,7 +225,7 @@ export default function GroupTripsTable({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'name' | 'createdAt' | 'startDate')}
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="createdAt">Mới nhất</option>
                 <option value="name">Tên A-Z</option>
@@ -275,8 +250,8 @@ export default function GroupTripsTable({
               </p>
               <TripCreateModal
                 trigger={
-                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                    <Plus className="w-5 h-5 mr-2" />
+                  <Button variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
                     {createTripLabel}
                   </Button>
                 }
@@ -291,20 +266,20 @@ export default function GroupTripsTable({
         </Card>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 lg:gap-8 md:grid-cols-2 lg:grid-cols-3">
             {paginatedTrips.map((trip) => {
               const statusInfo = getStatusInfo(trip.status);
               const StatusIcon = statusInfo.icon;
 
               return (
-                <Card key={trip.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <Card key={trip.id} className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <div className="p-2 bg-blue-100 rounded-lg">
+                        <div className="p-2 bg-primary-100 rounded-lg">
                           {getTripIcon(trip)}
                         </div>
-                        <span className="text-sm font-semibold text-blue-600">
+                        <span className="text-sm font-semibold text-primary-600">
                           Nhóm
                         </span>
                       </div>
@@ -315,7 +290,7 @@ export default function GroupTripsTable({
                         </div>
                       </div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
                       {trip.name}
                     </CardTitle>
                     <CardDescription className="text-gray-600 mt-2">
@@ -354,7 +329,7 @@ export default function GroupTripsTable({
                       {/* Action Buttons */}
                       <div className="flex gap-2 pt-4">
                         <Link href={`/g/${groupSlug}/trips/${trip.slug}`} className="flex-1">
-                          <Button variant="outline" className="w-full group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-700">
+                          <Button variant="outline" size="sm" className="w-full">
                             <Eye className="w-4 h-4 mr-2" />
                             Xem chuyến đi
                           </Button>
@@ -362,7 +337,7 @@ export default function GroupTripsTable({
                         
                         {user?.uid === trip.ownerId && (
                           <Link href={`/g/${groupSlug}/trips/${trip.slug}/manage`} className="flex-1">
-                            <Button variant="outline" className="w-full group-hover:bg-green-50 group-hover:border-green-200 group-hover:text-green-700">
+                            <Button variant="outline" size="sm" className="w-full">
                               <Settings className="w-4 h-4 mr-2" />
                               Quản lý
                             </Button>
@@ -378,13 +353,13 @@ export default function GroupTripsTable({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center">
+            <div className="mt-6 lg:mt-8 flex items-center justify-center">
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={goToPrevPage}
                   disabled={currentPage === 1}
-                  className="px-3 py-2"
                 >
                   Trước
                 </Button>
@@ -393,8 +368,8 @@ export default function GroupTripsTable({
                   <Button
                     key={page}
                     variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
                     onClick={() => goToPage(page)}
-                    className="px-3 py-2"
                   >
                     {page}
                   </Button>
@@ -402,9 +377,9 @@ export default function GroupTripsTable({
                 
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-2"
                 >
                   Sau
                 </Button>

@@ -23,17 +23,14 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="w-full border-t bg-white hidden md:block">
-      <div className="container mx-auto px-4 py-4 max-w-7xl flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="Logo" className="h-5 w-auto" />
-          ) : (
-            <span className="text-sm font-semibold text-gray-900">{siteName}</span>
-          )}
+    <footer className="mt-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
+        <hr className="border-gray-200 mb-4" />
+        <div className="py-4 text-center">
+          <div className="text-sm text-gray-500">
+            {copyright} • Quản lý nhóm và chuyến đi
+          </div>
         </div>
-        <div className="text-xs text-gray-500">{copyright}</div>
       </div>
     </footer>
   );

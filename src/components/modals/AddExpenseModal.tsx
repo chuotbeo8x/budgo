@@ -160,13 +160,13 @@ export default function AddExpenseModal({
             <DialogTrigger asChild>
                 {trigger || defaultTrigger}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="pb-4">
+                    <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                        <DollarSign className="w-5 h-5 text-primary-600" />
                         Thêm chi phí mới
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-sm text-gray-600">
                         Thêm chi phí mới cho chuyến đi này
                     </DialogDescription>
                 </DialogHeader>
@@ -187,9 +187,9 @@ export default function AddExpenseModal({
                         </Button>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="description">Mô tả *</Label>
+                            <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả *</Label>
                             <Input
                                 id="description"
                                 name="description"
@@ -200,91 +200,92 @@ export default function AddExpenseModal({
                             />
                         </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="amount">Số tiền *</Label>
-                        <Input
-                            id="amount"
-                            name="amount"
-                            type="number"
-                            step="0.01"
-                            value={formData.amount}
-                            onChange={handleInputChange}
-                            placeholder="Nhập số tiền"
-                            required
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="paidBy">Người chi *</Label>
-                        <select
-                            id="paidBy"
-                            name="paidBy"
-                            value={formData.paidBy}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-                            required
-                        >
-                            <option value="">Chọn người chi</option>
-                            {members.map((member) => (
-                                <option key={member.id} value={member.id}>
-                                    {member.name || member.ghostName || 'Unknown'}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="category">Danh mục</Label>
-                        <div className="grid grid-cols-2 gap-2 mt-1">
-                            {[
-                                { value: 'food', label: 'Ăn uống', icon: '🍽️' },
-                                { value: 'transport', label: 'Di chuyển', icon: '🚗' },
-                                { value: 'accommodation', label: 'Nơi ở', icon: '🏨' },
-                                { value: 'entertainment', label: 'Giải trí', icon: '🎮' }
-                            ].map((cat) => (
-                                <label key={cat.value} className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="category"
-                                        value={cat.value}
-                                        checked={formData.category === cat.value}
-                                        onChange={handleInputChange}
-                                        className="rounded"
-                                    />
-                                    <span className="text-sm">{cat.icon} {cat.label}</span>
-                                </label>
-                            ))}
+                        <div className="space-y-2">
+                            <Label htmlFor="amount" className="text-sm font-medium text-gray-700">Số tiền *</Label>
+                            <Input
+                                id="amount"
+                                name="amount"
+                                type="number"
+                                step="0.01"
+                                value={formData.amount}
+                                onChange={handleInputChange}
+                                placeholder="Nhập số tiền"
+                                required
+                                className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                            />
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="createdAt">Ngày *</Label>
-                        <Input
-                            id="createdAt"
-                            name="createdAt"
-                            type="date"
-                            value={formData.createdAt}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="paidBy" className="text-sm font-medium text-gray-700">Người chi *</Label>
+                            <select
+                                id="paidBy"
+                                name="paidBy"
+                                value={formData.paidBy}
+                                onChange={handleInputChange}
+                                className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 bg-white text-sm"
+                                required
+                            >
+                                <option value="">Chọn người chi</option>
+                                {members.map((member) => (
+                                    <option key={member.id} value={member.id}>
+                                        {member.name || member.ghostName || 'Unknown'}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="isEqualSplit"
-                            name="isEqualSplit"
-                            checked={formData.isEqualSplit}
-                            onChange={handleInputChange}
-                            className="rounded"
-                        />
-                        <Label htmlFor="isEqualSplit" className="text-sm">
-                            Chia đều cho tất cả thành viên
-                        </Label>
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="category" className="text-sm font-medium text-gray-700">Danh mục</Label>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { value: 'food', label: 'Ăn uống', icon: '🍽️' },
+                                    { value: 'transport', label: 'Di chuyển', icon: '🚗' },
+                                    { value: 'accommodation', label: 'Nơi ở', icon: '🏨' },
+                                    { value: 'entertainment', label: 'Giải trí', icon: '🎮' }
+                                ].map((cat) => (
+                                    <label key={cat.value} className="flex items-center space-x-2 cursor-pointer p-2 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors">
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            value={cat.value}
+                                            checked={formData.category === cat.value}
+                                            onChange={handleInputChange}
+                                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                        />
+                                        <span className="text-sm font-medium">{cat.icon} {cat.label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
 
-                        <div className="flex space-x-2 pt-4">
-                            <Button type="submit" disabled={submitting} className="flex-1">
+                        <div className="space-y-2">
+                            <Label htmlFor="createdAt" className="text-sm font-medium text-gray-700">Ngày *</Label>
+                            <Input
+                                id="createdAt"
+                                name="createdAt"
+                                type="date"
+                                value={formData.createdAt}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                            <input
+                                type="checkbox"
+                                id="isEqualSplit"
+                                name="isEqualSplit"
+                                checked={formData.isEqualSplit}
+                                onChange={handleInputChange}
+                                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            />
+                            <Label htmlFor="isEqualSplit" className="text-sm font-medium text-gray-700 cursor-pointer">
+                                Chia đều cho tất cả thành viên
+                            </Label>
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                            <Button type="submit" disabled={submitting} className="flex-1" variant="default">
                                 {submitting ? 'Đang thêm...' : 'Thêm chi phí'}
                             </Button>
                             <Button
