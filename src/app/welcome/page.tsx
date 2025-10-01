@@ -81,33 +81,33 @@ export default function WelcomePage() {
 
   if (!user || !profile) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   const features = [
     {
-      icon: <Users className="w-6 h-6 text-blue-600" />,
+      icon: <Users className="w-6 h-6 text-primary-600" />,
       title: "Quản lý nhóm thông minh",
       description: "Tạo nhóm Public, Close hoặc Secret. Mời bạn bè và quản lý quyền hạn dễ dàng.",
       benefits: ["3 loại nhóm linh hoạt", "Mời bạn bè nhanh chóng", "Phân quyền rõ ràng"]
     },
     {
-      icon: <MapPin className="w-6 h-6 text-green-600" />,
+      icon: <MapPin className="w-6 h-6 text-success-600" />,
       title: "Lập kế hoạch chuyến đi",
       description: "Tạo chuyến đi cá nhân hoặc nhóm với thông tin chi tiết và đa tiền tệ.",
       benefits: ["Chuyến đi cá nhân & nhóm", "Hỗ trợ VND & USD", "Ghi chú đầy đủ"]
     },
     {
-      icon: <DollarSign className="w-6 h-6 text-amber-600" />,
+      icon: <DollarSign className="w-6 h-6 text-warning-600" />,
       title: "Chia sẻ chi phí minh bạch",
       description: "Ghi nhận chi phí, chia đều hoặc theo trọng số, quản lý tạm ứng và quyết toán tự động.",
       benefits: ["Chia đều hoặc theo trọng số", "Quản lý tạm ứng", "Quyết toán tự động"]
     },
     {
-      icon: <Bell className="w-6 h-6 text-purple-600" />,
+      icon: <Bell className="w-6 h-6 text-gray-700" />,
       title: "Thông báo thông minh",
       description: "Nhận thông báo real-time về mọi hoạt động trong nhóm và chuyến đi.",
       benefits: ["Cập nhật real-time", "Đa dạng loại thông báo", "Quản lý trạng thái"]
@@ -120,67 +120,68 @@ export default function WelcomePage() {
       description: "Bắt đầu với việc tạo nhóm để mời bạn bè",
       action: "Tạo nhóm",
       href: "/groups/create",
-      color: "bg-blue-500 hover:bg-blue-600"
+      variant: "default" as const,
     },
     {
       title: "Lập kế hoạch chuyến đi",
       description: "Tạo chuyến đi cá nhân hoặc thuộc nhóm",
       action: "Tạo chuyến đi",
       href: "/trips/create",
-      color: "bg-green-500 hover:bg-green-600"
+      variant: "default" as const,
     },
     {
       title: "Khám phá dashboard",
       description: "Xem tổng quan và quản lý tất cả",
       action: "Vào dashboard",
       href: "/dashboard",
-      color: "bg-purple-500 hover:bg-purple-600"
+      variant: "outline" as const,
     }
   ];
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6">
-            <Heart className="w-8 h-8 text-white" />
+    // Design System: Clean background, responsive spacing
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 lg:px-6 py-8 lg:py-12 max-w-6xl">
+        {/* Header - Design System Typography */}
+        <div className="text-center mb-12 lg:mb-16">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-600 rounded-full mb-6 shadow-lg">
+            <Heart className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             🎉 Chào mừng đến với Budgo!
           </h1>
-          <p className="text-xl text-gray-600 mb-6">
-            Xin chào <span className="font-semibold text-blue-600">{profile.name}</span>! 
+          <p className="text-base lg:text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            Xin chào <span className="font-semibold text-primary-600">{profile.name}</span>! 
             Chúng tôi rất vui mừng chào đón bạn đến với cộng đồng quản lý nhóm và chuyến đi.
           </p>
           <Badge variant="secondary" className="text-sm px-4 py-2">
-            <Star className="w-4 h-4 mr-2" />
+            <Star className="w-4 h-4" />
             Thành viên mới
           </Badge>
         </div>
 
-        {/* Features Overview */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+        {/* Features Overview - Design System: Responsive grid */}
+        <div className="mb-12 lg:mb-16">
+          <h2 className="text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-8 lg:mb-12">
             🌟 Khám phá những tính năng tuyệt vời
           </h2>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <Card key={index} className="h-full">
                 <CardHeader>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-3 mb-2">
                     {feature.icon}
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    <CardTitle>{feature.title}</CardTitle>
                   </div>
-                  <CardDescription className="text-base">
+                  <CardDescription>
                     {feature.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {feature.benefits.map((benefit, idx) => (
-                      <li key={idx} className="flex items-center space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      <li key={idx} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-success-600" />
                         <span className="text-sm text-gray-600">{benefit}</span>
                       </li>
                     ))}
@@ -191,25 +192,25 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+        {/* Quick Actions - Design System: Responsive grid */}
+        <div className="mb-12 lg:mb-16">
+          <h2 className="text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-8 lg:mb-12">
             🚀 Bắt đầu ngay hôm nay
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 lg:gap-6">
             {quickActions.map((action, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <Card key={index} className="h-full group hover:-translate-y-1 transition-all duration-200">
                 <CardHeader>
-                  <CardTitle className="text-lg">{action.title}</CardTitle>
+                  <CardTitle>{action.title}</CardTitle>
                   <CardDescription>{action.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {action.href === '/trips/create' ? (
                     <TripCreateModal
                       trigger={
-                        <Button className={`w-full ${action.color} text-white`}>
+                        <Button variant="outline" className="w-full">
                           {action.action}
-                          <ArrowRight className="w-4 h-4 ml-2" />
+                          <ArrowRight className="w-4 h-4" />
                         </Button>
                       }
                       groups={groups}
@@ -228,9 +229,9 @@ export default function WelcomePage() {
                     />
                   ) : (
                     <Link href={action.href}>
-                      <Button className={`w-full ${action.color} text-white`}>
+                      <Button variant="outline" className="w-full">
                         {action.action}
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                        <ArrowRight className="w-4 h-4" />
                       </Button>
                     </Link>
                   )}
@@ -240,49 +241,49 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Tips & Best Practices */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+        {/* Tips & Best Practices - Design System: Semantic colors */}
+        <div className="mb-12 lg:mb-16">
+          <h2 className="text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-8 lg:mb-12">
             💡 Mẹo sử dụng hiệu quả
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="bg-blue-50 border-blue-200">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-6 h-6 text-primary-600" />
                   </div>
-                  <h3 className="font-semibold text-blue-900">Tạo nhóm phù hợp</h3>
+                  <h3 className="font-semibold text-gray-900">Tạo nhóm phù hợp</h3>
                 </div>
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-gray-600">
                   Chọn loại nhóm phù hợp: Public cho cộng đồng, Close cho bạn bè, Secret cho riêng tư.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-green-50 border-green-200">
+            <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-green-600" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-success-600" />
                   </div>
-                  <h3 className="font-semibold text-green-900">Chia sẻ chi phí thông minh</h3>
+                  <h3 className="font-semibold text-gray-900">Chia sẻ chi phí thông minh</h3>
                 </div>
-                <p className="text-sm text-green-800">
+                <p className="text-sm text-gray-600">
                   Sử dụng &quot;Chia đều&quot; khi mọi người tham gia đầy đủ, &quot;Theo trọng số&quot; khi có sự khác biệt.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-purple-50 border-purple-200">
+            <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Bell className="w-5 h-5 text-purple-600" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center">
+                    <Bell className="w-6 h-6 text-warning-600" />
                   </div>
-                  <h3 className="font-semibold text-purple-900">Theo dõi thông báo</h3>
+                  <h3 className="font-semibold text-gray-900">Theo dõi thông báo</h3>
                 </div>
-                <p className="text-sm text-purple-800">
+                <p className="text-sm text-gray-600">
                   Kiểm tra thông báo thường xuyên để không bỏ lỡ cập nhật quan trọng từ nhóm.
                 </p>
               </CardContent>
@@ -290,64 +291,96 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Security & Support */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+        {/* Security & Support - Design System: Clean cards */}
+        <div className="mb-12 lg:mb-16">
+          <h2 className="text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-8 lg:mb-12">
             🛡️ Bảo mật & Hỗ trợ
           </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="bg-gray-50">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+            <Card>
               <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <Shield className="w-6 h-6 text-gray-600" />
+                <div className="flex items-center gap-3">
+                  <Shield className="w-6 h-6 text-gray-700" />
                   <CardTitle>Bảo mật tuyệt đối</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Xác thực Google an toàn</li>
-                  <li>• Mã hóa dữ liệu bảo mật</li>
-                  <li>• Kiểm soát quyền truy cập</li>
-                  <li>• Không chia sẻ thông tin cá nhân</li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Xác thực Google an toàn</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Mã hóa dữ liệu bảo mật</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Kiểm soát quyền truy cập</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Không chia sẻ thông tin cá nhân</span>
+                  </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-50">
+            <Card>
               <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <Smartphone className="w-6 h-6 text-gray-600" />
+                <div className="flex items-center gap-3">
+                  <Smartphone className="w-6 h-6 text-gray-700" />
                   <CardTitle>Đa nền tảng</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Hoạt động trên mọi thiết bị</li>
-                  <li>• Đồng bộ real-time</li>
-                  <li>• Giao diện thân thiện</li>
-                  <li>• Tốc độ nhanh chóng</li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Hoạt động trên mọi thiết bị</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Đồng bộ real-time</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Giao diện thân thiện</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <span>Tốc độ nhanh chóng</span>
+                  </li>
                 </ul>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* Call to Action - Design System: Clean CTA */}
         <div className="text-center">
-          <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-4">
+          <Card className="bg-gray-100 border-gray-200">
+            <CardContent className="p-8 lg:p-12">
+              <h3 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
                 🎊 Chúc bạn có những trải nghiệm tuyệt vời!
               </h3>
-              <p className="text-lg mb-6 opacity-90">
+              <p className="text-base lg:text-lg mb-8 text-gray-600 max-w-2xl mx-auto">
                 Budgo được thiết kế để làm cho việc quản lý nhóm và chuyến đi trở nên đơn giản, minh bạch và thú vị.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" onClick={handleGoToDashboard}>
+                <Button 
+                  size="lg" 
+                  variant="default"
+                  onClick={handleGoToDashboard}
+                >
                   Vào Dashboard
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
-                <Button size="lg" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent" onClick={handleGoToHelp}>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={handleGoToHelp}
+                >
                   Xem hướng dẫn
                 </Button>
               </div>

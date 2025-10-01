@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -220,8 +220,8 @@ export default function ProfilesPage() {
 
   if (loading || profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 lg:px-6 py-8 max-w-7xl">
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
               <User className="w-8 h-8 text-gray-400 animate-pulse" />
@@ -238,76 +238,87 @@ export default function ProfilesPage() {
       <LoginPrompt
         title="Vui lòng đăng nhập"
         description="Bạn cần đăng nhập để xem trang cá nhân"
-        icon={<User className="w-8 h-8 text-blue-600" />}
+        icon={<User className="w-8 h-8 text-primary-600" />}
       />
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Header */}
-        <div className="mb-6">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Cài đặt cá nhân</h1>
-          <p className="text-gray-600">Quản lý thông tin và cài đặt tài khoản của bạn</p>
-        </div>
+    // Design System: Clean background, responsive spacing
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
+        <div className="max-w-4xl mx-auto">
+          {/* Header with Back Button */}
+          <div className="flex items-center justify-between mb-6 lg:mb-8">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Cài đặt cá nhân</h1>
+              <p className="text-sm text-gray-600 mt-1">Quản lý thông tin và cài đặt tài khoản của bạn</p>
+            </div>
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4" />
+                Quay lại
+              </Button>
+            </Link>
+          </div>
 
-        <div className="max-w-6xl mx-auto">
-          {/* Unified Profile Form */}
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-md">
-            <CardHeader className="pb-6">
+          {/* Profile Avatar Section */}
+          <Card className="mb-6">
+            <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="relative">
-                  {user?.photoURL ? (
-                    <img 
-                      src={user.photoURL} 
-                      alt="Avatar" 
-                      className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg" 
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                      <User className="w-8 h-8 text-white" />
-                    </div>
-                  )}
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                    <CheckCircle className="w-2.5 h-2.5 text-white" />
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full border-2 border-gray-200 overflow-hidden">
+                    {user?.photoURL ? (
+                      <img 
+                        src={user.photoURL} 
+                        alt="Avatar" 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-primary-600 flex items-center justify-center">
+                        <User className="w-10 h-10 text-white" />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div>
-                  <CardTitle className="text-2xl text-gray-900">Cài đặt cá nhân</CardTitle>
-                  <p className="text-gray-600 mt-1">Quản lý thông tin và cài đặt tài khoản của bạn</p>
+                  <h2 className="text-xl font-semibold text-gray-900">{profile?.name || 'Người dùng'}</h2>
+                  <p className="text-sm text-gray-600">@{(profile as any)?.username || 'username'}</p>
+                  <p className="text-xs text-gray-500 mt-1">{profile?.email}</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Profile Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardDescription>Cập nhật thông tin hiển thị của bạn</CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-8">
               {/* Basic Information Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-                  <User className="w-5 h-5 text-blue-600" />
+                  <User className="w-5 h-5 text-primary-600" />
                   <h3 className="text-lg font-semibold text-gray-900">Thông tin cơ bản</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Name Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium text-gray-700">Tên hiển thị *</Label>
+                    <Label htmlFor="name" required>Tên hiển thị</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Nhập tên hiển thị"
-                      className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+                      error={!!errors.name}
                     />
                     {errors.name && (
-                      <div className="flex items-center gap-1 text-sm text-red-600">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-xs text-error-600">
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {errors.name}
                       </div>
                     )}
@@ -315,17 +326,17 @@ export default function ProfilesPage() {
 
                   {/* Birthday Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="birthday" className="text-sm font-medium text-gray-700">Ngày sinh</Label>
+                    <Label htmlFor="birthday">Ngày sinh</Label>
                     <Input
                       id="birthday"
                       type="date"
                       value={formData.birthday}
                       onChange={(e) => handleInputChange('birthday', e.target.value)}
-                      className={errors.birthday ? 'border-red-500 focus:border-red-500' : ''}
+                      error={!!errors.birthday}
                     />
                     {errors.birthday && (
-                      <div className="flex items-center gap-1 text-sm text-red-600">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-xs text-error-600">
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {errors.birthday}
                       </div>
                     )}
@@ -333,18 +344,18 @@ export default function ProfilesPage() {
 
                   {/* Phone Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Số điện thoại</Label>
+                    <Label htmlFor="phone">Số điện thoại</Label>
                     <Input
                       id="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       placeholder="Nhập số điện thoại"
-                      className={errors.phone ? 'border-red-500 focus:border-red-500' : ''}
+                      error={!!errors.phone}
                     />
                     {errors.phone && (
-                      <div className="flex items-center gap-1 text-sm text-red-600">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-xs text-error-600">
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {errors.phone}
                       </div>
                     )}
@@ -352,17 +363,17 @@ export default function ProfilesPage() {
 
                   {/* Location Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="location" className="text-sm font-medium text-gray-700">Địa điểm</Label>
+                    <Label htmlFor="location">Địa điểm</Label>
                     <Input
                       id="location"
                       value={formData.location}
                       onChange={(e) => handleInputChange('location', e.target.value)}
                       placeholder="Thành phố, quốc gia"
-                      className={errors.location ? 'border-red-500 focus:border-red-500' : ''}
+                      error={!!errors.location}
                     />
                     {errors.location && (
-                      <div className="flex items-center gap-1 text-sm text-red-600">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-xs text-error-600">
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {errors.location}
                       </div>
                     )}
@@ -371,19 +382,19 @@ export default function ProfilesPage() {
 
                 {/* Bio Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="bio" className="text-sm font-medium text-gray-700">Giới thiệu bản thân</Label>
+                  <Label htmlFor="bio">Giới thiệu bản thân</Label>
                   <textarea
                     id="bio"
                     value={formData.bio}
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     placeholder="Giới thiệu về bản thân..."
-                    className={`w-full px-3 py-2 border rounded-md resize-none ${errors.bio ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                    className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors duration-200 outline-none resize-y placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${errors.bio ? 'border-error-500 ring-2 ring-error-500/20' : ''}`}
                     rows={3}
                   />
                   <div className="flex justify-between items-center">
                     {errors.bio && (
-                      <div className="flex items-center gap-1 text-sm text-red-600">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-xs text-error-600">
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {errors.bio}
                       </div>
                     )}
@@ -395,30 +406,30 @@ export default function ProfilesPage() {
               {/* Read-only Information */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-success-600" />
                   <h3 className="text-lg font-semibold text-gray-900">Thông tin từ Google</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       value={profile?.email || ''}
                       readOnly
-                      className="bg-gray-50 border-gray-300 text-gray-600"
+                      className="bg-gray-50"
                     />
                     <p className="text-xs text-gray-500">Từ tài khoản Google</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="username" className="text-sm font-medium text-gray-700">Tên người dùng</Label>
+                    <Label htmlFor="username">Tên người dùng</Label>
                     <Input
                       id="username"
                       value={(profile as any)?.username || ''}
                       disabled
-                      className="bg-gray-50 border-gray-300 text-gray-600"
+                      className="bg-gray-50"
                     />
                     <p className="text-xs text-gray-500">Không thể thay đổi</p>
                   </div>
@@ -428,18 +439,18 @@ export default function ProfilesPage() {
               {/* Preferences Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-                  <Settings className="w-5 h-5 text-purple-600" />
+                  <Settings className="w-5 h-5 text-gray-700" />
                   <h3 className="text-lg font-semibold text-gray-900">Tùy chọn</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="currency" className="text-sm font-medium text-gray-700">Đơn vị tiền tệ mặc định</Label>
+                    <Label htmlFor="currency">Đơn vị tiền tệ mặc định</Label>
                     <select
                       id="currency"
                       value={formData.currency}
                       onChange={(e) => handleInputChange('currency', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     >
                       <option value="VND">VND (Việt Nam Đồng)</option>
                       <option value="USD">USD (US Dollar)</option>
@@ -454,10 +465,10 @@ export default function ProfilesPage() {
 
           {/* Privacy Settings - deferred per spec */}
 
-          {/* Save Button */}
-          <div className="flex justify-between items-center mt-8">
+          {/* Save Button - Design System */}
+          <div className="flex justify-between items-center mt-6 lg:mt-8">
             {hasChanges && (
-              <div className="flex items-center gap-2 text-sm text-amber-600">
+              <div className="flex items-center gap-2 text-sm text-warning-600">
                 <AlertCircle className="w-4 h-4" />
                 Bạn có thay đổi chưa được lưu
               </div>
@@ -490,19 +501,10 @@ export default function ProfilesPage() {
               <Button 
                 onClick={handleSave}
                 disabled={!canSave}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={saving}
               >
-                {saving ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Đang lưu...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Lưu thay đổi
-                  </>
-                )}
+                <Save className="w-4 h-4" />
+                Lưu thay đổi
               </Button>
             </div>
           </div>

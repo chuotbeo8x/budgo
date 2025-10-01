@@ -100,9 +100,9 @@ export default function DashboardPage() {
 
   if (loading) {
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="text-center">Đang tải...</div>
+    <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 lg:px-6 py-8 max-w-7xl">
+          <div className="text-center text-gray-600">Đang tải...</div>
         </div>
       </div>
     );
@@ -113,54 +113,61 @@ export default function DashboardPage() {
   }
 
   return (
+    // Design System: Mobile-first layout
+    // Padding: mobile 1rem (16px), desktop 2rem (32px)
+    // Max-width: 7xl (1280px)
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-3 py-4 max-w-7xl">
-        {/* Header - Compact */}
-        <div className="mb-4">
-          <h1 className="text-xl font-semibold text-gray-900">Bảng điều khiển</h1>
+      <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
+        {/* Header - Design System Typography */}
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Bảng điều khiển</h1>
+          <p className="text-sm text-gray-600 mt-1">Tổng quan chuyến đi và nhóm của bạn</p>
         </div>
 
-        {/* Quick Stats Bar */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-blue-600">{trips.length}</p>
-              <p className="text-sm text-gray-600">Tổng chuyến đi</p>
-                </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-600">
-                      {trips.filter(t => t.startDate && new Date(t.startDate) > new Date()).length}
-                    </p>
-              <p className="text-sm text-gray-600">Sắp tới</p>
-                  </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-amber-600">
-                      {trips.filter(t => {
-                        const now = new Date().getTime();
-                        const s = t.startDate ? new Date(t.startDate).getTime() : 0;
-                        const e = t.endDate ? new Date(t.endDate).getTime() : Number.MAX_SAFE_INTEGER;
-                        return s <= now && now <= e;
-                      }).length}
-                    </p>
-              <p className="text-sm text-gray-600">Đang diễn ra</p>
-                  </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-slate-600">
-                  {trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0).toLocaleString('vi-VN')} VNĐ
-              </p>
-              <p className="text-sm text-gray-600">Tổng chi phí</p>
-                </div>
+        {/* Quick Stats Bar - Design System: Card spacing */}
+        <Card className="mb-6 lg:mb-8">
+          <CardContent className="p-4 lg:p-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              {/* Stat Item */}
+              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <p className="text-3xl font-bold text-primary-600">{trips.length}</p>
+                <p className="text-sm text-gray-600 mt-1">Tổng chuyến đi</p>
               </div>
-        </div>
+              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <p className="text-3xl font-bold text-success-600">
+                  {trips.filter(t => t.startDate && new Date(t.startDate) > new Date()).length}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">Sắp tới</p>
+              </div>
+              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <p className="text-3xl font-bold text-warning-600">
+                  {trips.filter(t => {
+                    const now = new Date().getTime();
+                    const s = t.startDate ? new Date(t.startDate).getTime() : 0;
+                    const e = t.endDate ? new Date(t.endDate).getTime() : Number.MAX_SAFE_INTEGER;
+                    return s <= now && now <= e;
+                  }).length}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">Đang diễn ra</p>
+              </div>
+              <div className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <p className="text-xl lg:text-2xl font-bold text-gray-700">
+                  {trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0).toLocaleString('vi-VN')} ₫
+                </p>
+                <p className="text-sm text-gray-600 mt-1">Tổng chi phí</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Two-column content - Compact layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Two-column content - Design System: Responsive gap */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
           {/* Trips Section */}
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-bold text-gray-900">Chuyến đi của bạn</h2>
+            <div className="flex items-center justify-between mb-3 md:mb-4 lg:mb-6">
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Chuyến đi của bạn</h2>
               <Link href="/trips/manage">
-                <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50 text-xs">
+                <Button size="sm" variant="outline">
                   Xem tất cả
                 </Button>
               </Link>
@@ -174,20 +181,20 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : trips.length === 0 ? (
-              <Card className="border-dashed border-2 border-blue-200 bg-blue-50/30">
-                <CardContent className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                    <MapPin className="w-8 h-8 text-blue-600" />
+              <Card className="border-dashed border-2 border-primary-200 bg-primary-50/30">
+                <CardContent className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+                    <MapPin className="w-8 h-8 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Tạo chuyến đi đầu tiên</h3>
-                  <p className="text-gray-600 mb-4 max-w-sm mx-auto text-sm">
+                  <p className="text-gray-600 mb-6 max-w-sm mx-auto text-sm">
                     Tạo chuyến đi cá nhân hoặc chọn nhóm để quản lý chi phí cùng bạn bè
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <TripCreateModal
                       trigger={
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 shadow-md">
-                          <Plus className="w-4 h-4 mr-1" /> Tạo chuyến đi
+                        <Button>
+                          <Plus className="w-4 h-4" /> Tạo chuyến đi
                         </Button>
                       }
                       groups={groups}
@@ -209,8 +216,8 @@ export default function DashboardPage() {
                     />
                   <GroupCreateModal
                     trigger={
-                        <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
-                          <Users className="w-4 h-4 mr-1" /> Tạo nhóm
+                        <Button variant="outline">
+                          <Users className="w-4 h-4" /> Tạo nhóm
                       </Button>
                     }
                     onSuccess={(groupId) => {
@@ -223,29 +230,29 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="shadow-lg flex-1">
-                <CardContent className="p-0 h-full">
-                  <ul className="divide-y divide-gray-200 h-full">
+              <Card className="flex-1">
+                <CardContent className="p-0">
+                  <ul className="divide-y divide-gray-100">
                     {trips.slice(0, 6).map(trip => {
                       const isGroup = !!trip.groupId;
                       return (
-                        <li key={trip.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        <li key={trip.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
                               {isGroup ? (
-                                <Users className="w-4 h-4 text-blue-600" />
+                                <Users className="w-4 h-4 text-primary-600" />
                               ) : (
-                                <MapPin className="w-4 h-4 text-green-600" />
+                                <MapPin className="w-4 h-4 text-success-600" />
                               )}
                               <span className="font-semibold text-gray-900 truncate">{trip.name}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${isGroup ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isGroup ? 'bg-primary-100 text-primary-700' : 'bg-success-100 text-success-700'}`}>
                                 {isGroup ? 'Nhóm' : 'Cá nhân'}
                               </span>
                             </div>
                             <div className="text-sm text-gray-500 flex items-center gap-1">
                               {trip.startDate ? (
                                 <>
-                                  <Plane className="w-3 h-3 text-blue-500" />
+                                  <Plane className="w-3 h-3 text-primary-600" />
                                   <span>{formatDate(trip.startDate)}</span>
                                 </>
                               ) : (
@@ -254,14 +261,14 @@ export default function DashboardPage() {
                               {trip.endDate && (
                                 <>
                                   <span>•</span>
-                                  <Home className="w-3 h-3 text-orange-500" />
+                                  <Home className="w-3 h-3 text-warning-600" />
                                   <span>{formatDate(trip.endDate)}</span>
                                 </>
                               )}
                               {trip.destination && (
                                 <>
                                   <span>•</span>
-                                  <MapPin className="w-3 h-3 text-red-500" />
+                                  <MapPin className="w-3 h-3 text-error-600" />
                                   <span>{trip.destination}</span>
                                 </>
                               )}
@@ -269,13 +276,13 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                             <Link href={isGroup ? `/g/${trip.groupId}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
-                              <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
-                                <Eye className="w-4 h-4 mr-1" /> Xem
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4" /> Xem
                             </Button>
                           </Link>
                             {trip.ownerId === user.uid && (
                               <Link href={isGroup ? `/g/${trip.groupId}/trips/${trip.slug}/manage` : `/trips/${trip.slug}/manage`}>
-                              <Button size="icon" variant="outline" className="h-8 w-8 border-gray-300">
+                              <Button size="icon-sm" variant="outline">
                                 <Settings className="w-4 h-4" />
                               </Button>
                             </Link>
@@ -292,10 +299,10 @@ export default function DashboardPage() {
 
           {/* Groups Section */}
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-bold text-gray-900">Nhóm của bạn</h2>
+            <div className="flex items-center justify-between mb-3 md:mb-4 lg:mb-6">
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Nhóm của bạn</h2>
               <Link href="/groups/manage">
-                <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 text-xs">
+                <Button size="sm" variant="outline">
                   Xem tất cả
                 </Button>
               </Link>
@@ -304,25 +311,25 @@ export default function DashboardPage() {
             {loadingGroups ? (
               <Card>
                 <CardContent className="text-center py-6">
-                  <div className="w-6 h-6 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <div className="w-6 h-6 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                   <p className="text-gray-600 text-sm">Đang tải nhóm...</p>
                 </CardContent>
               </Card>
             ) : groups.length === 0 ? (
-              <Card className="border-dashed border-2 border-emerald-200 bg-emerald-50/30">
-                <CardContent className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
-                    <Users className="w-8 h-8 text-emerald-600" />
+              <Card className="border-dashed border-2 border-primary-200 bg-primary-50/30">
+                <CardContent className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+                    <Users className="w-8 h-8 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Tạo nhóm đầu tiên</h3>
-                  <p className="text-gray-600 mb-4 max-w-sm mx-auto text-sm">
+                  <p className="text-gray-600 mb-6 max-w-sm mx-auto text-sm">
                     Tạo nhóm để đi cùng bạn bè và quản lý chuyến đi tập thể
                   </p>
                   <GroupCreateModal
                     trigger={
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
-                        <Plus className="w-4 h-4 mr-1" />
-                        Tạo nhóm mới
+                      <Button>
+                        <Plus className="w-4 h-4" />
+                        Tạo nhóm
                       </Button>
                     }
                     onSuccess={(groupId) => {
@@ -333,38 +340,37 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="shadow-lg flex-1">
-                <CardContent className="p-0 h-full">
-                  <ul className="divide-y divide-gray-200 h-full">
+              <Card className="flex-1">
+                <CardContent className="p-0">
+                  <ul className="divide-y divide-gray-100">
                     {groups.map((group) => (
-                      <li key={group.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <li key={group.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             {group.type === 'public' ? (
-                              <Globe className="w-4 h-4 text-blue-500" />
+                              <Globe className="w-4 h-4 text-success-600" />
                             ) : (
-                              <Lock className="w-4 h-4 text-orange-500" />
+                              <Lock className="w-4 h-4 text-warning-600" />
                             )}
                             <span className="font-semibold text-gray-900 truncate">{group.name}</span>
                           </div>
                           <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Users className="w-3 h-3 text-blue-500" />
+                            <Users className="w-3 h-3 text-primary-600" />
                             <span>{group.memberCount || 0} thành viên</span>
                             <span>•</span>
-                            <Calendar className="w-3 h-3 text-green-500" />
-                            <span>Tạo ngày {formatDate(group.createdAt)}</span>
+                            <Calendar className="w-3 h-3 text-success-600" />
+                            <span>{formatDate(group.createdAt)}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           <Link href={`/g/${group.slug}`}>
-                            <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Xem
+                            <Button size="sm" variant="outline">
+                              <Eye className="w-4 h-4" /> Xem
                             </Button>
                           </Link>
                           {group.ownerId === user.uid && (
                             <Link href={`/g/${group.slug}/manage`}>
-                              <Button size="icon" variant="outline" className="h-8 w-8 border-gray-300">
+                              <Button size="icon-sm" variant="outline">
                                 <Settings className="w-4 h-4" />
                               </Button>
                             </Link>

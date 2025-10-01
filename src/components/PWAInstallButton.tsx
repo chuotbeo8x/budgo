@@ -109,10 +109,11 @@ export default function PWAInstallButton({
       onClick={handleInstallClick}
       disabled={isLoading}
       variant={variant}
-      size={size}
-      className={`${className} ${isLoading ? 'opacity-50' : ''}`}
+      size={showText ? size : 'icon-sm'}
+      className={`${className} ${isLoading ? 'opacity-50' : ''} ${!showText ? 'rounded-full' : ''}`}
+      aria-label={showText ? undefined : 'Cài đặt ứng dụng'}
     >
-      <Download className="w-4 h-4 mr-2" />
+      <Download className={showText ? 'w-4 h-4' : 'w-5 h-5'} />
       {showText && (isLoading ? 'Đang cài đặt...' : 'Cài đặt ứng dụng')}
     </Button>
   );

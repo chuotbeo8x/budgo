@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -85,21 +86,32 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased pb-mobile-nav`}
             suppressHydrationWarning={true}
           >
-                    <AuthProvider>
-                      <ProfileProvider>
-                        <NotificationProvider>
-                          <PWAProvider />
-                          <WelcomeNotification />
-                          <Header />
-                          <MaintenanceGuard>
-                            {children}
-                          </MaintenanceGuard>
-                          <Footer />
-                          <MobileBottomNav />
-                          <Toaster position="top-right" />
-                        </NotificationProvider>
-                      </ProfileProvider>
-                    </AuthProvider>
+                    <ThemeProvider>
+                      <AuthProvider>
+                        <ProfileProvider>
+                          <NotificationProvider>
+                            <PWAProvider />
+                            <WelcomeNotification />
+                            {/* Skip link for keyboard accessibility - WCAG 2.4.1 */}
+                            <a 
+                              href="#main-content" 
+                              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-primary-300"
+                            >
+                              Skip to main content
+                            </a>
+                            <Header />
+                            <main id="main-content">
+                              <MaintenanceGuard>
+                                {children}
+                              </MaintenanceGuard>
+                            </main>
+                            <Footer />
+                            <MobileBottomNav />
+                            <Toaster position="top-right" />
+                          </NotificationProvider>
+                        </ProfileProvider>
+                      </AuthProvider>
+                    </ThemeProvider>
           </body>
         </html>
   );

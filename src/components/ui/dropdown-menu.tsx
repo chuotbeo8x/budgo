@@ -6,6 +6,16 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * DropdownMenu Component - Aligned with Design System
+ * 
+ * From design-system.ts componentVariants.list.item:
+ * - paddingX: 1rem (16px)
+ * - paddingY: 0.75rem (12px)
+ * - gap: 0.75rem (12px)
+ * - borderRadius: 0.375rem (6px)
+ */
+
 const DropdownMenu = DropdownMenuPrimitive.Root
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -59,13 +69,20 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 8, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        // Design System: z-index.dropdown = 1000, shadow-md, rounded-md (6px)
+        "z-[1000] min-w-[12rem] overflow-hidden rounded-md border border-gray-200 bg-white p-2 text-gray-900 shadow-lg",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "duration-200", // Design System: animations.normal
         className
       )}
       {...props}
@@ -83,7 +100,12 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      // Design System: list.item padding + gap
+      "relative flex cursor-pointer select-none items-center gap-3",
+      "rounded-md px-3 py-2 text-sm",
+      "outline-none transition-colors duration-200",
+      "hover:bg-gray-100 focus:bg-gray-100",
+      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -147,7 +169,8 @@ const DropdownMenuLabel = React.forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
-      "px-2 py-1.5 text-sm font-semibold",
+      // Design System: labels
+      "px-3 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wide",
       inset && "pl-8",
       className
     )}
@@ -162,7 +185,11 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    className={cn(
+      // Design System: divider.horizontal
+      "-mx-2 my-2 h-px bg-gray-200",
+      className
+    )}
     {...props}
   />
 ))

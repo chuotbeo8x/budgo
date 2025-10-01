@@ -61,21 +61,6 @@ export default function Header() {
     load();
   }, []);
 
-  // Prevent hydration mismatch by not rendering until hydrated
-  if (!isHydrated) {
-    return (
-      <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
-            <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-        </div>
-      </header>
-    );
-  }
-
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     // TODO: Implement theme switching logic
@@ -90,7 +75,7 @@ export default function Header() {
   if (!isHydrated) {
     return (
       <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
+        <div className="container mx-auto px-4 lg:px-6 h-14 lg:h-16 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
             <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
@@ -103,18 +88,19 @@ export default function Header() {
 
   return (
     <>
-      {/* Desktop Header */}
-      <header className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 hidden lg:block">
+      {/* Desktop Header - Design System Compliant */}
+      <header className="w-full border-b border-gray-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 hidden lg:block shadow-sm">
       {/* Locked account banner */}
       {profile && (profile as any).disabled === true && (
-        <div className="w-full bg-red-600 text-white text-sm">
-          <div className="container mx-auto px-4 py-2 flex items-center justify-between max-w-7xl">
+        <div className="w-full bg-error-600 text-white text-sm">
+          <div className="container mx-auto px-6 py-2 flex items-center justify-between max-w-7xl">
             <span>Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.</span>
           </div>
         </div>
       )}
       
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-7xl">
+      {/* Design System: Desktop header height = 64px (4rem) */}
+      <div className="container mx-auto px-6 h-16 flex items-center justify-between max-w-7xl gap-4">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
@@ -130,17 +116,17 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation - Hidden on mobile */}
+        {/* Desktop Navigation - Design System: gap-1.5rem (24px), min-h-44px for touch targets */}
         <nav className="hidden md:flex items-center gap-2">
           <Link 
             href="/groups/manage" 
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/groups') 
-                ? 'text-blue-600 bg-blue-50 shadow-sm' 
-                : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                ? 'text-primary-600 bg-primary-50 shadow-sm' 
+                : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
             }`}
           >
-            <Users className={`w-4 h-4 transition-transform ${
+            <Users className={`w-5 h-5 transition-transform ${
               pathname.startsWith('/groups') 
                 ? 'scale-110' 
                 : 'group-hover:scale-110'
@@ -149,13 +135,13 @@ export default function Header() {
           </Link>
           <Link 
             href="/trips/manage" 
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/trips') 
-                ? 'text-green-600 bg-green-50 shadow-sm' 
-                : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+                ? 'text-success-600 bg-success-50 shadow-sm' 
+                : 'text-gray-700 hover:text-success-600 hover:bg-gray-50'
             }`}
           >
-            <MapPin className={`w-4 h-4 transition-transform ${
+            <MapPin className={`w-5 h-5 transition-transform ${
               pathname.startsWith('/trips') 
                 ? 'scale-110' 
                 : 'group-hover:scale-110'
@@ -164,8 +150,8 @@ export default function Header() {
           </Link>
         </nav>
 
-        {/* Right side - User actions */}
-        <div className="flex items-center gap-2">
+        {/* Right side - User actions - Design System: gap-0.75rem (12px) */}
+        <div className="flex items-center gap-3">
           {loading && (
             <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
           )}
@@ -186,7 +172,7 @@ export default function Header() {
               <div className="hidden md:block">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 rounded-full">
                       <Avatar 
                         src={user.photoURL} 
                         alt="Avatar" 
@@ -212,14 +198,14 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/manage" className="flex items-center gap-2">
+                      <Link href="/manage">
                         <Settings className="w-4 h-4" />
                         <span>Quản lý</span>
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/welcome" className="flex items-center gap-2">
+                      <Link href="/welcome">
                         <Heart className="w-4 h-4" />
                         <span>Giới thiệu</span>
                       </Link>
@@ -228,13 +214,13 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/profiles/me" className="flex items-center gap-2">
+                      <Link href="/profiles/me">
                         <User className="w-4 h-4" />
                         <span>Cài đặt cá nhân</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center gap-2">
+                      <Link href="/settings">
                         <Settings className="w-4 h-4" />
                         <span>Cài đặt</span>
                       </Link>
@@ -244,11 +230,11 @@ export default function Header() {
                     {profile && (profile as any).role === 'admin' && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-gray-400">
-                          Khu vực quản trị
+                        <DropdownMenuLabel>
+                          Quản trị
                         </DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                          <Link href="/admin" className="flex items-center gap-2">
+                          <Link href="/admin">
                             <Settings className="w-4 h-4" />
                             <span>Admin Dashboard</span>
                           </Link>
@@ -261,18 +247,18 @@ export default function Header() {
                     <DropdownMenuItem onClick={toggleTheme}>
                       {isDarkMode ? (
                         <>
-                          <Sun className="w-4 h-4 mr-2" />
+                          <Sun className="w-4 h-4" />
                           <span>Chế độ sáng</span>
                         </>
                       ) : (
                         <>
-                          <Moon className="w-4 h-4 mr-2" />
+                          <Moon className="w-4 h-4" />
                           <span>Chế độ tối</span>
                         </>
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={toggleLanguage}>
-                      <Globe className="w-4 h-4 mr-2" />
+                      <Globe className="w-4 h-4" />
                       <span>Chuyển ngôn ngữ</span>
                     </DropdownMenuItem>
                     
@@ -283,7 +269,7 @@ export default function Header() {
                         await logout();
                         window.location.href = '/';
                       }}
-                      className="text-red-600 focus:text-red-600"
+                      className="text-error-600 hover:bg-error-50 focus:bg-error-50"
                     >
                       Đăng xuất
                     </DropdownMenuItem>
@@ -295,7 +281,7 @@ export default function Header() {
               <div className="md:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-1">
+                    <Button variant="ghost" size="sm" className="p-1 rounded-full">
                       <Avatar 
                         src={user.photoURL} 
                         alt="Avatar" 
@@ -319,19 +305,19 @@ export default function Header() {
                     
                     {/* Navigation */}
                     <DropdownMenuItem asChild>
-                      <Link href="/groups/manage" className="flex items-center gap-2">
+                      <Link href="/groups/manage">
                         <Users className="w-4 h-4" />
                         <span>Nhóm</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/trips/manage" className="flex items-center gap-2">
+                      <Link href="/trips/manage">
                         <MapPin className="w-4 h-4" />
                         <span>Chuyến đi</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/welcome" className="flex items-center gap-2">
+                      <Link href="/welcome">
                         <Heart className="w-4 h-4" />
                         <span>Giới thiệu</span>
                       </Link>
@@ -341,13 +327,13 @@ export default function Header() {
                     
                     {/* Settings */}
                     <DropdownMenuItem asChild>
-                      <Link href="/profiles/me" className="flex items-center gap-2">
+                      <Link href="/profiles/me">
                         <User className="w-4 h-4" />
                         <span>Cài đặt cá nhân</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center gap-2">
+                      <Link href="/settings">
                         <Settings className="w-4 h-4" />
                         <span>Cài đặt</span>
                       </Link>
@@ -357,11 +343,11 @@ export default function Header() {
                     {profile && (profile as any).role === 'admin' && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-gray-400">
-                          Khu vực quản trị
+                        <DropdownMenuLabel>
+                          Quản trị
                         </DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                          <Link href="/admin" className="flex items-center gap-2">
+                          <Link href="/admin">
                             <Settings className="w-4 h-4" />
                             <span>Admin Dashboard</span>
                           </Link>
@@ -374,18 +360,18 @@ export default function Header() {
                     <DropdownMenuItem onClick={toggleTheme}>
                       {isDarkMode ? (
                         <>
-                          <Sun className="w-4 h-4 mr-2" />
+                          <Sun className="w-4 h-4" />
                           <span>Chế độ sáng</span>
                         </>
                       ) : (
                         <>
-                          <Moon className="w-4 h-4 mr-2" />
+                          <Moon className="w-4 h-4" />
                           <span>Chế độ tối</span>
                         </>
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={toggleLanguage}>
-                      <Globe className="w-4 h-4 mr-2" />
+                      <Globe className="w-4 h-4" />
                       <span>Chuyển ngôn ngữ</span>
                     </DropdownMenuItem>
                     
@@ -396,7 +382,7 @@ export default function Header() {
                         await logout();
                         window.location.href = '/';
                       }}
-                      className="text-red-600 focus:text-red-600"
+                      className="text-error-600 hover:bg-error-50 focus:bg-error-50"
                     >
                       Đăng xuất
                     </DropdownMenuItem>
