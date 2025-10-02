@@ -42,9 +42,31 @@ export default function SplashScreen({ children }: SplashScreenProps) {
     hardTimeout = setTimeout(finish, 2000);
 
     // Prevent background scroll while splash is visible
-    const originalOverflow = typeof document !== "undefined" ? document.body.style.overflow : "";
     if (typeof document !== "undefined") {
-      document.body.style.overflow = "hidden";
+      // Store original values
+      const body = document.body;
+      const originalOverflow = body.style.overflow;
+      const originalOverflowY = body.style.overflowY;
+      
+      // Disable scroll
+      body.style.overflow = "hidden";
+      body.style.overflowY = "hidden";
+      
+      // Store cleanup function
+      const cleanup = () => {
+        body.style.overflow = originalOverflow;
+        body.style.overflowY = originalOverflowY;
+      };
+      
+      // Return cleanup function
+      return () => {
+        if (typeof window !== "undefined") {
+          window.removeEventListener("load", onWindowLoad);
+        }
+        if (fadeTimeout) clearTimeout(fadeTimeout);
+        if (hardTimeout) clearTimeout(hardTimeout);
+        cleanup();
+      };
     }
 
     return () => {
@@ -53,9 +75,6 @@ export default function SplashScreen({ children }: SplashScreenProps) {
       }
       if (fadeTimeout) clearTimeout(fadeTimeout);
       if (hardTimeout) clearTimeout(hardTimeout);
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = originalOverflow;
-      }
     };
   }, [prefersReducedMotion]);
 
@@ -69,6 +88,7 @@ export default function SplashScreen({ children }: SplashScreenProps) {
             "fixed inset-0 z-[9998]",
             "flex items-center justify-center",
             "bg-background",
+            "pointer-events-auto",
             prefersReducedMotion ? "" : isFading ? "opacity-0 transition-opacity duration-300" : "opacity-100",
           ].join(" ")}
         >
