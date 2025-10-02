@@ -773,14 +773,20 @@ export async function getAdvances(tripId: string, limit?: number) {
 }
 
 // Update Advance
-export async function updateAdvance(advanceId: string, formData: FormData) {
+export async function updateAdvance(advanceId: string, formDataOrObj: FormData | Record<string, unknown>) {
   try {
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
-    const userId = formData.get('userId') as string;
+    // Handle both FormData and object
+    const isFormData = formDataOrObj instanceof FormData;
+    const getValue = (key: string) => isFormData 
+      ? (formDataOrObj as FormData).get(key) as string
+      : (formDataOrObj as Record<string, unknown>)[key] as string;
+    
+    const userId = getValue('userId');
     if (!userId) {
       throw new Error('Chưa đăng nhập');
     }
@@ -799,7 +805,20 @@ export async function updateAdvance(advanceId: string, formData: FormData) {
       }
     }
 
-    const tripId = formData.get('tripId') as string;
+    // Debug: Log all entries
+    console.log('🔍 updateAdvance - Input type:', isFormData ? 'FormData' : 'Object');
+    if (isFormData) {
+      console.log('🔍 updateAdvance - FormData entries:');
+      for (const [key, value] of (formDataOrObj as FormData).entries()) {
+        console.log(`  ${key}:`, value);
+      }
+    } else {
+      console.log('🔍 updateAdvance - Object entries:', formDataOrObj);
+    }
+    
+    const tripId = getValue('tripId');
+    console.log('🔍 updateAdvance - tripId extracted:', tripId);
+    
     if (!tripId) {
       throw new Error('Trip ID không được để trống');
     }
@@ -828,17 +847,18 @@ export async function updateAdvance(advanceId: string, formData: FormData) {
     }
 
     const data = {
-      amount: parseFloat(formData.get('amount') as string),
-      description: formData.get('description') as string || undefined,
-      paidBy: formData.get('paidBy') as string,
-      paidTo: formData.get('paidTo') as string,
+      tripId: tripId,
+      amount: parseFloat(getValue('amount')),
+      description: getValue('description') || undefined,
+      paidBy: getValue('paidBy'),
+      paidTo: getValue('paidTo'),
     };
 
     // Validate input
     const validatedData = AddAdvanceSchema.parse(data);
 
     // Get createdAt from form (just store as string)
-    const createdAtFromForm = formData.get('createdAt') as string;
+    const createdAtFromForm = getValue('createdAt');
     const createdAt = createdAtFromForm || advanceData.createdAt;
 
     // Update advance

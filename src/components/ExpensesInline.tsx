@@ -94,8 +94,8 @@ export default function ExpensesInline({
     if (typeof createdAt === 'string') {
       // Check if it's a date-only string (like "2025-09-29")
       if (createdAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // It's date-only, return current time since we don't have time info
-        return new Date();
+        // For date-only strings, use the date as-is (will show as 00:00)
+        return new Date(createdAt + 'T00:00:00');
       }
       
       const parsed = new Date(createdAt);
@@ -108,19 +108,13 @@ export default function ExpensesInline({
 
   // Helper function to format time properly
   const formatTime = (createdAt: any): string => {
-    // Check if it's a date-only string from database
-    if (typeof createdAt === 'string' && createdAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      // Database only stores date, no time info available
-      return '--:--';
-    }
-    
     const date = parseCreatedAt(createdAt);
     
     // Check if the time is 00:00 (likely old data with date-only input)
     const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
     
     if (isMidnight) {
-      // For old data that was saved with 00:00, show a placeholder
+      // For date-only data, show a placeholder
       return '--:--';
     }
     
@@ -484,7 +478,22 @@ export default function ExpensesInline({
                 acc[entry.memberId] = entry.weight;
                 return acc;
             }, {} as { [memberId: string]: number }) : {},
-            createdAt: expense.createdAt.toISOString().split('T')[0],
+            createdAt: (() => {
+                if (!expense.createdAt) {
+                    return new Date().toISOString().split('T')[0];
+                }
+                if (expense.createdAt instanceof Date) {
+                    return expense.createdAt.toISOString().split('T')[0];
+                }
+                if (typeof expense.createdAt === 'string') {
+                    return expense.createdAt.split('T')[0];
+                }
+                // Handle Firestore Timestamp
+                if (expense.createdAt && typeof expense.createdAt === 'object' && expense.createdAt.seconds) {
+                    return new Date(expense.createdAt.seconds * 1000).toISOString().split('T')[0];
+                }
+                return new Date().toISOString().split('T')[0];
+            })(),
             isEqualSplit: expense.splitMethod === 'equal'
         });
     };
@@ -1196,6 +1205,7 @@ export default function ExpensesInline({
                         isTripClosed={isTripClosed}
                         getCategoryIcon={getCategoryIcon}
                         getCategoryLabel={getCategoryLabel}
+                        formatTime={formatTime}
                     />
                 </div>
             )}
@@ -1341,6 +1351,7 @@ export default function ExpensesInline({
                         isTripClosed={isTripClosed}
                         getCategoryIcon={getCategoryIcon}
                         getCategoryLabel={getCategoryLabel}
+                        formatTime={formatTime}
                     />
                 </div>
             )}
@@ -1353,6 +1364,7 @@ export default function ExpensesInline({
                     advance={editingAdvance}
                     members={members}
                     userId={user.uid}
+                    tripId={trip.id}
                     onSuccess={() => {
                         if (onAdvanceUpdated) {
                             onAdvanceUpdated();

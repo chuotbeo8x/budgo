@@ -23,6 +23,7 @@ interface TimelineViewProps {
     isTripClosed: boolean;
     getCategoryIcon: (category: string) => React.ReactNode;
     getCategoryLabel: (category: string) => string;
+    formatTime?: (createdAt: any) => string;
 }
 
 export default function TimelineView({
@@ -41,29 +42,11 @@ export default function TimelineView({
     canEdit,
     isTripClosed,
     getCategoryIcon,
-    getCategoryLabel
+    getCategoryLabel,
+    formatTime: externalFormatTime
 }: TimelineViewProps) {
     
-    // Combine and sort all items by date
-    const allItems = [
-        ...expenses.map(expense => ({ ...expense, type: 'expense' as const })),
-        ...advances.map(advance => ({ ...advance, type: 'advance' as const }))
-    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    // Group by date
-    const groupedItems = allItems.reduce((groups, item) => {
-        const dateKey = new Date(item.createdAt).toDateString();
-        if (!groups[dateKey]) {
-            groups[dateKey] = [];
-        }
-        groups[dateKey].push(item);
-        return groups;
-    }, {} as { [key: string]: Array<Expense & { type: 'expense' } | Advance & { type: 'advance' }> });
-
-    const sortedDates = Object.keys(groupedItems).sort((a, b) => 
-        new Date(b).getTime() - new Date(a).getTime()
-    );
-
+    // Parse createdAt properly first
     const parseCreatedAt = (createdAt: any): Date => {
         if (createdAt instanceof Date) {
             return createdAt;
@@ -77,63 +60,65 @@ export default function TimelineView({
         return new Date();
     };
 
+    // Combine and sort all items by date
+    const allItems = [
+        ...expenses.map(expense => ({ ...expense, type: 'expense' as const })),
+        ...advances.map(advance => ({ ...advance, type: 'advance' as const }))
+    ].sort((a, b) => {
+        const dateA = parseCreatedAt(a.createdAt);
+        const dateB = parseCreatedAt(b.createdAt);
+        return dateB.getTime() - dateA.getTime();
+    });
+
+    // Group by date
+    const groupedItems = allItems.reduce((groups, item) => {
+        const parsedDate = parseCreatedAt(item.createdAt);
+        const dateKey = parsedDate.toDateString();
+        if (!groups[dateKey]) {
+            groups[dateKey] = [];
+        }
+        groups[dateKey].push(item);
+        return groups;
+    }, {} as { [key: string]: Array<Expense & { type: 'expense' } | Advance & { type: 'advance' }> });
+
+    const sortedDates = Object.keys(groupedItems).sort((a, b) => 
+        new Date(b).getTime() - new Date(a).getTime()
+    );
+
     const formatTime = (createdAt: any): string => {
+        // Use external formatTime if provided, otherwise use internal logic
+        if (externalFormatTime) {
+            return externalFormatTime(createdAt);
+        }
+        
         try {
-            // Handle null/undefined
-            if (!createdAt) {
+            const date = parseCreatedAt(createdAt);
+            
+            // Check if the time is 00:00 (likely old data with date-only input)
+            const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
+            
+            if (isMidnight) {
+                // For date-only data, show a placeholder
                 return '--:--';
             }
             
-            // Handle Firestore Timestamp
-            if (createdAt.toDate && typeof createdAt.toDate === 'function') {
-                const date = createdAt.toDate();
-                const timeStr = date.toLocaleString('vi-VN', {
+            // Try multiple formatting approaches
+            try {
+                // Method 1: toLocaleString with timezone
+                const formatted = date.toLocaleString('vi-VN', {
                     hour: '2-digit',
                     minute: '2-digit',
                     timeZone: 'Asia/Ho_Chi_Minh'
                 });
-                return timeStr;
-            }
-            
-            // Handle Date object
-            if (createdAt instanceof Date) {
-                const timeStr = createdAt.toLocaleString('vi-VN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Asia/Ho_Chi_Minh'
-                });
-                return timeStr;
-            }
-            
-            // Handle string
-            if (typeof createdAt === 'string') {
-                // Check if it's a date-only string (old data format)
-                if (createdAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    return '--:--';
-                }
                 
-                const date = new Date(createdAt);
-                if (isNaN(date.getTime())) {
-                    return '--:--';
-                }
-                
-                // Check if it's midnight (old data with date-only input)
-                const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
-                if (isMidnight) {
-                    return '--:--';
-                }
-                
-                const timeStr = date.toLocaleString('vi-VN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Asia/Ho_Chi_Minh'
-                });
-                return timeStr;
+                return formatted;
+            } catch (error) {
+                console.error('Error formatting time:', error);
+                // Fallback: manual formatting
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
             }
-            
-            // Fallback
-            return '--:--';
-            
         } catch (error) {
             console.error('Error formatting time:', error);
             return '--:--';
@@ -197,7 +182,7 @@ export default function TimelineView({
                                                         ? isExpanded 
                                                             ? '!border-green-500' 
                                                             : '!border-gray-300'
-                                                        : '!border-blue-500'
+                                                        : '!border-green-500'
                                                 }`}></div>
                                                 
                                                 <div className="flex-1">

@@ -48,7 +48,7 @@ export default function ExpenseAdvanceItem({
                 ? isExpanded 
                     ? 'border-l-green-500' 
                     : 'border-l-gray-300'
-                : 'border-l-blue-500'
+                : 'border-l-green-500'
         } hover:border-l-green-400`}>
             <CardContent className="p-2" onClick={onToggle}>
                 <div className="flex items-center justify-between">
@@ -64,7 +64,7 @@ export default function ExpenseAdvanceItem({
                                     {type === 'expense' ? (
                                         getCategoryIcon((item as Expense).category || 'other')
                                     ) : (
-                                        <CreditCard className="w-4 h-4 text-blue-600" />
+                                        <CreditCard className="w-4 h-4 text-green-600" />
                                     )}
                                 </>
                             )}
@@ -83,16 +83,18 @@ export default function ExpenseAdvanceItem({
                                     {type === 'expense' ? 'Chi phí' : 'Tạm ứng'}
                                 </span>
                             )}
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded flex-shrink-0">
-                                {type === 'expense' ? getCategoryLabel((item as Expense).category || 'other') : 'Tạm ứng'}
-                            </span>
+                            {!isExpanded && (
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded flex-shrink-0">
+                                    {type === 'expense' ? getCategoryLabel((item as Expense).category || 'other') : 'Tạm ứng'}
+                                </span>
+                            )}
                         </div>
                     </div>
                     
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <div className="text-right">
                             <div className={`font-semibold text-sm ${
-                                type === 'expense' ? 'text-green-700' : 'text-blue-700'
+                                type === 'expense' ? 'text-green-700' : 'text-green-700'
                             }`}>
                                 {formatCurrency(item.amount, trip.currency)}
                             </div>

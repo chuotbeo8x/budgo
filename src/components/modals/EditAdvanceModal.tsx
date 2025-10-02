@@ -15,6 +15,7 @@ interface EditAdvanceModalProps {
   advance: Advance | null;
   members: TripMember[];
   userId: string;
+  tripId?: string; // Add tripId as fallback
   onSuccess: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function EditAdvanceModal({
   advance, 
   members, 
   userId,
+  tripId,
   onSuccess 
 }: EditAdvanceModalProps) {
   const [formData, setFormData] = useState({
@@ -36,13 +38,28 @@ export default function EditAdvanceModal({
 
   useEffect(() => {
     if (advance) {
+      // Debug: Log the entire advance object
+      console.log('🔍 EditAdvanceModal - advance object:', advance);
+      console.log('🔍 EditAdvanceModal - advance.tripId:', advance.tripId);
+      
+      // Parse createdAt properly
+      let createdAtDate: Date;
+      if (advance.createdAt instanceof Date) {
+        createdAtDate = advance.createdAt;
+      } else if (advance.createdAt && typeof advance.createdAt === 'object' && advance.createdAt.seconds) {
+        // Firestore Timestamp
+        createdAtDate = new Date(advance.createdAt.seconds * 1000 + (advance.createdAt.nanoseconds || 0) / 1000000);
+      } else if (typeof advance.createdAt === 'string') {
+        createdAtDate = new Date(advance.createdAt);
+      } else {
+        createdAtDate = new Date();
+      }
+
       setFormData({
         amount: advance.amount.toString(),
         description: advance.description || '',
         paidBy: advance.paidBy,
-        createdAt: advance.createdAt instanceof Date 
-          ? advance.createdAt.toISOString().split('T')[0] 
-          : new Date().toISOString().split('T')[0],
+        createdAt: createdAtDate.toISOString().split('T')[0],
       });
     }
   }, [advance]);
@@ -50,6 +67,15 @@ export default function EditAdvanceModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!advance) return;
+
+    // Debug: Check if advance has tripId
+    const finalTripId = advance.tripId || tripId;
+    if (!finalTripId) {
+      console.error('Advance missing tripId:', advance);
+      console.error('Fallback tripId also missing:', tripId);
+      toast.error('Lỗi: Không tìm thấy ID chuyến đi');
+      return;
+    }
 
     // Parse amount - remove dots and convert to number
     const cleanAmount = formData.amount.replace(/\./g, '');
@@ -68,16 +94,31 @@ export default function EditAdvanceModal({
 
     try {
       setSubmitting(true);
-      const formDataObj = new FormData();
-      formDataObj.append('tripId', advance.tripId);
-      formDataObj.append('userId', userId);
-      formDataObj.append('amount', amount.toString());
-      formDataObj.append('description', formData.description);
-      formDataObj.append('paidBy', formData.paidBy);
-      formDataObj.append('paidTo', advance.paidTo); // Keep existing paidTo
-      formDataObj.append('createdAt', formData.createdAt);
+      
+      // Debug: Log the values being sent
+      console.log('🔍 Update values:');
+      console.log('  tripId:', finalTripId);
+      console.log('  userId:', userId);
+      console.log('  amount:', amount.toString());
+      console.log('  description:', formData.description);
+      console.log('  paidBy:', formData.paidBy);
+      console.log('  paidTo:', advance.paidTo);
+      console.log('  createdAt:', formData.createdAt);
+      
+      // Try using object instead of FormData
+      const updateData = {
+        tripId: finalTripId,
+        userId: userId,
+        amount: amount.toString(),
+        description: formData.description,
+        paidBy: formData.paidBy,
+        paidTo: advance.paidTo,
+        createdAt: formData.createdAt
+      };
+      
+      console.log('🔍 Update data object:', updateData);
 
-      await updateAdvance(advance.id, formDataObj);
+      await updateAdvance(advance.id, updateData);
       toast.success('Cập nhật tạm ứng thành công!');
       onSuccess();
       onClose();
