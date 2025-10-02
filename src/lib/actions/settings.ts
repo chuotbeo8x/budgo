@@ -10,6 +10,7 @@ export type AppSettings = {
   logoUrl?: string;
   siteName?: string;
   copyright?: string;
+  darkModeEnabled?: boolean;
   updatedAt?: Date;
   updatedBy?: string;
 };
@@ -25,6 +26,7 @@ export async function getAppSettings(): Promise<AppSettings | null> {
     logoUrl: data.logoUrl || undefined,
     siteName: data.siteName || undefined,
     copyright: data.copyright || undefined,
+    darkModeEnabled: !!data.darkModeEnabled,
     updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.updatedAt || undefined),
     updatedBy: data.updatedBy || undefined,
   };

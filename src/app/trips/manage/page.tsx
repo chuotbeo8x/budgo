@@ -472,39 +472,21 @@ export default function TripsManagePage() {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-2">
-                      {trip.groupId ? (
-                        <Link href={`/g/${trip.groupId}/trips/${trip.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Eye className="w-4 h-4 mr-2" />
-                            Xem chuyến đi
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link href={`/trips/${trip.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Eye className="w-4 h-4 mr-2" />
-                            Xem chuyến đi
-                          </Button>
-                        </Link>
-                      )}
+                      <Link href={`/trips/${trip.slug}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Xem chuyến đi
+                        </Button>
+                      </Link>
                       
                       {user.uid === trip.ownerId && (
                         <>
-                          {trip.groupId ? (
-                            <Link href={`/g/${trip.groupId}/trips/${trip.slug}/manage`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full">
-                                <Settings className="w-4 h-4 mr-2" />
-                                Quản lý
-                              </Button>
-                            </Link>
-                          ) : (
-                            <Link href={`/trips/${trip.slug}/manage`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full">
-                                <Settings className="w-4 h-4 mr-2" />
-                                Quản lý
-                              </Button>
-                            </Link>
-                          )}
+                          <Link href={`/trips/${trip.slug}/manage`} className="flex-1">
+                            <Button variant="outline" size="sm" className="w-full">
+                              <Settings className="w-4 h-4 mr-2" />
+                              Quản lý
+                            </Button>
+                          </Link>
                         </>
                       )}
                     </div>

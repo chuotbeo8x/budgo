@@ -18,6 +18,7 @@ import {
   Heart,
   MoreVertical
 } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -36,7 +37,6 @@ export default function Header() {
   const { user, loading } = useAuth();
   const { profile } = useProfile();
   const pathname = usePathname();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('vi');
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
   const [siteName, setSiteName] = useState<string>('Budgo');
@@ -61,10 +61,6 @@ export default function Header() {
     load();
   }, []);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // TODO: Implement theme switching logic
-  };
 
   const toggleLanguage = () => {
     setLanguage(language === 'vi' ? 'en' : 'vi');
@@ -89,7 +85,12 @@ export default function Header() {
   return (
     <>
       {/* Desktop Header - Design System Compliant */}
-      <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-50 hidden lg:block shadow-sm">
+      <header 
+        className="w-full border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 hidden lg:block shadow-sm transition-colors duration-200"
+        style={{
+          backgroundColor: 'var(--background)',
+        }}
+      >
       {/* Locked account banner */}
       {profile && (profile as any).disabled === true && (
         <div className="w-full bg-error-600 text-white text-sm">
@@ -108,11 +109,10 @@ export default function Header() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoUrl} alt="Logo" className="h-6 w-auto" />
             ) : (
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src="/logo-budgo.svg" alt="Budgo Logo" className="h-6 w-auto" />
             )}
-            <span className="font-bold text-lg tracking-tight">{siteName}</span>
+            <span className="font-bold text-lg tracking-tight text-gray-900 dark:text-gray-100">{siteName}</span>
           </Link>
         </div>
 
@@ -122,8 +122,8 @@ export default function Header() {
             href="/groups/manage" 
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/groups') 
-                ? 'text-green-600 bg-green-50 shadow-sm' 
-                : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                ? 'text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-300 shadow-sm' 
+                : 'text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
             }`}
           >
             <Users className={`w-5 h-5 transition-transform ${
@@ -137,8 +137,8 @@ export default function Header() {
             href="/trips/manage" 
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group min-h-[44px] ${
               pathname.startsWith('/trips') 
-                ? 'text-blue-600 bg-blue-50 shadow-sm' 
-                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 shadow-sm' 
+                : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
             }`}
           >
             <MapPin className={`w-5 h-5 transition-transform ${
@@ -153,10 +153,13 @@ export default function Header() {
         {/* Right side - User actions - Design System: gap-0.75rem (12px) */}
         <div className="flex items-center gap-3">
           {loading && (
-            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+            <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
           )}
           {!loading && user && (
             <>
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {/* Notification Bell */}
               <NotificationBell />
               
@@ -179,7 +182,7 @@ export default function Header() {
                         size={32}
                         fallbackIcon={<User className="w-5 h-5 text-white" />}
                       />
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                         {profile?.name || 'Bạn'}
                       </span>
                     </Button>
@@ -244,18 +247,11 @@ export default function Header() {
                     
                     <DropdownMenuSeparator />
                     
-                    <DropdownMenuItem onClick={toggleTheme}>
-                      {isDarkMode ? (
-                        <>
-                          <Sun className="w-4 h-4" />
-                          <span>Chế độ sáng</span>
-                        </>
-                      ) : (
-                        <>
-                          <Moon className="w-4 h-4" />
-                          <span>Chế độ tối</span>
-                        </>
-                      )}
+                    <DropdownMenuItem asChild>
+                      <div className="flex items-center justify-between w-full">
+                        <span>Chế độ hiển thị</span>
+                        <ThemeToggle variant="ghost" size="sm" />
+                      </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={toggleLanguage}>
                       <Globe className="w-4 h-4" />
@@ -269,7 +265,7 @@ export default function Header() {
                         await logout();
                         window.location.href = '/';
                       }}
-                      className="text-error-600 hover:bg-error-50 focus:bg-error-50"
+                      className="text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 focus:bg-error-50 dark:focus:bg-error-900/20"
                     >
                       Đăng xuất
                     </DropdownMenuItem>
@@ -357,18 +353,11 @@ export default function Header() {
                     
                     <DropdownMenuSeparator />
                     
-                    <DropdownMenuItem onClick={toggleTheme}>
-                      {isDarkMode ? (
-                        <>
-                          <Sun className="w-4 h-4" />
-                          <span>Chế độ sáng</span>
-                        </>
-                      ) : (
-                        <>
-                          <Moon className="w-4 h-4" />
-                          <span>Chế độ tối</span>
-                        </>
-                      )}
+                    <DropdownMenuItem asChild>
+                      <div className="flex items-center justify-between w-full">
+                        <span>Chế độ hiển thị</span>
+                        <ThemeToggle variant="ghost" size="sm" />
+                      </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={toggleLanguage}>
                       <Globe className="w-4 h-4" />
@@ -382,7 +371,7 @@ export default function Header() {
                         await logout();
                         window.location.href = '/';
                       }}
-                      className="text-error-600 hover:bg-error-50 focus:bg-error-50"
+                      className="text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 focus:bg-error-50 dark:focus:bg-error-900/20"
                     >
                       Đăng xuất
                     </DropdownMenuItem>

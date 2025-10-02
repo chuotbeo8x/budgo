@@ -210,21 +210,21 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
   // Tab Content Components
   const TripInfoTab = () => (
-    <div className="space-y-4 lg:space-y-6">
-      <Card className="rounded-lg shadow-sm border border-gray-200">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-            <Edit className="w-5 h-5 text-primary-600" />
+    <div className="space-y-4">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Edit className="w-4 h-4 text-blue-600" />
             Thông tin chuyến đi
           </CardTitle>
-          <CardDescription className="text-sm text-gray-600">
+          <CardDescription className="text-sm">
             Chỉnh sửa thông tin cơ bản của chuyến đi
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
-          <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-gray-700">Tên chuyến đi *</Label>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-sm">Tên chuyến đi *</Label>
               <Input
                 id="name"
                 name="name"
@@ -232,12 +232,11 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 onChange={handleInputChange}
                 disabled={!editing || isTripClosed}
                 className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
-                placeholder="Nhập tên chuyến đi"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="description" className="text-sm">Mô tả</Label>
               <Textarea
                 id="description"
                 name="description"
@@ -246,12 +245,11 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 disabled={!editing || isTripClosed}
                 rows={3}
                 className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
-                placeholder="Nhập mô tả chuyến đi"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="destination" className="text-sm font-medium text-gray-700">Địa điểm</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="destination" className="text-sm">Địa điểm</Label>
               <Input
                 id="destination"
                 name="destination"
@@ -259,13 +257,12 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 onChange={handleInputChange}
                 disabled={!editing || isTripClosed}
                 className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
-                placeholder="Nhập địa điểm"
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="startDate" className="text-sm font-medium text-gray-700">Ngày bắt đầu</Label>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="startDate" className="text-sm">Ngày bắt đầu</Label>
                 <Input
                   id="startDate"
                   name="startDate"
@@ -277,8 +274,8 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="endDate" className="text-sm font-medium text-gray-700">Ngày kết thúc</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="endDate" className="text-sm">Ngày kết thúc</Label>
                 <Input
                   id="endDate"
                   name="endDate"
@@ -291,9 +288,9 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="currency" className="text-sm font-medium text-gray-700">Tiền tệ</Label>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="currency" className="text-sm">Tiền tệ</Label>
                 <Select
                   id="currency"
                   name="currency"
@@ -308,8 +305,8 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="costPerPersonPlanned" className="text-sm font-medium text-gray-700">Chi phí dự kiến/người</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="costPerPersonPlanned" className="text-sm">Chi phí dự kiến/người</Label>
                 <Input
                   id="costPerPersonPlanned"
                   name="costPerPersonPlanned"
@@ -318,13 +315,12 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                   onChange={handleInputChange}
                   disabled={!editing || isTripClosed}
                   className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
-                  placeholder="Nhập chi phí dự kiến"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coverUrl" className="text-sm font-medium text-gray-700">URL ảnh bìa</Label>
+              <Label htmlFor="coverUrl">URL ảnh bìa</Label>
               <Input
                 id="coverUrl"
                 name="coverUrl"
@@ -332,7 +328,6 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 onChange={handleInputChange}
                 disabled={!editing || isTripClosed}
                 className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
-                placeholder="https://example.com/image.jpg"
               />
             </div>
 
@@ -341,18 +336,17 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 type="button"
                 onClick={() => setEditing(true)}
                 disabled={isTripClosed}
-                variant="outline"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 <Edit className="w-4 h-4 mr-2" />
-                {isTripClosed ? 'Chuyến đi đã đóng' : 'Chỉnh sửa thông tin'}
+                Chỉnh sửa thông tin
               </Button>
             ) : (
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1"
-                  variant="default"
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   {submitting ? 'Đang lưu...' : 'Lưu thay đổi'}
@@ -362,7 +356,6 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                   variant="outline"
                   onClick={handleCancel}
                   disabled={submitting}
-                  className="flex-1"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Hủy
@@ -392,7 +385,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 trigger={
                   <Button
                     disabled={submitting}
-                    variant="outline"
+                    className="w-full justify-start bg-orange-600 hover:bg-orange-700"
                   >
                     <AlertTriangle className="w-4 h-4 mr-2" />
                     {submitting ? 'Đang lưu trữ...' : 'Lưu trữ chuyến đi'}
@@ -411,7 +404,8 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               trigger={
                 <Button
                   disabled={submitting}
-                  variant="outline"
+                  variant="destructive"
+                  className="w-full justify-start"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   {submitting ? 'Đang xóa...' : 'Xóa chuyến đi'}
@@ -563,7 +557,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               Xuất báo cáo tổng hợp chi phí và quyết toán
             </p>
             <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}/export` : `/trips/${trip.slug}/export`}>
-              <Button variant="outline">
+              <Button className="w-full">
                 <Download className="w-4 h-4 mr-2" />
                 Xuất báo cáo
               </Button>
@@ -588,7 +582,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               Xem báo cáo quyết toán chi tiết
             </p>
             <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}/settlement` : `/trips/${trip.slug}/settlement`}>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full">
                 <FileText className="w-4 h-4 mr-2" />
                 Xem chi tiết quyết toán
               </Button>
@@ -612,66 +606,62 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-      <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
-        {/* Header */}
-        <header className="mb-6 lg:mb-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
+        {/* Back Button - Keep at original position */}
+        <div className="mb-6">
           <Link href={backUrl}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
               {backLabel}
             </Button>
           </Link>
-        </header>
+        </div>
 
         {/* Trip Status Banner */}
         {isTripClosed && (
-          <div className="mb-4 lg:mb-6">
+          <div className="mb-6">
             <TripStatusAlerts.closed />
           </div>
         )}
 
         {/* Main Management Container */}
-        <main role="main" aria-label="Quản lý chuyến đi">
-          <Card className="overflow-hidden rounded-lg shadow-sm border border-gray-200">
-            <CardContent className="p-0">
-              {/* Header */}
-              <div className="px-4 lg:px-6 py-4 border-b bg-gray-50/50">
-                <div className="max-w-7xl mx-auto">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary-100 rounded-lg">
-                        <Settings className="w-5 h-5 text-primary-600" />
-                      </div>
-                      <div>
-                        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
-                          Quản lý chuyến đi
-                        </h1>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-sm text-gray-600 truncate max-w-[200px]">{trip.name}</span>
-                          <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                          <span className="text-xs text-gray-500">
-                            {trip.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}
-                          </span>
-                        </div>
-                      </div>
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            {/* Header - Compact */}
+            <div className="px-4 py-2 border-b bg-gray-50/50">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-blue-600" />
+                  <div>
+                    <h1 className="text-base font-semibold text-gray-900">
+                      Quản lý chuyến đi
+                    </h1>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm text-gray-600 truncate max-w-[200px]">{trip.name}</span>
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span className="text-xs text-gray-500">
+                        {trip.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}
+                      </span>
                     </div>
-                    
-                    <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-2" />
-                        <span className="hidden sm:inline">Xem thông tin</span>
-                        <span className="sm:hidden">Xem</span>
-                      </Button>
-                    </Link>
                   </div>
                 </div>
+                
+                <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
+                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                    <Eye className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Xem thông tin</span>
+                    <span className="sm:hidden">Xem</span>
+                  </Button>
+                </Link>
               </div>
+            </div>
 
             {/* Mobile Menu Button */}
             <div className="lg:hidden p-3 border-b">
               <Button
                 variant="outline"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-full justify-between text-sm h-8"
               >
                 <span>Menu quản lý</span>
                 <Menu className="w-4 h-4" />
@@ -685,6 +675,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('expenses');
                       setMobileMenuOpen(false);
                     }}
+                    className="w-full justify-start text-sm"
                   >
                     <DollarSign className="w-4 h-4 mr-2" />
                     Chi phí
@@ -695,6 +686,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('members');
                       setMobileMenuOpen(false);
                     }}
+                    className="w-full justify-start text-sm"
                   >
                     <Users className="w-4 h-4 mr-2" />
                     Thành viên
@@ -705,6 +697,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('settlement');
                       setMobileMenuOpen(false);
                     }}
+                    className="w-full justify-start text-sm"
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Quyết toán
@@ -715,6 +708,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('reports');
                       setMobileMenuOpen(false);
                     }}
+                    className="w-full justify-start text-sm"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Báo cáo
@@ -725,6 +719,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('info');
                       setMobileMenuOpen(false);
                     }}
+                    className="w-full justify-start text-sm"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Thông tin
@@ -733,58 +728,58 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               )}
             </div>
 
-            {/* Desktop Tabs */}
+            {/* Desktop Tabs / Mobile Content */}
             <div className="hidden lg:block">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" role="tablist" aria-label="Quản lý chuyến đi">
-                <TabsList className="grid grid-cols-5 mx-4 lg:mx-6 mt-4 lg:mt-6 mb-0">
-                  <TabsTrigger value="expenses" className="flex items-center justify-center gap-2 text-sm px-3 py-2" role="tab" aria-selected={activeTab === 'expenses'}>
-                    <DollarSign className="w-4 h-4" />
-                    <span>Chi phí</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="members" className="flex items-center justify-center gap-2 text-sm px-3 py-2" role="tab" aria-selected={activeTab === 'members'}>
-                    <Users className="w-4 h-4" />
-                    <span>Thành viên</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="settlement" className="flex items-center justify-center gap-2 text-sm px-3 py-2" role="tab" aria-selected={activeTab === 'settlement'}>
-                    <FileText className="w-4 h-4" />
-                    <span>Quyết toán</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="reports" className="flex items-center justify-center gap-2 text-sm px-3 py-2" role="tab" aria-selected={activeTab === 'reports'}>
-                    <Download className="w-4 h-4" />
-                    <span>Báo cáo</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="info" className="flex items-center justify-center gap-2 text-sm px-3 py-2" role="tab" aria-selected={activeTab === 'info'}>
-                    <Edit className="w-4 h-4" />
-                    <span>Thông tin</span>
-                  </TabsTrigger>
-                </TabsList>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="flex mx-4 mt-3 mb-0 gap-1 h-8">
+              <TabsTrigger value="expenses" className="flex items-center justify-center gap-1 text-xs px-2 h-7 flex-1 min-w-0">
+                <DollarSign className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">Chi phí</span>
+              </TabsTrigger>
+              <TabsTrigger value="members" className="flex items-center justify-center gap-1 text-xs px-2 h-7 flex-1 min-w-0">
+                <Users className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">Thành viên</span>
+              </TabsTrigger>
+              <TabsTrigger value="settlement" className="flex items-center justify-center gap-1 text-xs px-2 h-7 flex-1 min-w-0">
+                <FileText className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">Quyết toán</span>
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="flex items-center justify-center gap-1 text-xs px-2 h-7 flex-1 min-w-0">
+                <Download className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">Báo cáo</span>
+              </TabsTrigger>
+              <TabsTrigger value="info" className="flex items-center justify-center gap-1 text-xs px-2 h-7 flex-1 min-w-0">
+                <Edit className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">Thông tin</span>
+              </TabsTrigger>
+            </TabsList>
             
-                <TabsContent value="expenses" className="mt-4 lg:mt-6" role="tabpanel" aria-labelledby="expenses-tab">
-                  <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+                <TabsContent value="expenses" className="mt-0">
+                  <div className="p-3">
                     <ExpensesTab />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="members" className="mt-4 lg:mt-6" role="tabpanel" aria-labelledby="members-tab">
-                  <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+                <TabsContent value="members" className="mt-0">
+                  <div className="p-3">
                     <MembersTab />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="settlement" className="mt-4 lg:mt-6" role="tabpanel" aria-labelledby="settlement-tab">
-                  <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+                <TabsContent value="settlement" className="mt-0">
+                  <div className="p-3">
                     <SettlementTab />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="reports" className="mt-4 lg:mt-6" role="tabpanel" aria-labelledby="reports-tab">
-                  <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+                <TabsContent value="reports" className="mt-0">
+                  <div className="p-3">
                     <ReportsTab />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="info" className="mt-4 lg:mt-6" role="tabpanel" aria-labelledby="info-tab">
-                  <div className="px-4 lg:px-6 pb-4 lg:pb-6">
+                <TabsContent value="info" className="mt-0">
+                  <div className="p-3">
                     <TripInfoTab />
                   </div>
                 </TabsContent>
@@ -793,7 +788,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
             {/* Mobile Content */}
             <div className="lg:hidden">
-              <div className="px-4 pb-4">
+              <div className="p-3">
                 {activeTab === 'expenses' && <ExpensesTab />}
                 {activeTab === 'members' && <MembersTab />}
                 {activeTab === 'settlement' && <SettlementTab />}
@@ -803,7 +798,6 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
             </div>
           </CardContent>
         </Card>
-        </main>
       </div>
     </div>
   );

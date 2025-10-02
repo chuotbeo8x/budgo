@@ -76,7 +76,7 @@ const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         // Design System: z-index.dropdown = 1000, shadow-md, rounded-md (6px)
-        "z-[1000] min-w-[12rem] overflow-hidden rounded-md border border-gray-200 bg-white p-2 text-gray-900 shadow-lg",
+        "z-[1000] min-w-[12rem] overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 text-gray-900 dark:text-gray-100 shadow-lg",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -104,7 +104,7 @@ const DropdownMenuItem = React.forwardRef<
       "relative flex cursor-pointer select-none items-center gap-3",
       "rounded-md px-3 py-2 text-sm",
       "outline-none transition-colors duration-200",
-      "hover:bg-gray-100 focus:bg-gray-100",
+      "hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
@@ -187,7 +187,7 @@ const DropdownMenuSeparator = React.forwardRef<
     ref={ref}
     className={cn(
       // Design System: divider.horizontal
-      "-mx-2 my-2 h-px bg-gray-200",
+      "-mx-2 my-2 h-px bg-gray-200 dark:bg-gray-700",
       className
     )}
     {...props}

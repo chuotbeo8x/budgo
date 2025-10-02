@@ -29,7 +29,10 @@ import {
   Plane,
   Home,
   Sunrise,
-  Sunset
+  Sunset,
+  CheckCircle,
+  XCircle,
+  Clock
 } from 'lucide-react';
 import GroupCreateModal from '@/components/modals/GroupCreateModal';
 import TripCreateModal from '@/components/modals/TripCreateModal';
@@ -41,6 +44,61 @@ export default function DashboardPage() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [loadingTrips, setLoadingTrips] = useState(true);
+
+  // Helper functions for trip display
+  const getTripTypeInfo = (trip: Trip) => {
+    if (trip.groupId) {
+      return {
+        icon: Users,
+        label: 'Nhóm',
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-100'
+      };
+    }
+    return {
+      icon: MapPin,
+      label: 'Cá nhân',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100'
+    };
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'active':
+        return {
+          icon: CheckCircle,
+          label: 'Đang hoạt động',
+          labelShort: 'Hoạt động',
+          color: 'text-green-600',
+          bgColor: 'bg-green-100'
+        };
+      case 'completed':
+        return {
+          icon: CheckCircle,
+          label: 'Đã hoàn thành',
+          labelShort: 'Hoàn thành',
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-100'
+        };
+      case 'closed':
+        return {
+          icon: XCircle,
+          label: 'Đã đóng',
+          labelShort: 'Đóng',
+          color: 'text-red-600',
+          bgColor: 'bg-red-100'
+        };
+      default:
+        return {
+          icon: Clock,
+          label: 'Chưa xác định',
+          labelShort: 'Chưa xác định',
+          color: 'text-gray-600',
+          bgColor: 'bg-gray-100'
+        };
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -220,12 +278,7 @@ export default function DashboardPage() {
                         toast.success('Chuyến đi đã được tạo thành công!');
                         if (groupId) {
                           // Find group slug for redirect
-                          const group = groups.find(g => g.id === groupId);
-                          if (group) {
-                            router.push(`/g/${group.slug}/trips/${tripSlug}/manage`);
-                          } else {
-                            router.push(`/trips/${tripSlug}/manage`);
-                          }
+                          router.push(`/trips/${tripSlug}/manage`);
                         } else {
                           router.push(`/trips/${tripSlug}/manage`);
                         }
@@ -252,19 +305,19 @@ export default function DashboardPage() {
                 <CardContent className="p-0">
                   <ul className="divide-y divide-gray-100" role="list" aria-label="Danh sách chuyến đi">
                     {trips.slice(0, 6).map(trip => {
-                      const isGroup = !!trip.groupId;
+                      const typeInfo = getTripTypeInfo(trip);
+                      const statusInfo = getStatusInfo(trip.status);
+                      const TypeIcon = typeInfo.icon;
+                      const StatusIcon = statusInfo.icon;
+                      
                       return (
                         <li key={trip.id} className="p-3 md:p-4 lg:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer" role="listitem">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                              {isGroup ? (
-                                <Users className="w-4 h-4 text-primary-600" aria-hidden="true" />
-                              ) : (
-                                <MapPin className="w-4 h-4 text-success-600" aria-hidden="true" />
-                              )}
+                              <TypeIcon className="w-4 h-4" aria-hidden="true" />
                               <span className="font-semibold text-gray-900 truncate">{trip.name}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isGroup ? 'bg-primary-100 text-primary-700' : 'bg-success-100 text-success-700'}`} aria-label={isGroup ? 'Chuyến đi nhóm' : 'Chuyến đi cá nhân'}>
-                                {isGroup ? 'Nhóm' : 'Cá nhân'}
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${typeInfo.bgColor} ${typeInfo.color}`} aria-label={typeInfo.label}>
+                                {typeInfo.label}
                               </span>
                             </div>
                             <div className="text-sm text-gray-500 flex items-center gap-1">
@@ -293,13 +346,13 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
-                            <Link href={isGroup ? `/g/${trip.groupId}/trips/${trip.slug}` : `/trips/${trip.slug}`}>
+                            <Link href={`/trips/${trip.slug}`}>
                               <Button size="sm" variant="outline">
                                 <Eye className="w-4 h-4" /> Xem
                             </Button>
                           </Link>
                             {trip.ownerId === user.uid && (
-                              <Link href={isGroup ? `/g/${trip.groupId}/trips/${trip.slug}/manage` : `/trips/${trip.slug}/manage`}>
+                              <Link href={`/trips/${trip.slug}/manage`}>
                               <Button size="icon-sm" variant="outline">
                                 <Settings className="w-4 h-4" />
                               </Button>

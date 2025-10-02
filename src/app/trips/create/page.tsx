@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
-import TripCreateForm from '@/components/TripCreateForm';
+import TripCreateModal from '@/components/modals/TripCreateModal';
 import { getUserGroups } from '@/lib/actions/groups';
 import { Group } from '@/lib/types';
 import { useState } from 'react';
@@ -63,11 +63,11 @@ export default function CreateTripPage() {
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <TripCreateForm
+        <TripCreateModal
           mode={groupId ? 'group' : 'personal'}
           group={groupId ? (groups.find(g => g.id === groupId) as Group | undefined) || null : null}
-          onCancel={() => router.push(groupId ? `/g/${groupId}/trips` : '/trips/manage')}
-          onSuccess={(slug) => router.push(groupId ? `/g/${groupId}/trips/${slug}` : `/trips/${slug}`)}
+          onCancel={() => router.push(groupId ? `/g/${groupId}` : '/trips/manage')}
+          onSuccess={(slug) => router.push(`/trips/${slug}`)}
         />
       </div>
     </div>

@@ -185,8 +185,8 @@ export default function TripCreateModal({
               className="focus:ring-primary-500 focus:border-primary-500"
             >
               <option key="personal" value="">🏠 Chuyến đi cá nhân</option>
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
+              {groups.map((g, index) => (
+                <option key={g.id || `group-${index}`} value={g.id}>
                   👥 {g.name}
                 </option>
               ))}

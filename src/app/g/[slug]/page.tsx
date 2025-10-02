@@ -10,13 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { getGroupBySlug, joinGroup, leaveGroup, getGroupMembers, isGroupMember, removeGroupMember } from '@/lib/actions/groups';
-import { getGroupTrips } from '@/lib/actions/trips';
+import { getUserTrips } from '@/lib/actions/trips';
 import { createGroupPost, getGroupPosts, likeGroupPost, getPostLikes, createGroupComment, getGroupComments } from '@/lib/actions/posts';
 import { getGroupActivities } from '@/lib/actions/activities';
 import { Group, GroupMember, GroupPost, GroupActivity } from '@/lib/types';
 import { formatDate } from '@/lib/utils/date';
 import Link from 'next/link';
-import GroupTripsTable from '@/components/GroupTripsTable';
 import GroupMembersTable from '@/components/GroupMembersTable';
 import TripCreateModal from '@/components/modals/TripCreateModal';
 import { 
@@ -28,14 +27,17 @@ import {
   Globe, 
   Lock, 
   Plus,
+  MapPin,
   Copy,
   Check,
   UserCheck,
   Mail,
   Phone,
   ArrowLeft,
-  MapPin,
   Clock,
+  DollarSign,
+  CheckCircle,
+  XCircle,
   Shield,
   Star,
   TrendingUp,
@@ -48,7 +50,6 @@ import {
   Trash2,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   MessageSquare,
   Bell,
   FileText,
@@ -66,7 +67,6 @@ import {
   Award,
   Target,
   PieChart,
-  DollarSign,
   CreditCard,
   Receipt,
   Plane,
@@ -99,6 +99,63 @@ export default function GroupPage() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [commenting, setCommenting] = useState(false);
+  const [showTripCreateModal, setShowTripCreateModal] = useState(false);
+
+  // Helper functions for trip display
+  const getTripTypeInfo = (trip: any) => {
+    // Show group tag if trip is classified/tagged to this group
+    if (trip.groupId === group?.id) {
+      return {
+        icon: Users,
+        label: group?.name || 'Nhóm',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100'
+      };
+    }
+    return {
+      icon: MapPin,
+      label: 'Cá nhân',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100'
+    };
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'active':
+        return {
+          icon: CheckCircle,
+          label: 'Đang hoạt động',
+          labelShort: 'Hoạt động',
+          color: 'text-green-600',
+          bgColor: 'bg-green-100'
+        };
+      case 'completed':
+        return {
+          icon: CheckCircle,
+          label: 'Đã hoàn thành',
+          labelShort: 'Hoàn thành',
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-100'
+        };
+      case 'closed':
+        return {
+          icon: XCircle,
+          label: 'Đã đóng',
+          labelShort: 'Đóng',
+          color: 'text-red-600',
+          bgColor: 'bg-red-100'
+        };
+      default:
+        return {
+          icon: Clock,
+          label: 'Chưa xác định',
+          labelShort: 'Chưa xác định',
+          color: 'text-gray-600',
+          bgColor: 'bg-gray-100'
+        };
+    }
+  };
 
   useEffect(() => {
     if (slug && user) {
@@ -144,12 +201,14 @@ export default function GroupPage() {
   };
 
   const loadTrips = async () => {
-    if (!group) return;
+    if (!group || !user) return;
     
     try {
       setLoadingTrips(true);
-      const tripsData = await getGroupTrips(group.id);
-      setTrips(tripsData);
+      // Load all user trips and filter by groupId (tag/classification)
+      const userTrips = await getUserTrips(user.uid);
+      const groupTrips = userTrips.filter(trip => trip.groupId === group.id);
+      setTrips(groupTrips);
     } catch (error) {
       console.error('Error loading trips:', error);
       toast.error('Có lỗi xảy ra khi tải danh sách chuyến đi');
@@ -730,16 +789,132 @@ export default function GroupPage() {
               </div>
 
               {/* Trips Content */}
-              <GroupTripsTable
-                trips={trips}
-                loading={loadingTrips}
-                groupSlug={group.slug}
-                groupName={group.name}
-                createTripUrl={`/g/${group.slug}/trips`}
-                createTripLabel="Tạo chuyến đi mới"
-                emptyStateTitle="Chưa có chuyến đi nào trong nhóm"
-                emptyStateDescription="Tạo chuyến đi mới để bắt đầu quản lý chi phí cùng nhóm"
-              />
+              {loadingTrips ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500">Đang tải chuyến đi...</div>
+                </div>
+              ) : trips.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MapPin className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Chưa có chuyến đi nào</h3>
+                    <p className="text-gray-600 mb-6">
+                      Tạo chuyến đi mới để bắt đầu quản lý chi phí cùng nhóm
+                    </p>
+                    <Button onClick={() => setShowTripCreateModal(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tạo chuyến đi mới
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Create Trip Button */}
+                  <div className="flex justify-end">
+                    <Button onClick={() => setShowTripCreateModal(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tạo chuyến đi mới
+                    </Button>
+                  </div>
+
+                  {/* Trips Grid */}
+                  <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {trips.map((trip) => {
+                      const typeInfo = getTripTypeInfo(trip);
+                      const statusInfo = getStatusInfo(trip.status);
+                      const TypeIcon = typeInfo.icon;
+                      const StatusIcon = statusInfo.icon;
+
+                      return (
+                        <Card key={trip.id} className="group">
+                          <CardContent className="p-4 lg:p-6">
+                            {/* Header with title and status */}
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                                  {trip.name}
+                                </h3>
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.color}`}>
+                                    <TypeIcon className="w-3 h-3" />
+                                    {typeInfo.label}
+                                  </div>
+                                  <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.color}`}>
+                                    <StatusIcon className="w-3 h-3" />
+                                    <span className="hidden sm:inline">{statusInfo.label}</span>
+                                    <span className="sm:hidden">{statusInfo.labelShort}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Key Info - Compact */}
+                            <div className="space-y-2 mb-3 sm:mb-4">
+                              {trip.destination && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                  <span className="truncate">{trip.destination}</span>
+                                </div>
+                              )}
+                              
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                <span>
+                                  {trip.startDate && trip.endDate ? (
+                                    `${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}`
+                                  ) : trip.startDate ? (
+                                    `Từ ${formatDate(trip.startDate)}`
+                                  ) : trip.endDate ? (
+                                    `Đến ${formatDate(trip.endDate)}`
+                                  ) : (
+                                    'Chưa có thời gian'
+                                  )}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                <span>{trip.memberCount > 0 ? trip.memberCount : 1} thành viên</span>
+                                {trip.statsCache?.totalExpense !== undefined && (
+                                  <>
+                                    <span className="text-gray-400">•</span>
+                                    <DollarSign className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                    <span>{trip.statsCache.totalExpense.toLocaleString()} VND</span>
+                                    <span className="text-gray-500 text-xs">(tổng chi phí)</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Link href={`/trips/${trip.slug}`} className="flex-1">
+                                <Button variant="outline" size="sm" className="w-full">
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  Xem chuyến đi
+                                </Button>
+                              </Link>
+                              
+                              {user?.uid === trip.ownerId && (
+                                <>
+                                  <Link href={`/trips/${trip.slug}/manage`} className="flex-1">
+                                    <Button variant="outline" size="sm" className="w-full">
+                                      <Settings className="w-4 h-4 mr-2" />
+                                      Quản lý
+                                    </Button>
+                                  </Link>
+                                </>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
@@ -824,6 +999,23 @@ export default function GroupPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Trip Create Modal */}
+      <TripCreateModal
+        trigger={null}
+        mode="group"
+        group={group}
+        groups={[]}
+        onSuccess={(tripId, groupId, tripSlug) => {
+          toast.success('Chuyến đi đã được tạo thành công!');
+          loadTrips(); // Reload trips list
+          setShowTripCreateModal(false);
+        }}
+        onCancel={() => setShowTripCreateModal(false)}
+        open={showTripCreateModal}
+        onOpenChange={setShowTripCreateModal}
+      />
+
       <Footer />
     </>
   );

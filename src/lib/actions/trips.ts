@@ -371,11 +371,9 @@ export async function getTripBySlug(slug: string, groupId?: string, userId?: str
     // Filter results for personal trips
     let filteredDocs = tripSnapshot.docs;
     if (!groupId) {
-      // For personal trips, filter out group trips
-      filteredDocs = tripSnapshot.docs.filter(doc => {
-        const data = doc.data();
-        return !data.groupId; // groupId is null, undefined, or falsy
-      });
+      // For personal trips, include all trips (both with and without groupId)
+      // The access control will be handled later based on user permissions
+      filteredDocs = tripSnapshot.docs;
     }
     
     if (filteredDocs.length === 0) {
@@ -391,14 +389,14 @@ export async function getTripBySlug(slug: string, groupId?: string, userId?: str
       if (tripData.ownerId === userId) {
         // Owner has access, continue
       } else {
-        // For personal trips, only owner can access
-        if (!tripData.groupId) {
-          throw new Error('Bạn không có quyền truy cập chuyến đi này');
-        }
-        
-        // For group trips, check if user is a trip member
-        const member = await isTripMember(doc.id, userId);
-        if (!member) {
+        // For trips tagged to a group, check group membership
+        if (tripData.groupId) {
+          const isGroupMember = await isGroupMember(tripData.groupId, userId);
+          if (!isGroupMember) {
+            throw new Error('Bạn không có quyền truy cập chuyến đi này');
+          }
+        } else {
+          // For personal trips without group tag, only owner can access
           throw new Error('Bạn không có quyền truy cập chuyến đi này');
         }
       }
@@ -521,30 +519,23 @@ export async function getTripById(tripId: string) {
 // Get Group Trips
 export async function getGroupTrips(groupId: string) {
   try {
-    console.log('=== getGroupTrips START ===');
-    console.log('Group ID:', groupId);
-    console.log('Admin DB available:', !!adminDb);
     
     if (!adminDb) {
       console.error('Admin database not initialized');
       throw new Error('Database chưa được khởi tạo');
     }
 
-    console.log('Getting trips for group:', groupId);
-    
     // Get trips where groupId matches
     const tripsQuery = adminDb.collection('trips')
       .where('groupId', '==', groupId);
     
     const tripsSnapshot = await tripsQuery.get();
-    console.log('Found group trips:', tripsSnapshot.docs.length);
     
     const trips: Trip[] = [];
     
     // Process each trip
     for (const doc of tripsSnapshot.docs) {
       try {
-        console.log('Processing trip:', doc.id);
         const tripData = doc.data();
         
         // Get member count for this trip
@@ -603,11 +594,8 @@ export async function getGroupTrips(groupId: string) {
       return bTime - aTime;
     });
     
-    console.log('=== getGroupTrips SUCCESS ===');
-    console.log('Returning trips:', trips.length);
     return trips;
   } catch (error) {
-    console.error('=== getGroupTrips ERROR ===');
     console.error('Error getting group trips:', error);
     throw new Error('Có lỗi xảy ra khi lấy danh sách chuyến đi của nhóm');
   }
@@ -616,9 +604,6 @@ export async function getGroupTrips(groupId: string) {
 // Get User Trips
 export async function getUserTrips(userId: string) {
   try {
-    console.log('=== getUserTrips START ===');
-    console.log('User ID:', userId);
-    console.log('Admin DB available:', !!adminDb);
     
     if (!adminDb) {
       console.error('Admin database not initialized');
@@ -807,18 +792,9 @@ export async function getUserTrips(userId: string) {
       return bTime - aTime;
     });
     
-    console.log('=== getUserTrips SUCCESS ===');
-    console.log('Returning trips:', allTrips.length);
     return allTrips;
   } catch (error) {
-    console.error('=== getUserTrips ERROR ===');
     console.error('Error getting user trips:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      userId,
-      adminDbAvailable: !!adminDb
-    });
     throw new Error('Có lỗi xảy ra khi lấy danh sách chuyến đi');
   }
 }
@@ -884,9 +860,6 @@ export async function updateTripStatsCache(tripId: string) {
 // Get Trip Members
 export async function getTripMembers(tripId: string) {
   try {
-    console.log('=== getTripMembers START ===');
-    console.log('Trip ID:', tripId);
-    console.log('Admin DB available:', !!adminDb);
     
     if (!adminDb) {
       console.error('Admin database not initialized');
@@ -985,17 +958,9 @@ export async function getTripMembers(tripId: string) {
       return aTime - bTime; // ascending order
     });
     
-    console.log('=== getTripMembers SUCCESS ===');
     return result;
   } catch (error) {
-    console.error('=== getTripMembers ERROR ===');
     console.error('Error getting trip members:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      tripId,
-      adminDbAvailable: !!adminDb
-    });
     throw new Error('Có lỗi xảy ra khi lấy danh sách thành viên');
   }
 }
@@ -1003,9 +968,6 @@ export async function getTripMembers(tripId: string) {
 // Add Trip Member
 export async function addTripMember(formData: FormData, userId?: string) {
   try {
-    console.log('=== addTripMember START ===');
-    console.log('FormData entries:', Array.from(formData.entries()));
-    console.log('UserId from parameter:', userId);
     
     if (!adminDb) {
       console.error('Admin database not initialized');
@@ -1187,7 +1149,6 @@ export async function addTripMember(formData: FormData, userId?: string) {
         }
       }
       
-      console.log('=== addTripMember SUCCESS (group) ===');
       return { success: true, memberIds: results };
     } else {
       throw new Error('Phương thức thêm thành viên không hợp lệ');
@@ -1199,11 +1160,9 @@ export async function addTripMember(formData: FormData, userId?: string) {
       const cleanedMemberData = prepareFirestoreData(memberData);
       await adminDb.collection('tripMembers').doc(memberId).set(cleanedMemberData);
 
-      console.log('=== addTripMember SUCCESS ===');
       return { success: true, memberId };
     }
   } catch (error) {
-    console.error('=== addTripMember ERROR ===');
     console.error('Error adding trip member:', error);
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -1667,8 +1626,6 @@ export async function getTripPaymentStatus(tripId: string) {
       throw new Error('Database chưa được khởi tạo');
     }
 
-    console.log('=== getTripPaymentStatus DEBUG (NEW APPROACH) ===');
-    console.log('Trip ID:', tripId);
 
     // Get payment status from trip document instead of tripMembers
     const tripRef = adminDb.collection('trips').doc(tripId);

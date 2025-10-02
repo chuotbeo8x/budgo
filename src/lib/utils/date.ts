@@ -3,7 +3,6 @@
  */
 export function toDate(timestamp: unknown): Date {
   if (!timestamp) {
-    console.warn('toDate: timestamp is null/undefined, returning epoch date');
     return new Date(0);
   }
   
@@ -14,7 +13,6 @@ export function toDate(timestamp: unknown): Date {
   
   // If it's an empty object or invalid object (common Firestore issue)
   if (typeof timestamp === 'object' && Object.keys(timestamp).length === 0) {
-    console.warn('toDate: empty object detected, returning epoch date');
     return new Date(0);
   }
   
@@ -23,7 +21,6 @@ export function toDate(timestamp: unknown): Date {
     try {
       return (timestamp as any).toDate();
     } catch (error) {
-      console.warn('toDate: error calling toDate method:', error);
       return new Date(0);
     }
   }
@@ -46,7 +43,6 @@ export function toDate(timestamp: unknown): Date {
     }
   }
   
-  console.warn('toDate: unknown timestamp format:', timestamp);
   // Fallback to current date instead of epoch
   return new Date();
 }
@@ -92,7 +88,6 @@ export function safeToDate(timestamp: unknown): Date | null {
     }
     return null;
   } catch (error) {
-    console.warn('safeToDate: error converting timestamp:', error);
     return null;
   }
 }

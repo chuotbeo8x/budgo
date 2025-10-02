@@ -114,35 +114,45 @@ export default function AdminBroadcastPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        {/* Header */}
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-              <Megaphone className="w-6 h-6 text-orange-600" />
-              Gửi thông báo hệ thống
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Gửi thông báo quan trọng đến tất cả thành viên trong hệ thống</p>
+    // Design System: Clean background, responsive spacing
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
+        {/* Header Section - Design System Typography */}
+        <header className="mb-6 lg:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2 mb-2">
+                <Megaphone className="w-6 h-6 text-warning-600" />
+                Gửi thông báo hệ thống
+              </h1>
+              <p className="text-sm text-gray-600">
+                Gửi thông báo quan trọng đến tất cả thành viên trong hệ thống
+              </p>
+            </div>
+            <Link href="/admin">
+              <Button variant="outline" size="sm">
+                Quay lại
+              </Button>
+            </Link>
           </div>
-          <Link href="/admin">
-            <Button variant="outline">Quay lại</Button>
-          </Link>
-        </div>
+        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Send Broadcast Form */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Send className="w-5 h-5 text-blue-600" />
+        {/* Main Content - Design System: Responsive grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          {/* Send Broadcast Form - Design System: Card with proper shadows */}
+          <Card className="h-full shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                <Send className="w-5 h-5 text-primary-600" />
                 Tạo thông báo mới
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Tiêu đề *</Label>
+              <form onSubmit={handleSubmit} className="space-y-6" role="form" aria-label="Tạo thông báo mới">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                    Tiêu đề *
+                  </Label>
                   <Input
                     id="title"
                     value={form.title}
@@ -150,30 +160,40 @@ export default function AdminBroadcastPage() {
                     placeholder="Nhập tiêu đề thông báo..."
                     maxLength={100}
                     required
+                    aria-describedby="title-help"
+                    className="w-full"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{form.title.length}/100 ký tự</p>
+                  <p id="title-help" className="text-xs text-gray-500">
+                    {form.title.length}/100 ký tự
+                  </p>
                 </div>
 
-                <div>
-                  <Label htmlFor="message">Nội dung *</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-sm font-medium text-gray-700">
+                    Nội dung *
+                  </Label>
                   <textarea
                     id="message"
                     value={form.message}
                     onChange={(e) => setForm(prev => ({ ...prev, message: e.target.value }))}
                     placeholder="Nhập nội dung thông báo..."
-                    className="w-full min-h-[120px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full min-h-[120px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none transition-colors duration-200"
                     maxLength={500}
                     required
+                    aria-describedby="message-help"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{form.message.length}/500 ký tự</p>
+                  <p id="message-help" className="text-xs text-gray-500">
+                    {form.message.length}/500 ký tự
+                  </p>
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <div className="flex items-start gap-2">
-                    <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
-                    <div className="text-sm text-yellow-800">
-                      <p className="font-medium">Lưu ý quan trọng:</p>
-                      <ul className="mt-1 space-y-1 text-xs">
+                {/* Warning Notice - Design System: Alert styling */}
+                <div className="bg-warning-50 border border-warning-200 rounded-lg p-4" role="alert" aria-label="Lưu ý quan trọng">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 text-warning-600 mt-0.5 flex-shrink-0">⚠️</div>
+                    <div className="text-sm text-warning-800">
+                      <p className="font-medium mb-2">Lưu ý quan trọng:</p>
+                      <ul className="space-y-1 text-xs">
                         <li>• Thông báo sẽ được gửi đến TẤT CẢ thành viên</li>
                         <li>• Không thể hoàn tác sau khi gửi</li>
                         <li>• Hãy kiểm tra kỹ nội dung trước khi gửi</li>
@@ -186,6 +206,7 @@ export default function AdminBroadcastPage() {
                   type="submit" 
                   disabled={isSubmitting || !form.title.trim() || !form.message.trim()}
                   className="w-full"
+                  size="lg"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
@@ -203,48 +224,48 @@ export default function AdminBroadcastPage() {
             </CardContent>
           </Card>
 
-          {/* Broadcast History */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          {/* Broadcast History - Design System: Card with proper shadows */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                 <Clock className="w-5 h-5 text-gray-600" />
                 Lịch sử gửi thông báo
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loadingHistory ? (
-                <div className="space-y-3">
+                <div className="space-y-4" role="status" aria-label="Đang tải lịch sử">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-16 bg-gray-100 rounded-lg"></div>
+                      <div className="h-20 bg-gray-100 rounded-lg"></div>
                     </div>
                   ))}
                 </div>
               ) : history.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Megaphone className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>Chưa có thông báo nào được gửi</p>
+                <div className="text-center py-12" role="status" aria-label="Không có dữ liệu">
+                  <Megaphone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p className="text-sm text-gray-500">Chưa có thông báo nào được gửi</p>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className="space-y-4 max-h-96 overflow-y-auto" role="list" aria-label="Lịch sử thông báo">
                   {history.map((item) => (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start justify-between">
+                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200" role="listitem">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{item.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{item.message}</p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <h4 className="font-medium text-gray-900 truncate mb-1">{item.title}</h4>
+                          <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.message}</p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
                             <div className="flex items-center gap-1">
                               <Users className="w-3 h-3" />
-                              {item.recipientCount} người nhận
+                              <span>{item.recipientCount} người nhận</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {new Date(item.sentAt).toLocaleString('vi-VN')}
+                              <span>{new Date(item.sentAt).toLocaleString('vi-VN')}</span>
                             </div>
                           </div>
                         </div>
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-1" />
+                        <CheckCircle className="w-4 h-4 text-success-500 flex-shrink-0 mt-1" />
                       </div>
                     </div>
                   ))}

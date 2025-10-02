@@ -8,6 +8,7 @@ interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   resolvedTheme: 'light' | 'dark';
+  isDarkModeEnabled: boolean; // Admin setting: whether dark mode feature is enabled
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -16,6 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('system');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
+  const [isDarkModeEnabled, setIsDarkModeEnabled] = useState(true); // Default to enabled
 
   useEffect(() => {
     setMounted(true);
@@ -24,6 +26,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (stored) {
       setTheme(stored);
     }
+    
+    // Load admin dark mode setting
+    const loadAdminSetting = async () => {
+      try {
+        const res = await fetch('/api/admin/settings', { cache: 'no-store' });
+        const data = await res.json();
+        if (data?.success && data.data) {
+          setIsDarkModeEnabled(!!data.data.darkModeEnabled);
+        }
+      } catch (error) {
+        console.warn('Failed to load admin dark mode setting:', error);
+      }
+    };
+    loadAdminSetting();
   }, []);
 
   useEffect(() => {
@@ -37,7 +53,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Determine resolved theme
     let resolved: 'light' | 'dark' = 'light';
     
-    if (theme === 'system') {
+    // If dark mode is disabled by admin, force light mode
+    if (!isDarkModeEnabled) {
+      resolved = 'light';
+    } else if (theme === 'system') {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       resolved = systemTheme;
     } else {
@@ -50,11 +69,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Save to localStorage
     localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+  }, [theme, mounted, isDarkModeEnabled]);
 
   // Listen to system theme changes
   useEffect(() => {
-    if (theme !== 'system') return;
+    if (theme !== 'system' || !isDarkModeEnabled) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
@@ -66,7 +85,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, [theme, isDarkModeEnabled]);
 
   // Prevent flash of incorrect theme
   if (!mounted) {
@@ -74,7 +93,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme, isDarkModeEnabled }}>
       {children}
     </ThemeContext.Provider>
   );

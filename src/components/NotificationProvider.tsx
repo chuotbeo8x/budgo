@@ -6,6 +6,7 @@ import { getUnreadNotificationsCount } from '@/lib/actions/notifications';
 import { getTodaysBirthdays } from '@/lib/actions/users';
 import NotificationPanel from './NotificationPanel';
 import { useNotificationToast } from '@/hooks/useNotificationToast';
+import { usePWABadge } from '@/hooks/usePWABadge';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
 
@@ -17,6 +18,9 @@ export default function NotificationProvider({ children }: { children: React.Rea
 
   // Enable toast notifications for new notifications
   useNotificationToast();
+  
+  // Enable PWA badge notifications
+  usePWABadge();
 
   useEffect(() => {
     if (user) {

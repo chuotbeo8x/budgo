@@ -13,8 +13,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { maintenanceEnabled, logoUrl, siteName, copyright, updatedBy } = body || {};
-    await updateAppSettings({ maintenanceEnabled, logoUrl, siteName, copyright, updatedBy });
+    const { maintenanceEnabled, logoUrl, siteName, copyright, darkModeEnabled, updatedBy } = body || {};
+    await updateAppSettings({ maintenanceEnabled, logoUrl, siteName, copyright, darkModeEnabled, updatedBy });
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json({ success: false, error: 'Không lưu được cài đặt' }, { status: 500 });

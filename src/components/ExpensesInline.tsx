@@ -294,7 +294,6 @@ export default function ExpensesInline({
             
             // Call server action in background (don't await to prevent blocking)
             addExpense(formDataObj).catch((error) => {
-                console.error('Error adding expense:', error);
                 toast.error('Có lỗi xảy ra khi thêm chi phí');
                 // Revert optimistic update on error
                 setLocalExpenses(prev => prev.filter(expense => expense.id !== tempExpense.id));
@@ -314,7 +313,6 @@ export default function ExpensesInline({
             
             // Note: Removed onExpenseAdded callback to prevent reload
         } catch (error) {
-            console.error('Error adding expense:', error);
             toast.error('Có lỗi xảy ra khi thêm chi phí');
         } finally {
             setSubmitting(false);
@@ -369,7 +367,6 @@ export default function ExpensesInline({
             
             // Call server action in background (don't await to prevent blocking)
             addAdvance(formDataObj).catch((error) => {
-                console.error('Error adding advance:', error);
                 toast.error('Có lỗi xảy ra khi thêm tạm ứng');
                 // Revert optimistic update on error
                 setLocalAdvances(prev => prev.filter(advance => advance.id !== tempAdvance.id));
@@ -385,7 +382,6 @@ export default function ExpensesInline({
             
             // Note: Removed onAdvanceAdded callback to prevent reload
         } catch (error) {
-            console.error('Error adding advance:', error);
             toast.error('Có lỗi xảy ra khi thêm tạm ứng');
         } finally {
             setSubmitting(false);
@@ -430,7 +426,6 @@ export default function ExpensesInline({
             
             // Call server action in background
             deleteExpense(expenseId, user.uid).catch((error) => {
-                console.error('Error deleting expense:', error);
                 toast.error('Có lỗi xảy ra khi xóa chi phí');
                 // Revert optimistic update on error - would need to restore the expense
                 // For now, just show error message
@@ -438,7 +433,6 @@ export default function ExpensesInline({
             
             // Note: Removed onExpenseDeleted callback to prevent reload
         } catch (error) {
-            console.error('Error deleting expense:', error);
             toast.error('Có lỗi xảy ra khi xóa chi phí');
             
             // Revert optimistic update on error
@@ -461,7 +455,6 @@ export default function ExpensesInline({
             
             // Call server action in background
             deleteAdvance(advanceId, user.uid).catch((error) => {
-                console.error('Error deleting advance:', error);
                 toast.error('Có lỗi xảy ra khi xóa tạm ứng');
                 // Revert optimistic update on error - would need to restore the advance
                 // For now, just show error message
@@ -469,7 +462,6 @@ export default function ExpensesInline({
             
             // Note: Removed onAdvanceDeleted callback to prevent reload
         } catch (error) {
-            console.error('Error deleting advance:', error);
             toast.error('Có lỗi xảy ra khi xóa tạm ứng');
             
             // Revert optimistic update on error
@@ -582,11 +574,9 @@ export default function ExpensesInline({
             toast.success('Cập nhật chi phí thành công!');
             
             // Call server action in background (don't await to prevent blocking)
-            console.log('🚀 Calling updateExpense with:', editingExpense.id, formDataObj);
             updateExpense(editingExpense.id, formDataObj).then((result) => {
-                console.log('✅ updateExpense completed:', result);
+                // Success handled by optimistic update
             }).catch((error) => {
-                console.error('❌ Error updating expense:', error);
                 toast.error('Có lỗi xảy ra khi cập nhật chi phí');
                 // Revert optimistic update on error
                 if (originalExpense) {
@@ -613,7 +603,6 @@ export default function ExpensesInline({
                 onExpenseUpdated();
             }
         } catch (error) {
-            console.error('Error updating expense:', error);
             toast.error('Có lỗi xảy ra khi cập nhật chi phí');
         } finally {
             setSubmitting(false);

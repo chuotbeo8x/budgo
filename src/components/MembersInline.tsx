@@ -174,17 +174,8 @@ export default function MembersInline({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('=== handleSubmit START ===');
-    console.log('Trip:', trip?.id);
-    console.log('User:', user?.uid);
-    console.log('Add method:', addMethod);
-    console.log('Form data:', formData);
-    console.log('Selected user:', selectedUser);
-    console.log('Selected group:', selectedGroup);
-    console.log('Selected group members:', selectedGroupMembers);
     
     if (!trip || !user) {
-      console.log('Missing trip or user');
       return;
     }
 
@@ -230,7 +221,6 @@ export default function MembersInline({
 
       // Create optimistic member objects based on method
       const optimisticMembers: TripMember[] = [];
-      console.log('Creating optimistic members for method:', addMethod);
       
       if (addMethod === 'ghost') {
         const tempMember: TripMember = {
@@ -277,11 +267,9 @@ export default function MembersInline({
       }
       
       // Optimistically add to local state FIRST
-      console.log('Adding optimistic members:', optimisticMembers);
       setLocalMembers(prev => [...prev, ...optimisticMembers]);
       
       // Reset form
-      console.log('Closing form and resetting state');
       setShowAddForm(false);
       setFormData({
         name: '',
@@ -303,7 +291,6 @@ export default function MembersInline({
       
       // Call server action in background (don't await to prevent blocking)
       addTripMember(formDataObj, user?.uid).catch((error) => {
-        console.error('Error adding member:', error);
         toast.error('Có lỗi xảy ra khi thêm thành viên');
         // Revert optimistic update on error
         setLocalMembers(prev => prev.filter(member => 
@@ -311,7 +298,6 @@ export default function MembersInline({
         ));
       });
     } catch (error) {
-      console.error('Error adding member:', error);
       toast.error('Có lỗi xảy ra khi thêm thành viên');
       setSubmitting(false);
     }
@@ -336,7 +322,6 @@ export default function MembersInline({
       
       // Call server action in background (don't await to prevent blocking)
       removeTripMember(trip.id, memberId, user.uid).catch((error) => {
-        console.error('Error removing member:', error);
         toast.error('Có lỗi xảy ra khi xóa thành viên');
         // Revert optimistic update on error
         if (originalMember) {
@@ -344,7 +329,6 @@ export default function MembersInline({
         }
       });
     } catch (error) {
-      console.error('Error removing member:', error);
       toast.error('Có lỗi xảy ra khi xóa thành viên');
       setSubmitting(false);
     }

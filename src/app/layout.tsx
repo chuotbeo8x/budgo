@@ -12,6 +12,7 @@ import NotificationProvider from "@/components/NotificationProvider";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
 import WelcomeNotification from "@/components/WelcomeNotification";
 import PWAProvider from "@/components/PWAProvider";
+import SplashScreen from "@/components/SplashScreen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,11 +77,11 @@ export default function RootLayout({
             <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
             <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
             <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
-            <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
+            <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+            <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
             <link rel="manifest" href="/manifest.json" />
             <link rel="mask-icon" href="/icons/icon-192x192.png" color="#2563eb" />
-            <link rel="shortcut icon" href="/favicon.ico" />
+            <link rel="shortcut icon" href="/favicon.png" />
           </head>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased pb-mobile-nav`}
@@ -92,21 +93,23 @@ export default function RootLayout({
                           <NotificationProvider>
                             <PWAProvider />
                             <WelcomeNotification />
-                            {/* Skip link for keyboard accessibility - WCAG 2.4.1 */}
-                            <a 
-                              href="#main-content" 
-                              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-primary-300"
-                            >
-                              Skip to main content
-                            </a>
-                            <Header />
-                            <main id="main-content">
-                              <MaintenanceGuard>
-                                {children}
-                              </MaintenanceGuard>
-                            </main>
-                            <MobileBottomNav />
-                            <Toaster position="top-right" />
+                            <SplashScreen>
+                              {/* Skip link for keyboard accessibility - WCAG 2.4.1 */}
+                              <a 
+                                href="#main-content" 
+                                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-primary-300"
+                              >
+                                Skip to main content
+                              </a>
+                              <Header />
+                              <main id="main-content">
+                                <MaintenanceGuard>
+                                  {children}
+                                </MaintenanceGuard>
+                              </main>
+                              <MobileBottomNav />
+                              <Toaster position="top-right" />
+                            </SplashScreen>
                           </NotificationProvider>
                         </ProfileProvider>
                       </AuthProvider>
