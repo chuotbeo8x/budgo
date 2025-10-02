@@ -41,34 +41,7 @@ export default function SplashScreen({ children }: SplashScreenProps) {
     // Hard fallback in case load never fires (e.g., SPA nav)
     hardTimeout = setTimeout(finish, 2000);
 
-    // Prevent background scroll while splash is visible
-    if (typeof document !== "undefined") {
-      // Store original values
-      const body = document.body;
-      const originalOverflow = body.style.overflow;
-      const originalOverflowY = body.style.overflowY;
-      
-      // Disable scroll
-      body.style.overflow = "hidden";
-      body.style.overflowY = "hidden";
-      
-      // Store cleanup function
-      const cleanup = () => {
-        body.style.overflow = originalOverflow;
-        body.style.overflowY = originalOverflowY;
-      };
-      
-      // Return cleanup function
-      return () => {
-        if (typeof window !== "undefined") {
-          window.removeEventListener("load", onWindowLoad);
-        }
-        if (fadeTimeout) clearTimeout(fadeTimeout);
-        if (hardTimeout) clearTimeout(hardTimeout);
-        cleanup();
-      };
-    }
-
+    // Don't disable scroll - let the fixed overlay handle it
     return () => {
       if (typeof window !== "undefined") {
         window.removeEventListener("load", onWindowLoad);
@@ -89,8 +62,19 @@ export default function SplashScreen({ children }: SplashScreenProps) {
             "flex items-center justify-center",
             "bg-background",
             "pointer-events-auto",
+            "overflow-hidden",
             prefersReducedMotion ? "" : isFading ? "opacity-0 transition-opacity duration-300" : "opacity-100",
           ].join(" ")}
+          style={{
+            // Prevent scroll on the splash screen itself
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+          }}
         >
           <div className="relative w-full h-full flex flex-col items-center justify-center px-6">
             {/* Background pattern using design system colors */}
