@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog';
+import EditAdvanceModal from '@/components/modals/EditAdvanceModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -486,6 +487,10 @@ export default function ExpensesInline({
             createdAt: expense.createdAt.toISOString().split('T')[0],
             isEqualSplit: expense.splitMethod === 'equal'
         });
+    };
+
+    const handleEditAdvance = (advance: Advance) => {
+        setEditingAdvance(advance);
     };
 
     const handleUpdateExpense = async (e: React.FormEvent) => {
@@ -1330,7 +1335,7 @@ export default function ExpensesInline({
                         toggleAdvance={toggleAdvance}
                         handleEditExpense={() => {}}
                         handleDeleteExpense={() => {}}
-                        setEditingAdvance={setEditingAdvance}
+                        setEditingAdvance={handleEditAdvance}
                         handleDeleteAdvance={handleDeleteAdvance}
                         canEdit={canEdit}
                         isTripClosed={isTripClosed}
@@ -1338,6 +1343,23 @@ export default function ExpensesInline({
                         getCategoryLabel={getCategoryLabel}
                     />
                 </div>
+            )}
+
+            {/* Edit Advance Modal */}
+            {user && (
+                <EditAdvanceModal
+                    isOpen={!!editingAdvance}
+                    onClose={() => setEditingAdvance(null)}
+                    advance={editingAdvance}
+                    members={members}
+                    userId={user.uid}
+                    onSuccess={() => {
+                        if (onAdvanceUpdated) {
+                            onAdvanceUpdated();
+                        }
+                        setEditingAdvance(null);
+                    }}
+                />
             )}
         </div>
     );
