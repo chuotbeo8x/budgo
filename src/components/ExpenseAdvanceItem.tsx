@@ -172,14 +172,6 @@ export default function ExpenseAdvanceItem({
                                 </span>
                             </div>
                             
-                            {type === 'advance' && (
-                                <div className="flex items-center gap-2">
-                                    <User className="w-3 h-3 text-green-600" />
-                                    <span className="text-gray-600">
-                                        Nhận bởi: <span className="font-medium">{members.find(m => m.id === (item as Advance).paidTo)?.name || members.find(m => m.id === (item as Advance).paidTo)?.ghostName || 'Unknown'}</span>
-                                    </span>
-                                </div>
-                            )}
                             
                             <div className="flex items-center gap-2">
                                 <Clock className="w-3 h-3 text-gray-500" />

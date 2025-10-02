@@ -733,12 +733,6 @@ export default function ExpensesInline({
                                             </select>
                                         </div>
 
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label>Người nhận</Label>
-                                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-600">
-                                                Chủ chuyến đi (tự động)
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <div className="flex justify-end gap-2">
@@ -1262,7 +1256,7 @@ export default function ExpensesInline({
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
+                                        <div className="space-y-1 sm:space-y-2">
                                             <Label htmlFor="advanceCreatedAt">Ngày tạo *</Label>
                                             <Input
                                                 id="advanceCreatedAt"
