@@ -72,7 +72,10 @@ export default function ExpenseAdvanceItem({
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                             {!isExpanded && (
                                 <span className="font-medium text-sm truncate">
-                                    {item.description || 'Không có mô tả'}
+                                    {type === 'advance' 
+                                        ? members.find(m => m.id === item.paidBy)?.name || members.find(m => m.id === item.paidBy)?.ghostName || 'Unknown'
+                                        : item.description || 'Không có mô tả'
+                                    }
                                 </span>
                             )}
                             {isExpanded && (
