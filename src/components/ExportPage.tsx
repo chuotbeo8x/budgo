@@ -202,14 +202,14 @@ export default function ExportPage({
 
   if (loadingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -346,7 +346,7 @@ export default function ExportPage({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="p-4 bg-main rounded-lg">
                   <h4 className="font-semibold text-gray-900 mb-2">Thông tin chuyến đi</h4>
                   <div className="space-y-1 text-sm text-gray-600">
                     <p><strong>Tên:</strong> {trip.name}</p>
@@ -393,7 +393,7 @@ export default function ExportPage({
                     const member = members.find(m => m.id === item.paidBy);
                     
                     return (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-3 bg-main rounded-lg">
                         <div className="flex items-center gap-3">
                           {isExpense ? (
                             <DollarSign className="w-5 h-5 text-green-600" />

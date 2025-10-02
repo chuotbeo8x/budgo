@@ -43,7 +43,7 @@ export default function PersonalTripDetailPage() {
 
   if (loading || loadingTrip) {
     return (
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center">Đang tải...</div>
         </div>
@@ -53,7 +53,7 @@ export default function PersonalTripDetailPage() {
 
   if (!trip) {
     return (
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Không tìm thấy chuyến đi</h1>

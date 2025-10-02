@@ -169,6 +169,28 @@ export const responsiveSpacing = {
   },
 } as const;
 
+// Background System - Simplified Single Color Approach
+export const backgrounds = {
+  // Main Background - Used everywhere
+  main: 'bg-main', // bg-gray-50
+  
+  // Alternative backgrounds for specific needs
+  white: 'bg-main-white', // bg-white
+  gradient: 'bg-main-gradient', // bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100
+  
+  // Legacy support - will be deprecated
+  page: {
+    primary: 'bg-main',
+    dashboard: 'bg-main',
+    loading: 'bg-main',
+  },
+  
+  card: {
+    primary: 'bg-main-white',
+    secondary: 'bg-main',
+  },
+} as const;
+
 // Component Variants
 export const componentVariants = {
   // Button sizes with consistent spacing

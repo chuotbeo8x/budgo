@@ -16,7 +16,7 @@ export default function LoadingPage({
   className = ''
 }: LoadingPageProps) {
   return (
-    <div className={`min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 ${className}`}>
+    <div className={`min-h-[calc(100vh-4rem)] bg-main ${className}`}>
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
         <div className="max-w-6xl mx-auto">
           <div className="text-center py-16">

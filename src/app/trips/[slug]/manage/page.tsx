@@ -41,7 +41,7 @@ export default function PersonalTripManagePage() {
 
   if (loading || loadingTrip) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">Đang tải...</div>
         </div>
@@ -51,7 +51,7 @@ export default function PersonalTripManagePage() {
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Không tìm thấy chuyến đi</h1>

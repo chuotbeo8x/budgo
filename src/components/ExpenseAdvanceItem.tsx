@@ -44,11 +44,9 @@ export default function ExpenseAdvanceItem({
     
     return (
         <Card className={`!py-0 !shadow-none !rounded-sm cursor-pointer border-l-2 ${
-            type === 'expense' 
-                ? isExpanded 
-                    ? 'border-l-green-500' 
-                    : 'border-l-gray-300'
-                : 'border-l-green-500'
+            isExpanded 
+                ? 'border-l-green-500' 
+                : 'border-l-gray-300'
         } hover:border-l-green-400`}>
             <CardContent className="p-2" onClick={onToggle}>
                 <div className="flex items-center justify-between">
@@ -166,55 +164,158 @@ export default function ExpenseAdvanceItem({
                             </div>
                         )}
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <div className="flex items-center gap-2">
-                                <User className="w-3 h-3 text-blue-600" />
-                                <span className="text-gray-600">
-                                    {type === 'expense' ? 'Chi bởi: ' : 'Ứng bởi: '}
-                                    <span className="font-medium">
-                                        {members.find(m => m.id === item.paidBy)?.name || members.find(m => m.id === item.paidBy)?.ghostName || 'Unknown'}
-                                    </span>
-                                </span>
-                            </div>
-                            
-                            
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-3 h-3 text-gray-500" />
-                                <span className="text-gray-600">
-                                    {formatTime(item.createdAt)}
-                                </span>
-                            </div>
-
-                            {type === 'expense' && (item as Expense).splitMethod && (
+                        <div className="space-y-3">
+                            {/* Basic info row */}
+                            <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <DollarSign className="w-3 h-3 text-purple-600" />
-                                    <span className="text-gray-600">
-                                        {(item as Expense).splitMethod === 'equal' ? 'Chia đều' : 'Theo trọng số'}
+                                    <User className="w-3 h-3 text-blue-600" />
+                                    <span className="text-gray-600 text-xs">
+                                        {type === 'expense' ? 'Chi bởi: ' : 'Ứng bởi: '}
+                                        <span className="font-medium">
+                                            {members.find(m => m.id === item.paidBy)?.name || members.find(m => m.id === item.paidBy)?.ghostName || 'Unknown'}
+                                        </span>
                                     </span>
                                 </div>
-                            )}
+                                <div className="flex items-center gap-2">
+                                    <Clock className="w-3 h-3 text-gray-500" />
+                                    <span className="text-gray-600 text-xs">
+                                        {formatTime(item.createdAt)}
+                                    </span>
+                                </div>
+                            </div>
 
+                            {/* Equal split details */}
                             {type === 'expense' && (item as Expense).splitMethod === 'equal' && members.length > 0 && (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-gray-600">
-                                        {members.length} người • {formatCurrency(item.amount / members.length, trip.currency)}/người
-                                    </span>
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                                        <span className="text-gray-600 text-xs font-medium">
+                                            Chia đều
+                                        </span>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-2.5 border border-gray-100">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                                <div className="flex-1 min-w-0">
+                                                    <span className="text-gray-700 text-xs font-medium">
+                                                        {members.length > 1 ? (
+                                                            <span 
+                                                                className="cursor-help underline decoration-dotted decoration-gray-300 hover:decoration-gray-500 transition-colors"
+                                                                title={members.map(m => m.name || m.ghostName).join(', ')}
+                                                            >
+                                                                {members.length} người
+                                                            </span>
+                                                        ) : (
+                                                            members.find(m => m.id === item.paidBy)?.name || members.find(m => m.id === item.paidBy)?.ghostName || 'Unknown'
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center ml-3 flex-shrink-0">
+                                                <div className="text-green-600 font-bold text-xs">
+                                                    {formatCurrency(item.amount / members.length, trip.currency)}{members.length > 1 ? '/người' : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
+                            {/* Weight split details - Full width */}
                             {type === 'expense' && (item as Expense).splitMethod === 'weight' && (item as Expense).weightMap && (item as Expense).weightMap!.length > 0 && (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-gray-600">
-                                        Theo trọng số ({(item as Expense).weightMap!.length} người)
-                                    </span>
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                                        <span className="text-gray-600 text-xs font-medium">
+                                            Chia theo trọng số
+                                        </span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {(() => {
+                                            // Group members by weight
+                                            const weightGroups = (item as Expense).weightMap!
+                                                .filter(w => w.weight > 0) // Only show members with weight > 0
+                                                .reduce((groups, weightEntry) => {
+                                                    if (!groups[weightEntry.weight]) {
+                                                        groups[weightEntry.weight] = [];
+                                                    }
+                                                    groups[weightEntry.weight].push(weightEntry);
+                                                    return groups;
+                                                }, {} as { [weight: number]: any[] });
+
+                                            const totalWeight = (item as Expense).weightMap!.reduce((sum, w) => sum + (w.weight > 0 ? w.weight : 0), 0);
+                                            
+                                            return Object.keys(weightGroups)
+                                                .sort((a, b) => parseInt(b) - parseInt(a)) // Sort by weight descending
+                                                .map(weight => {
+                                                    const membersInGroup = weightGroups[parseInt(weight)];
+                                                    const memberNames = membersInGroup
+                                                        .map(weightEntry => {
+                                                            const member = members.find(m => m.id === weightEntry.memberId);
+                                                            return member?.name || member?.ghostName || 'Unknown';
+                                                        })
+                                                        .join(', ');
+                                                    
+                                                    // Calculate base amount per person (as if everyone had weight 1)
+                                                    const baseAmountPerPerson = totalWeight > 0 ? (item.amount / totalWeight) : 0;
+                                                    // Each person with this weight pays: base amount × their weight
+                                                    const amountPerPerson = baseAmountPerPerson * parseInt(weight);
+                                                    const totalAmountForGroup = amountPerPerson * membersInGroup.length;
+                                                    
+                                                    return (
+                                                        <div key={weight} className="bg-white rounded-lg p-2.5 border border-gray-100">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <span className="text-gray-700 text-xs font-medium">
+                                                                            {membersInGroup.length > 1 ? (
+                                                                                <span 
+                                                                                    className="cursor-help underline decoration-dotted decoration-gray-300 hover:decoration-gray-500 transition-colors"
+                                                                                    title={memberNames}
+                                                                                >
+                                                                                    {membersInGroup.length} người
+                                                                                </span>
+                                                                            ) : (
+                                                                                memberNames
+                                                                            )}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center ml-3 flex-shrink-0">
+                                                                    <div className="text-right">
+                                                                        {parseInt(weight) > 1 ? (
+                                                                            <div className="text-right">
+                                                                                <div className={`font-bold text-xs ${
+                                                                                    parseInt(weight) >= 3 ? 'text-red-600' : 
+                                                                                    parseInt(weight) === 2 ? 'text-yellow-600' : 
+                                                                                    'text-green-600'
+                                                                                }`}>
+                                                                                    {formatCurrency(amountPerPerson, trip.currency)}{membersInGroup.length > 1 ? '/người' : ''}
+                                                                                </div>
+                                                                                <div className="text-xs text-gray-500 font-medium">
+                                                                                    ({formatCurrency(baseAmountPerPerson, trip.currency)} × {weight} suất)
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="text-green-600 font-bold text-xs">
+                                                                                {formatCurrency(amountPerPerson, trip.currency)}{membersInGroup.length > 1 ? '/người' : ''}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                });
+                                        })()}
+                                    </div>
                                 </div>
                             )}
 
+                            {/* Advance info */}
                             {type === 'advance' && (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-gray-600">
-                                        Tạm ứng cho chuyến đi
-                                    </span>
+                                <div className="text-xs text-gray-600">
+                                    Tạm ứng cho chuyến đi
                                 </div>
                             )}
                         </div>

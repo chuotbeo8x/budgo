@@ -416,7 +416,7 @@ export default function GroupPage() {
 
   if (loading || loadingGroup) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-[calc(100vh-4rem)] bg-main">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-6 animate-pulse">
@@ -432,7 +432,7 @@ export default function GroupPage() {
 
   if (!group) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-[calc(100vh-4rem)] bg-main">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
@@ -487,7 +487,7 @@ export default function GroupPage() {
         <link rel="canonical" href={`https://budgo.app/g/${group.slug}`} />
       </Head>
       
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] bg-main">
         <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
         {/* Social Media Style Header - SEO optimized */}
         <header className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 lg:mb-8 overflow-hidden">

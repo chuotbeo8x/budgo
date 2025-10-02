@@ -349,7 +349,7 @@ export default function GroupMembersPage() {
 
   if (loading || loadingGroup) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -357,7 +357,7 @@ export default function GroupMembersPage() {
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Không tìm thấy nhóm
@@ -375,7 +375,7 @@ export default function GroupMembersPage() {
 
   if (!isOwner) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Không có quyền truy cập
@@ -392,7 +392,7 @@ export default function GroupMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -473,7 +473,7 @@ export default function GroupMembersPage() {
                       {searchResults.map((user) => {
                         const isAlreadyMember = members.some(member => member.userId === user.id);
                         return (
-                          <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div key={user.id} className="flex items-center justify-between p-3 bg-main rounded-lg">
                             <div>
                               <p className="font-medium">{user.name}</p>
                               <p className="text-sm text-gray-600">{user.email}</p>
@@ -633,7 +633,7 @@ export default function GroupMembersPage() {
             ) : (
               <div className="space-y-3">
                 {filteredMembers.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={member.id} className="flex items-center justify-between p-4 bg-main rounded-lg">
                     <div className="flex items-center space-x-3">
                       {member.role === 'member' && (
                         <input

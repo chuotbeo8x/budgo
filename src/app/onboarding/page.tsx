@@ -152,7 +152,7 @@ export default function OnboardingPage() {
 
   if (loading || checkingProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -163,7 +163,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+    <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8 text-center">

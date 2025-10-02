@@ -110,21 +110,14 @@ export default function ExpensesInline({
   const formatTime = (createdAt: any): string => {
     const date = parseCreatedAt(createdAt);
     
-    // Check if the time is 00:00 (likely old data with date-only input)
-    const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
-    
-    if (isMidnight) {
-      // For date-only data, show a placeholder
-      return '--:--';
-    }
+    // Always show the actual time, even if it's 00:00
     
     // Try multiple formatting approaches
     try {
-      // Method 1: toLocaleString with timezone
+      // Method 1: toLocaleString with user's local timezone
       const formatted = date.toLocaleString('vi-VN', {
         hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Asia/Ho_Chi_Minh'
+        minute: '2-digit'
       });
       
       return formatted;
@@ -352,7 +345,7 @@ export default function ExpensesInline({
                 description: advanceFormData.description,
                 paidBy: advanceFormData.paidBy,
                 paidTo: trip.ownerId,
-                createdAt: new Date(),
+                createdAt: new Date(advanceFormData.createdAt + 'T00:00:00'),
                 createdBy: user.uid
             };
             setLocalAdvances(prev => [tempAdvance, ...prev]);

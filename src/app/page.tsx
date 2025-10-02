@@ -24,14 +24,14 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-4rem)] bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-[calc(100vh-4rem)] bg-main">
       <div className="container mx-auto px-4 lg:px-6 py-8 lg:py-12 max-w-7xl">
         {/* Hero Section */}
         <div className="text-center mb-12 lg:mb-16">

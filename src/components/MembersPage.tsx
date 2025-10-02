@@ -246,14 +246,14 @@ export default function MembersPage({
 
   if (loadingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -414,7 +414,7 @@ export default function MembersPage({
 
                     {/* Search Results */}
                     {searching && (
-                      <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                      <div className="mt-2 p-3 bg-main rounded-md">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                           <span className="text-sm text-gray-600">Đang tìm kiếm...</span>
@@ -424,7 +424,7 @@ export default function MembersPage({
 
                     {searchResults.length > 0 && !searching && (
                       <div className="mt-2 border border-gray-200 rounded-md max-h-48 overflow-y-auto">
-                        <div className="p-2 text-xs text-gray-500 bg-gray-50 border-b">
+                        <div className="p-2 text-xs text-gray-500 bg-main border-b">
                           Tìm thấy {searchResults.length} kết quả
                         </div>
                         {searchResults.map((user) => (
@@ -432,7 +432,7 @@ export default function MembersPage({
                             key={user.id}
                             type="button"
                             onClick={() => handleSelectUser(user)}
-                            className="w-full p-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            className="w-full p-3 text-left hover:bg-main border-b border-gray-100 last:border-b-0"
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
@@ -510,7 +510,7 @@ export default function MembersPage({
                         Chọn nhóm
                       </label>
                       {userGroups.length === 0 ? (
-                        <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
+                        <div className="p-4 border border-gray-300 rounded-md bg-main">
                           <p className="text-sm text-gray-600">
                             Bạn chưa tham gia nhóm nào. 
                             <button
@@ -551,14 +551,14 @@ export default function MembersPage({
                           Chọn thành viên từ nhóm "{selectedGroup.name}"
                         </label>
                         {loadingGroupMembers ? (
-                          <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
+                          <div className="p-4 border border-gray-300 rounded-md bg-main">
                             <div className="flex items-center gap-2">
                               <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                               <span className="text-sm text-gray-600">Đang tải thành viên...</span>
                             </div>
                           </div>
                         ) : groupMembers.length === 0 ? (
-                          <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
+                          <div className="p-4 border border-gray-300 rounded-md bg-main">
                             <p className="text-sm text-gray-600">Nhóm này chưa có thành viên nào</p>
                           </div>
                         ) : (
@@ -570,7 +570,7 @@ export default function MembersPage({
                                   key={member.id}
                                   type="button"
                                   onClick={() => handleGroupMemberToggle(member)}
-                                  className={`w-full p-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
+                                  className={`w-full p-3 text-left hover:bg-main border-b border-gray-100 last:border-b-0 ${
                                     isSelected ? 'bg-blue-50' : ''
                                   }`}
                                 >
@@ -767,7 +767,7 @@ export default function MembersPage({
                       const isOwnerMember = member.role === 'creator' || member.userId === trip.ownerId;
                       
                       return (
-                        <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <tr key={member.id} className="border-b border-gray-100 hover:bg-main transition-colors">
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">

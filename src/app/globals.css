@@ -351,16 +351,31 @@
     background-size: 20px 20px;
   }
   
-    /* Mobile bottom navigation spacing */
+  /* Unified Background System - Single Color Approach */
+  /* Main Background - Used everywhere */
+  .bg-main {
+    @apply bg-gray-50;
+  }
+  
+  /* Alternative backgrounds for specific needs */
+  .bg-main-white {
+    @apply bg-white;
+  }
+  
+  .bg-main-gradient {
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
+  }
+  
+  /* Mobile bottom navigation spacing */
+  .pb-mobile-nav {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+  
+  @media (min-width: 1024px) {
     .pb-mobile-nav {
-      padding-bottom: calc(60px + env(safe-area-inset-bottom));
+      padding-bottom: 0;
     }
-    
-    @media (min-width: 1024px) {
-      .pb-mobile-nav {
-        padding-bottom: 0;
-      }
-    }
+  }
 }
 
 /* Safe area support for mobile devices */

@@ -131,7 +131,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
 
   if (!isOwner) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Không có quyền truy cập</h1>
@@ -146,7 +146,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
         <div className="mb-6">
@@ -250,7 +250,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
                       placeholder="Nhập tên chuyến đi"
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                     />
                   </div>
 
@@ -263,7 +263,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
                       placeholder="Nhập điểm đến"
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                     />
                   </div>
                 </div>
@@ -286,7 +286,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       value={formData.startDate}
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                     />
                   </div>
 
@@ -299,7 +299,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       value={formData.endDate}
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                     />
                   </div>
                 </div>
@@ -322,7 +322,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
                       placeholder="https://example.com/image.jpg"
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                     />
                   </div>
 
@@ -335,7 +335,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                       onChange={handleInputChange}
                       disabled={!editing || isTripClosed}
                       placeholder="Nhập mô tả chuyến đi"
-                      className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                      className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                       rows={3}
                     />
                   </div>
@@ -349,7 +349,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                         value={formData.currency}
                         onChange={handleInputChange}
                         disabled={!editing || isTripClosed}
-                        className={!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}
+                        className={!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}
                       >
                         <option value="VND">🇻🇳 VND (Việt Nam Đồng)</option>
                         <option value="USD">🇺🇸 USD (US Dollar)</option>
@@ -369,7 +369,7 @@ export default function TripManagePage({ trip, groupSlug, backUrl, backLabel }: 
                           onChange={handleInputChange}
                           disabled={!editing || isTripClosed}
                           placeholder="Nhập chi phí dự kiến"
-                          className={`pr-8 ${!editing || isTripClosed ? 'bg-gray-50 border-gray-300 text-gray-600' : ''}`}
+                          className={`pr-8 ${!editing || isTripClosed ? 'bg-main border-gray-300 text-gray-600' : ''}`}
                         />
                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
                           {formData.currency}

@@ -33,7 +33,7 @@ export default function CreateGroupPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -80,7 +80,7 @@ export default function CreateGroupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
@@ -154,7 +154,7 @@ export default function CreateGroupPage() {
                 {generatedSlug && (
                   <div className="space-y-2">
                     <Label>Slug tự động</Label>
-                    <div className="p-3 bg-gray-50 rounded-md border">
+                    <div className="p-3 bg-main rounded-md border">
                       <p className="text-sm font-mono text-gray-700">{generatedSlug}</p>
                       <p className="text-xs text-gray-500 mt-1">
                         Slug sẽ được tự động tạo từ tên nhóm và sử dụng trong URL (tối đa 100 ký tự)

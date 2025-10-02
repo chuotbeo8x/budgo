@@ -61,7 +61,7 @@ export default function CreateTripPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+    <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <TripCreateModal
           mode={groupId ? 'group' : 'personal'}

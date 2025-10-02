@@ -94,21 +94,14 @@ export default function TimelineView({
         try {
             const date = parseCreatedAt(createdAt);
             
-            // Check if the time is 00:00 (likely old data with date-only input)
-            const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
-            
-            if (isMidnight) {
-                // For date-only data, show a placeholder
-                return '--:--';
-            }
+            // Always show the actual time, even if it's 00:00
             
             // Try multiple formatting approaches
             try {
-                // Method 1: toLocaleString with timezone
+                // Method 1: toLocaleString with user's local timezone
                 const formatted = date.toLocaleString('vi-VN', {
                     hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Asia/Ho_Chi_Minh'
+                    minute: '2-digit'
                 });
                 
                 return formatted;
@@ -178,11 +171,9 @@ export default function TimelineView({
                                             {/* Item Node - Compact */}
                                             <div className="flex items-center">
                                                 <div className={`absolute -left-7 w-3 h-3 rounded-full border-2 bg-white ${
-                                                    item.type === 'expense' 
-                                                        ? isExpanded 
-                                                            ? '!border-green-500' 
-                                                            : '!border-gray-300'
-                                                        : '!border-green-500'
+                                                    isExpanded 
+                                                        ? '!border-green-500' 
+                                                        : '!border-gray-300'
                                                 }`}></div>
                                                 
                                                 <div className="flex-1">

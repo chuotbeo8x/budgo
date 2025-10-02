@@ -231,7 +231,7 @@ export default function NotificationsPage() {
 
   if (loading || loadingNotifications) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-4rem)] bg-main flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -248,7 +248,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+    <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="mb-4 sm:mb-8">
@@ -325,7 +325,7 @@ export default function NotificationsPage() {
                     key={notification.id} 
                     className={`flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-lg border ${
                       notification.isRead 
-                        ? 'bg-gray-50 border-gray-200' 
+                        ? 'bg-main border-gray-200' 
                         : 'bg-blue-50 border-blue-200'
                     }`}
                   >

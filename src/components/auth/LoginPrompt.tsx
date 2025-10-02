@@ -44,7 +44,7 @@ export default function LoginPrompt({
   };
 
   return (
-    <div className={`bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4 ${className}`} style={{ minHeight: 'calc(100vh - 200px)' }}>
+    <div className={`bg-main flex items-center justify-center p-4 ${className}`} style={{ minHeight: 'calc(100vh - 200px)' }}>
       <Card className="w-full max-w-md shadow-lg">
         <CardContent className="pt-8 pb-8">
           <div className="text-center">

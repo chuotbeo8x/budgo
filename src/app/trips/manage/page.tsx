@@ -242,7 +242,7 @@ export default function TripsManagePage() {
         <link rel="canonical" href="https://budgo.app/trips/manage" />
       </Head>
       
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="bg-main" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
         {/* Header Section */}
         <header className="mb-4 sm:mb-6 lg:mb-8">

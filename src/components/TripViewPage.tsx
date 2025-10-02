@@ -165,7 +165,7 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+      <div className="bg-main min-h-screen">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
           <div className="text-center">Đang tải thông tin chuyến đi...</div>
         </div>
@@ -174,7 +174,7 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+    <div className="bg-main min-h-screen">
       <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
         {/* Header */}
         <header className="mb-6 lg:mb-8">
@@ -273,7 +273,7 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
 
 
               {/* Share Link */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+              <div className="bg-main border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-600 font-medium mb-1">Chia sẻ chuyến đi</p>
@@ -414,7 +414,7 @@ export default function TripViewPage({ trip, groupSlug, backUrl, backLabel }: Tr
                           return (
                             <div key={settlement.memberId} className={`p-3 rounded-lg border-l-4 transition-all duration-200 ${
                               isCompleted
-                                ? 'bg-gray-50 border-l-gray-400' 
+                                ? 'bg-main border-l-gray-400' 
                                 : isZero
                                   ? 'bg-purple-50 border-l-purple-500'
                                   : isPositive

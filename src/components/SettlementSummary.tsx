@@ -122,327 +122,365 @@ export default function SettlementSummary({
 
   if (settlements.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <Calculator className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-        <p>Chưa có dữ liệu quyết toán</p>
-        <p className="text-sm">Thêm chi phí và tạm ứng để xem quyết toán</p>
+      <div className="text-center py-12">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+            <Calculator className="w-6 h-6 text-gray-400" />
+          </div>
+          <div>
+            <p className="text-gray-600 font-medium">Chưa có dữ liệu quyết toán</p>
+            <p className="text-sm text-gray-500 mt-1">Thêm chi phí và tạm ứng để xem quyết toán</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      {/* Info Note */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-medium text-blue-900 mb-1 text-sm">Lưu ý về tính toán thanh toán</h4>
+            <p className="text-xs text-blue-800">
+              Chi phí chỉ được chia cho những thành viên có trong chuyến đi khi chi phí được tạo. 
+              Thành viên mới thêm vào sau sẽ không bị chia tiền cho các chi phí trước đó.
+            </p>
+          </div>
+        </div>
+      </div>
             
-            {/* Info Note */}
-            <AlertMessage
-              type="info"
-              title="Lưu ý về tính toán thanh toán"
-              message="Chi phí chỉ được chia cho những thành viên có trong chuyến đi khi chi phí được tạo. Thành viên mới thêm vào sau sẽ không bị chia tiền cho các chi phí trước đó."
-              icon={<AlertCircle className="w-4 h-4" />}
-            />
-            
-            {/* Settlement List (mobile-first) */}
-            <div className="block md:hidden">
-              <div className="space-y-2">
-                {settlements.map((settlement) => {
-                  const isPositive = settlement.balance > 0;
-                  const isNegative = settlement.balance < 0;
-                  const isZero = Math.abs(settlement.balance) < 0.01;
-                  return (
-                    <div key={settlement.memberId} className="border border-gray-200 rounded-lg p-3 bg-white">
-                      {/* Row: Avatar + Name */}
+      {/* Settlement List (mobile-first) */}
+      <div className="block md:hidden">
+        <div className="space-y-3">
+          {settlements.map((settlement) => {
+            const isPositive = settlement.balance > 0;
+            const isNegative = settlement.balance < 0;
+            const isZero = Math.abs(settlement.balance) < 0.01;
+            return (
+              <div key={settlement.memberId} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                {/* Row: Avatar + Name */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shrink-0">
+                    <span className="text-white font-semibold text-sm">
+                      {settlement.memberName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-900 truncate text-sm">{settlement.memberName}</p>
+                    <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                      <span className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3 text-red-500" />
+                        Tổng chi: {formatCurrency(settlement.totalExpenses, currency)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <CreditCard className="w-3 h-3 text-blue-500" />
+                        Tạm ứng: {formatCurrency(settlement.totalAdvances, currency)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row: Amount + Status */}
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                  <div className={`text-base font-bold ${
+                    isZero ? 'text-gray-600' : isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {formatCurrency(settlement.balance, currency)}
+                  </div>
+                  {isZero ? (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Đã cân bằng</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-end w-full max-w-[200px]">
+                      {isOwner ? (
+                        <Button
+                          variant={paymentStatus[settlement.memberId] ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => togglePaymentStatus(settlement.memberId)}
+                          disabled={updating || isUpdating}
+                          className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
+                            paymentStatus[settlement.memberId]
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : isPositive
+                                ? 'border-green-600 text-green-600 hover:bg-green-50'
+                                : 'border-red-600 text-red-600 hover:bg-red-50'
+                          }`}
+                        >
+                          {paymentStatus[settlement.memberId] ? (
+                            <>
+                              <CheckCircle className="w-4 h-4" />
+                              <span>{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="w-4 h-4" />
+                              <span>{isPositive ? 'Chưa nhận' : 'Chưa trả'}</span>
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <div className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
+                          paymentStatus[settlement.memberId]
+                            ? 'text-gray-500'
+                            : isPositive
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
+                        }`}>
+                          {paymentStatus[settlement.memberId] ? (
+                            <>
+                              <CheckCircle className="w-5 h-5" />
+                              <span className="text-sm font-medium">{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                            </>
+                          ) : isPositive ? (
+                            <>
+                              <CheckCircle className="w-5 h-5" />
+                              <span className="text-sm font-medium">Chưa nhận</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="w-5 h-5" />
+                              <span className="text-sm font-medium">Chưa trả</span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900">Thành viên</th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900">Tổng chi phí</th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900">Tổng tạm ứng</th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900">Số dư</th>
+                <th className="text-center py-4 px-6 font-semibold text-gray-900">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {settlements.map((settlement) => {
+                const isPositive = settlement.balance > 0;
+                const isNegative = settlement.balance < 0;
+                const isZero = Math.abs(settlement.balance) < 0.01;
+                
+                return (
+                  <tr key={settlement.memberId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-xs">
                             {settlement.memberName.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 truncate">{settlement.memberName}</p>
-                          <div className="text-[11px] text-gray-500 mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
-                            <span>Tổng chi: {formatCurrency(settlement.totalExpenses, currency)}</span>
-                            <span>Tạm ứng: {formatCurrency(settlement.totalAdvances, currency)}</span>
-                          </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{settlement.memberName}</p>
                         </div>
                       </div>
-
-                      {/* Row: Amount + Status (same row) */}
-                      <div className="mt-2 flex items-center justify-between gap-3">
-                        <div className={`text-base font-bold ${
-                          isZero ? 'text-gray-600' : isPositive ? 'text-green-600' : 'text-red-600'
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-red-500" />
+                        <span className="text-base font-semibold text-red-600">
+                          {formatCurrency(settlement.totalExpenses, currency)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-4 h-4 text-blue-500" />
+                        <span className="text-base font-semibold text-blue-600">
+                          {formatCurrency(settlement.totalAdvances, currency)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2">
+                        <Calculator className="w-4 h-4 text-gray-500" />
+                        <span className={`text-base font-bold ${
+                          isPositive ? 'text-green-600' : 
+                          isNegative ? 'text-red-600' : 
+                          'text-gray-600'
                         }`}>
                           {formatCurrency(settlement.balance, currency)}
-                        </div>
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center justify-center">
                         {isZero ? (
                           <div className="flex items-center gap-2 text-green-600">
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle className="w-5 h-5" />
                             <span className="text-sm font-medium">Đã cân bằng</span>
                           </div>
-                        ) : (
-                          <div className="flex items-center justify-end w-full max-w-[200px]">
-                            {isOwner ? (
-                              <Button
-                                variant={paymentStatus[settlement.memberId] ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => togglePaymentStatus(settlement.memberId)}
-                                disabled={updating || isUpdating}
-                                className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
-                                  paymentStatus[settlement.memberId]
-                                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                                    : isPositive
-                                      ? 'border-green-600 text-green-600 hover:bg-green-50'
-                                      : 'border-red-600 text-red-600 hover:bg-red-50'
-                                }`}
-                              >
-                                {paymentStatus[settlement.memberId] ? (
-                                  <>
-                                    <CheckCircle className="w-4 h-4" />
-                                    <span>{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="w-4 h-4" />
-                                    <span>{isPositive ? 'Chưa nhận' : 'Chưa trả'}</span>
-                                  </>
-                                )}
-                              </Button>
+                        ) : (isOwner && showToggle) ? (
+                          <Button
+                            variant={paymentStatus[settlement.memberId] ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              console.log('Button clicked for settlement:', {
+                                settlementMemberId: settlement.memberId,
+                                paymentStatusValue: paymentStatus[settlement.memberId],
+                                allPaymentStatus: paymentStatus
+                              });
+                              togglePaymentStatus(settlement.memberId);
+                            }}
+                            disabled={updating || isUpdating}
+                            className={`flex items-center gap-2 min-w-[128px] justify-start ${
+                              paymentStatus[settlement.memberId] 
+                                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                : isPositive 
+                                  ? 'border-green-600 text-green-600 hover:bg-green-50'
+                                  : 'border-red-600 text-red-600 hover:bg-red-50'
+                            }`}
+                          >
+                            {paymentStatus[settlement.memberId] ? (
+                              <>
+                                <CheckCircle className="w-4 h-4" />
+                                <span>{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                              </>
                             ) : (
-                              <div className={`flex items-center gap-2 w-full justify-start min-w-[140px] ${
-                                paymentStatus[settlement.memberId]
-                                  ? 'text-green-600'
-                                  : isPositive
-                                    ? 'text-amber-600'
-                                    : 'text-red-600'
-                              }`}>
-                                {paymentStatus[settlement.memberId] ? (
-                                  <>
-                                    <CheckCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
-                                  </>
-                                ) : isPositive ? (
-                                  <>
-                                    <CheckCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Chưa nhận</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Chưa trả</span>
-                                  </>
-                                )}
-                              </div>
+                              <>
+                                <AlertCircle className="w-4 h-4" />
+                                <span>{isPositive ? 'Chưa nhận' : 'Chưa trả'}</span>
+                              </>
+                            )}
+                          </Button>
+                        ) : (
+                          <div className={`flex items-center gap-2 min-w-[128px] justify-start ${
+                            paymentStatus[settlement.memberId]
+                              ? 'text-gray-500'
+                              : isPositive
+                                ? 'text-yellow-600'
+                                : 'text-red-600'
+                          }`}>
+                            {paymentStatus[settlement.memberId] ? (
+                              <>
+                                <CheckCircle className="w-5 h-5" />
+                                <span className="text-sm font-medium">{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
+                              </>
+                            ) : isPositive ? (
+                              <>
+                                <CheckCircle className="w-5 h-5" />
+                                <span className="text-sm font-medium">Chưa nhận</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="w-5 h-5" />
+                                <span className="text-sm font-medium">Chưa trả</span>
+                              </>
                             )}
                           </div>
                         )}
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Desktop table */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Thành viên</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Tổng chi phí</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Tổng tạm ứng</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Số dư</th>
-                    <th className="text-center py-4 px-6 font-semibold text-gray-900">Trạng thái</th>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {settlements.map((settlement) => {
-                    const isPositive = settlement.balance > 0;
-                    const isNegative = settlement.balance < 0;
-                    const isZero = Math.abs(settlement.balance) < 0.01;
-                    
-                    return (
-                      <tr key={settlement.memberId} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-semibold text-xs">
-                                {settlement.memberName.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">{settlement.memberName}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-red-500" />
-                            <span className="text-lg font-semibold text-red-600">
-                              {formatCurrency(settlement.totalExpenses, currency)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-blue-500" />
-                            <span className="text-lg font-semibold text-blue-600">
-                              {formatCurrency(settlement.totalAdvances, currency)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-2">
-                            <Calculator className="w-4 h-4" />
-                            <span className={`text-lg font-bold ${
-                              isPositive ? 'text-green-600' : 
-                              isNegative ? 'text-red-600' : 
-                              'text-gray-600'
-                            }`}>
-                              {formatCurrency(settlement.balance, currency)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center justify-center">
-                            {isZero ? (
-                              <div className="flex items-center gap-2 text-green-600">
-                                <CheckCircle className="w-5 h-5" />
-                                <span className="text-sm font-medium">Đã cân bằng</span>
-                              </div>
-                            ) : (isOwner && showToggle) ? (
-                              <Button
-                                variant={paymentStatus[settlement.memberId] ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => {
-                                  console.log('Button clicked for settlement:', {
-                                    settlementMemberId: settlement.memberId,
-                                    paymentStatusValue: paymentStatus[settlement.memberId],
-                                    allPaymentStatus: paymentStatus
-                                  });
-                                  togglePaymentStatus(settlement.memberId);
-                                }}
-                                disabled={updating || isUpdating}
-                                className={`flex items-center gap-2 min-w-[128px] justify-start ${
-                                  paymentStatus[settlement.memberId] 
-                                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                                    : isPositive 
-                                      ? 'border-green-600 text-green-600 hover:bg-green-50'
-                                      : 'border-red-600 text-red-600 hover:bg-red-50'
-                                }`}
-                              >
-                                {paymentStatus[settlement.memberId] ? (
-                                  <>
-                                    <CheckCircle className="w-4 h-4" />
-                                    <span>{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="w-4 h-4" />
-                                    <span>{isPositive ? 'Chưa nhận' : 'Chưa trả'}</span>
-                                  </>
-                                )}
-                              </Button>
-                            ) : (
-                              <div className={`flex items-center gap-2 min-w-[128px] justify-start ${
-                                paymentStatus[settlement.memberId]
-                                  ? 'text-green-600'
-                                  : isPositive
-                                    ? 'text-amber-600'
-                                    : 'text-red-600'
-                              }`}>
-                                {paymentStatus[settlement.memberId] ? (
-                                  <>
-                                    <CheckCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">{isPositive ? 'Đã nhận' : 'Đã trả'}</span>
-                                  </>
-                                ) : isPositive ? (
-                                  <>
-                                    <CheckCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Chưa nhận</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="w-5 h-5" />
-                                    <span className="text-sm font-medium">Chưa trả</span>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
             
-            {/* Settlement Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Những người cần trả tiền:</h4>
-                <div className="space-y-2">
-                  {debtors.length === 0 ? (
-                    <div className="text-center py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
-                      Không có ai cần trả tiền
-                    </div>
-                  ) : (
-                    debtors.map(settlement => {
-                      const isPaid = paymentStatus[settlement.memberId];
-                      return (
-                        <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                          isPaid ? 'bg-gray-100' : 'bg-red-50'
-                        }`}>
-                          <span className={`font-medium ${isPaid ? 'line-through text-gray-500' : ''}`}>
-                            {settlement.memberName}
-                          </span>
-                          <span className={`font-bold ${isPaid ? 'line-through text-gray-500' : 'text-red-600'}`}>
-                            {formatCurrency(Math.abs(settlement.balance), currency)}
-                          </span>
-                        </div>
-                      );
-                    })
-                  )}
+      {/* Settlement Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Debtors Card */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            Những người cần trả tiền
+          </h4>
+          <div className="space-y-2">
+            {debtors.length === 0 ? (
+              <div className="text-center py-6 text-sm text-gray-500 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex flex-col items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span>Không có ai cần trả tiền</span>
                 </div>
               </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Những người sẽ nhận tiền:</h4>
-                <div className="space-y-2">
-                  {creditors.length === 0 ? (
-                    <div className="text-center py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
-                      Không có ai cần nhận tiền
-                    </div>
-                  ) : (
-                    creditors.map(settlement => {
-                      const isReceived = paymentStatus[settlement.memberId];
-                      const isRefund = settlement.totalAdvances > settlement.totalExpenses;
-                      return (
-                        <div key={settlement.memberId} className={`flex justify-between items-center p-2 rounded ${
-                          isReceived ? 'bg-gray-100' : 'bg-amber-50'
-                        }`}>
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${isReceived ? 'line-through text-gray-500' : ''}`}>
-                              {settlement.memberName}
-                            </span>
-                            {!isReceived && (
-                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Chưa nhận</span>
-                            )}
-                            {isRefund && (
-                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                                Hoàn trả tạm ứng
-                              </span>
-                            )}
-                          </div>
-                          <span className={`font-bold ${isReceived ? 'line-through text-gray-500' : 'text-amber-700'}`}>
-                            {formatCurrency(settlement.balance, currency)}
-                          </span>
-                        </div>
-                      );
-                    })
-                  )}
+            ) : (
+              debtors.map(settlement => {
+                const isPaid = paymentStatus[settlement.memberId];
+                return (
+                  <div key={settlement.memberId} className={`flex justify-between items-center p-3 rounded-lg border ${
+                    isPaid ? 'bg-gray-50 border-gray-200' : 'bg-red-50 border-red-200'
+                  }`}>
+                    <span className={`font-medium text-sm ${isPaid ? 'line-through text-gray-500' : 'text-red-800'}`}>
+                      {settlement.memberName}
+                    </span>
+                    <span className={`font-bold text-sm ${isPaid ? 'line-through text-gray-500' : 'text-red-600'}`}>
+                      {formatCurrency(Math.abs(settlement.balance), currency)}
+                    </span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+        
+        {/* Creditors Card */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            Những người sẽ nhận tiền
+          </h4>
+          <div className="space-y-2">
+            {creditors.length === 0 ? (
+              <div className="text-center py-6 text-sm text-gray-500 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex flex-col items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span>Không có ai cần nhận tiền</span>
                 </div>
               </div>
-            </div>
+            ) : (
+              creditors.map(settlement => {
+                const isReceived = paymentStatus[settlement.memberId];
+                const isRefund = settlement.totalAdvances > settlement.totalExpenses;
+                return (
+                  <div key={settlement.memberId} className={`flex justify-between items-center p-3 rounded-lg border ${
+                    isReceived ? 'bg-gray-50 border-gray-200' : 'bg-yellow-50 border-yellow-200'
+                  }`}>
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className={`font-medium text-sm ${isReceived ? 'line-through text-gray-500' : 'text-yellow-800'}`}>
+                        {settlement.memberName}
+                      </span>
+                      {!isReceived && isRefund && (
+                        <span 
+                          className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap cursor-help"
+                          title="Hoàn trả tạm ứng"
+                        >
+                          🔄
+                        </span>
+                      )}
+                      {!isReceived && !isRefund && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 whitespace-nowrap">
+                          ⏳
+                        </span>
+                      )}
+                    </div>
+                    <span className={`font-bold text-sm ${isReceived ? 'line-through text-gray-500' : 'text-yellow-700'} flex-shrink-0`}>
+                      {formatCurrency(settlement.balance, currency)}
+                    </span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
             
     </div>
   );

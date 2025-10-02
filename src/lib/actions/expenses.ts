@@ -175,12 +175,10 @@ export async function addExpense(formData: FormData) {
     let createdAt;
     
     if (createdAtFromForm) {
-      // If form provides a date, use it with current time
-      const formDate = new Date(createdAtFromForm);
+      // If form provides a date, use it with local timezone
+      const formDate = new Date(createdAtFromForm + 'T00:00:00');
       if (!isNaN(formDate.getTime())) {
-        // Valid date from form, use it with current time
-        const now = new Date();
-        formDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+        // Valid date from form, use it with local timezone
         createdAt = formDate.toISOString();
       } else {
         // Invalid date from form, use current timestamp
@@ -655,12 +653,10 @@ export async function addAdvance(formData: FormData) {
     let createdAt;
     
     if (createdAtFromForm) {
-      // If form provides a date, use it with current time
-      const formDate = new Date(createdAtFromForm);
+      // If form provides a date, use it with local timezone
+      const formDate = new Date(createdAtFromForm + 'T00:00:00');
       if (!isNaN(formDate.getTime())) {
-        // Valid date from form, use it with current time
-        const now = new Date();
-        formDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+        // Valid date from form, use it with local timezone
         createdAt = formDate.toISOString();
       } else {
         // Invalid date from form, use current timestamp

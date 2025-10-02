@@ -132,7 +132,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center">Đang tải...</div>
         </div>
@@ -142,7 +142,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Không tìm thấy chuyến đi</h1>
@@ -157,7 +157,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
 
   if (!isMember) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-main">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Không có quyền truy cập</h1>
@@ -182,7 +182,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
   const exportUrl = groupSlug ? `/g/${groupSlug}/trips/${trip.slug}/export` : `/trips/${trip.slug}/export`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-main">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Hero Section */}
         <div className="mb-6">
@@ -326,7 +326,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
             </div>
             
             {/* Share Trip Link */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-6 p-4 bg-main rounded-lg">
               <p className="text-sm text-gray-500 mb-2">Chia sẻ liên kết chuyến đi</p>
               <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <input
@@ -421,7 +421,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
                     return Object.entries(groupedCategories)
                       .sort(([,a], [,b]) => b - a)
                       .map(([displayName, amount]) => (
-                        <div key={displayName} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={displayName} className="flex items-center justify-between p-3 bg-main rounded-lg">
                           <div className="flex-1">
                             <p className="font-medium text-gray-900">{displayName}</p>
                           </div>
@@ -461,7 +461,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
                   {expenses.slice(0, 5).map((expense) => {
                     const paidByMember = members.find(m => m.id === expense.paidBy);
                     return (
-                      <div key={expense.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={expense.id} className="flex items-center justify-between p-3 bg-main rounded-lg">
                         <div className="flex-1">
                           <p className="font-medium text-gray-900 truncate">{expense.description}</p>
                           <p className="text-sm text-gray-500">
@@ -511,7 +511,7 @@ export default function TripDetailPage({ trip, groupSlug, backUrl, backLabel }: 
                   {advances.slice(0, 5).map((advance) => {
                     const paidByMember = members.find(m => m.id === advance.paidBy);
                     return (
-                      <div key={advance.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={advance.id} className="flex items-center justify-between p-3 bg-main rounded-lg">
                         <div className="flex-1">
                           <p className="font-medium text-gray-900 truncate">{advance.description}</p>
                           <p className="text-sm text-gray-500">

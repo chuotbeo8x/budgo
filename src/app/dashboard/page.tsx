@@ -185,7 +185,7 @@ export default function DashboardPage() {
       {/* Design System: Mobile-first layout */}
       {/* Padding: mobile 1rem (16px), desktop 2rem (32px) */}
       {/* Max-width: 7xl (1280px) */}
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] bg-main">
         <div className="container mx-auto px-4 lg:px-6 py-6 lg:py-8 max-w-7xl">
         {/* Header - Design System Typography with SEO optimization */}
         <header className="mb-6 lg:mb-8">

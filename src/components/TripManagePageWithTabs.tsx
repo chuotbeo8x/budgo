@@ -213,18 +213,18 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
     <div className="space-y-4">
       <Card className="shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <Edit className="w-4 h-4 text-blue-600" />
             Thông tin chuyến đi
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-xs">
             Chỉnh sửa thông tin cơ bản của chuyến đi
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm">Tên chuyến đi *</Label>
+              <Label htmlFor="name" className="text-xs">Tên chuyến đi *</Label>
               <Input
                 id="name"
                 name="name"
@@ -236,7 +236,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-sm">Mô tả</Label>
+              <Label htmlFor="description" className="text-xs">Mô tả</Label>
               <Textarea
                 id="description"
                 name="description"
@@ -249,7 +249,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="destination" className="text-sm">Địa điểm</Label>
+              <Label htmlFor="destination" className="text-xs">Địa điểm</Label>
               <Input
                 id="destination"
                 name="destination"
@@ -262,7 +262,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="startDate" className="text-sm">Ngày bắt đầu</Label>
+                <Label htmlFor="startDate" className="text-xs">Ngày bắt đầu</Label>
                 <Input
                   id="startDate"
                   name="startDate"
@@ -275,7 +275,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="endDate" className="text-sm">Ngày kết thúc</Label>
+                <Label htmlFor="endDate" className="text-xs">Ngày kết thúc</Label>
                 <Input
                   id="endDate"
                   name="endDate"
@@ -290,7 +290,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="currency" className="text-sm">Tiền tệ</Label>
+                <Label htmlFor="currency" className="text-xs">Tiền tệ</Label>
                 <Select
                   id="currency"
                   name="currency"
@@ -306,7 +306,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="costPerPersonPlanned" className="text-sm">Chi phí dự kiến/người</Label>
+                <Label htmlFor="costPerPersonPlanned" className="text-xs">Chi phí dự kiến/người</Label>
                 <Input
                   id="costPerPersonPlanned"
                   name="costPerPersonPlanned"
@@ -320,7 +320,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coverUrl">URL ảnh bìa</Label>
+              <Label htmlFor="coverUrl" className="text-xs">URL ảnh bìa</Label>
               <Input
                 id="coverUrl"
                 name="coverUrl"
@@ -498,41 +498,54 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
   );
 
   const SettlementTab = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {settlements && settlements.length > 0 ? (
-        <Card className="shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base font-semibold">
-              <FileText className="w-4 h-4 text-green-600" />
-              Quyết toán chi phí
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Quản lý trạng thái thanh toán của các thành viên
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {trip?.id && (
-              <SettlementSummary 
-                settlements={settlements}
-                currency={trip.currency}
-                tripId={trip.id}
-                isOwner={canManage}
-                showToggle={true}
-                userId={user?.uid}
-                paymentStatus={hookPaymentStatuses}
-                onPaymentStatusChange={handlePaymentStatusUpdate}
-              />
-            )}
-            {/* Debug logging */}
-            {console.log('🔍 TripManagePageWithTabs - trip.id:', trip.id)}
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          {/* Header Card */}
+          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold text-green-800">
+                <FileText className="w-4 h-4 text-green-600" />
+                Quyết toán chi phí
+              </CardTitle>
+              <CardDescription className="text-xs text-green-700">
+                Tổng quan và quản lý trạng thái thanh toán của các thành viên
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          {/* Settlement Summary Card */}
+          <Card className="bg-white border-gray-200 shadow-sm">
+            <CardContent className="p-0">
+              {trip?.id && (
+                <SettlementSummary 
+                  settlements={settlements}
+                  currency={trip.currency}
+                  tripId={trip.id}
+                  isOwner={canManage}
+                  showToggle={true}
+                  userId={user?.uid}
+                  paymentStatus={hookPaymentStatuses}
+                  onPaymentStatusChange={handlePaymentStatusUpdate}
+                />
+              )}
+              {/* Debug logging */}
+              {console.log('🔍 TripManagePageWithTabs - trip.id:', trip.id)}
+            </CardContent>
+          </Card>
+        </div>
       ) : (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
-            <FileText className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-            <p>Chưa có dữ liệu quyết toán</p>
-            <p className="text-sm">Thêm chi phí và tạm ứng để xem quyết toán</p>
+        <Card className="bg-gray-50 border-gray-200">
+          <CardContent className="py-12 text-center">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <FileText className="w-6 h-6 text-gray-400" />
+              </div>
+              <div>
+                <p className="text-gray-600 font-medium text-sm">Chưa có dữ liệu quyết toán</p>
+                <p className="text-xs text-gray-500 mt-1">Thêm chi phí và tạm ứng để xem quyết toán</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -543,17 +556,17 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
     <div className="space-y-4">
       <Card className="shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <Download className="w-4 h-4 text-orange-600" />
             Báo cáo và xuất dữ liệu
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-xs">
             Xuất báo cáo chi tiết và dữ liệu chuyến đi
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-3">
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               Xuất báo cáo tổng hợp chi phí và quyết toán
             </p>
             <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}/export` : `/trips/${trip.slug}/export`}>
@@ -568,17 +581,17 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
       <Card className="shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <FileText className="w-4 h-4 text-green-600" />
             Chi tiết quyết toán
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-xs">
             Xem chi tiết báo cáo quyết toán
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-3">
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               Xem báo cáo quyết toán chi tiết
             </p>
             <Link href={groupSlug ? `/g/${groupSlug}/trips/${trip.slug}/settlement` : `/trips/${trip.slug}/settlement`}>
@@ -596,16 +609,16 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+      <div className="bg-main min-h-screen">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
-          <div className="text-center">Đang tải thông tin chuyến đi...</div>
+          <div className="text-center text-sm text-gray-600">Đang tải thông tin chuyến đi...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+    <div className="bg-main min-h-screen">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
         {/* Back Button - Keep at original position */}
         <div className="mb-6">
@@ -633,11 +646,11 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                 <div className="flex items-center gap-2">
                   <Settings className="w-4 h-4 text-blue-600" />
                   <div>
-                    <h1 className="text-base font-semibold text-gray-900">
+                    <h1 className="text-sm font-semibold text-gray-900">
                       Quản lý chuyến đi
                     </h1>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm text-gray-600 truncate max-w-[200px]">{trip.name}</span>
+                      <span className="text-xs text-gray-600 truncate max-w-[200px]">{trip.name}</span>
                       <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                       <span className="text-xs text-gray-500">
                         {trip.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}
@@ -661,7 +674,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
               <Button
                 variant="outline"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-full justify-between text-sm h-8"
+                className="w-full justify-between text-xs h-8"
               >
                 <span>Menu quản lý</span>
                 <Menu className="w-4 h-4" />
@@ -675,7 +688,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('expenses');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-xs"
                   >
                     <DollarSign className="w-4 h-4 mr-2" />
                     Chi phí
@@ -686,7 +699,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('members');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-xs"
                   >
                     <Users className="w-4 h-4 mr-2" />
                     Thành viên
@@ -697,7 +710,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('settlement');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-xs"
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Quyết toán
@@ -708,7 +721,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('reports');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-xs"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Báo cáo
@@ -719,7 +732,7 @@ export default function TripManagePageWithTabs({ trip, groupSlug, backUrl, backL
                       setActiveTab('info');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-xs"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Thông tin
