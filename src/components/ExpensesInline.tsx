@@ -644,206 +644,13 @@ export default function ExpensesInline({
                 {showAddButton && !isTripClosed && members.length > 0 && (
                     <div className="hidden md:flex gap-2">
                         {activeTab === 'expenses' && (
-                            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Thêm chi phí
-                                    </Button>
-                                </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
-                                <DialogHeader>
-                                    <DialogTitle>Thêm chi phí mới</DialogTitle>
-                                    <DialogDescription>
-                                        Thêm chi phí cho chuyến đi với đầy đủ thông tin và cách chia tiền
-                                    </DialogDescription>
-                                </DialogHeader>
-                                
-                                <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="amount">Số tiền *</Label>
-                                            <Input
-                                                id="amount"
-                                                type="text"
-                                                value={formData.amount}
-                                                onChange={(e) => {
-                                                    // Remove all non-numeric characters
-                                                    let value = e.target.value.replace(/[^\d]/g, '');
-
-                                                    // Add thousand separators for display
-                                                    if (value) {
-                                                        const number = parseInt(value);
-                                                        value = number.toLocaleString('vi-VN');
-                                                    }
-
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        amount: value
-                                                    }));
-                                                }}
-                                                placeholder="Nhập số tiền..."
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="description">Mô tả *</Label>
-                                            <Input
-                                                id="description"
-                                                type="text"
-                                                value={formData.description}
-                                                onChange={(e) => setFormData(prev => ({
-                                                    ...prev,
-                                                    description: e.target.value
-                                                }))}
-                                                placeholder="Nhập mô tả chi phí..."
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="paidBy">Người chi *</Label>
-                                            <select
-                                                id="paidBy"
-                                                value={formData.paidBy}
-                                                onChange={(e) => setFormData(prev => ({
-                                                    ...prev,
-                                                    paidBy: e.target.value
-                                                }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white"
-                                                required
-                                            >
-                                                <option value="">Chọn người chi</option>
-                                                {members.map((member) => (
-                                                    <option key={member.id} value={member.id}>
-                                                        {member.name || member.ghostName || 'Unknown'}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="category">Danh mục</Label>
-                                            <select
-                                                id="category"
-                                                value={formData.category}
-                                                onChange={(e) => setFormData(prev => ({
-                                                    ...prev,
-                                                    category: e.target.value
-                                                }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white"
-                                            >
-                                                <option value="other">Khác</option>
-                                                <option value="food">Ăn uống</option>
-                                                <option value="transport">Di chuyển</option>
-                                                <option value="accommodation">Nghỉ dưỡng</option>
-                                                <option value="shopping">Mua sắm</option>
-                                                <option value="entertainment">Giải trí</option>
-                                                <option value="travel">Du lịch</option>
-                                                <option value="photography">Chụp ảnh</option>
-                                                <option value="healthcare">Y tế</option>
-                                                <option value="gifts">Quà tặng</option>
-                                                <option value="drinks">Đồ uống</option>
-                                                <option value="repair">Sửa chữa</option>
-                                                <option value="books">Sách vở</option>
-                                                <option value="music">Âm nhạc</option>
-                                                <option value="location">Địa điểm</option>
-                                                <option value="work">Công việc</option>
-                                                <option value="medical">Y khoa</option>
-                                                <option value="education">Giáo dục</option>
-                                                <option value="art">Nghệ thuật</option>
-                                                <option value="sports">Thể thao</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    {/* Split Method */}
-                                    <div className="space-y-3">
-                                        <Label>Cách chia tiền *</Label>
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="splitMethod"
-                                                    value="equal"
-                                                    checked={formData.isEqualSplit}
-                                                    onChange={(e) => setFormData(prev => ({
-                                                        ...prev,
-                                                        isEqualSplit: true
-                                                    }))}
-                                                    className="mr-2"
-                                                />
-                                                Chia đều cho tất cả thành viên
-                                            </label>
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="splitMethod"
-                                                    value="weight"
-                                                    checked={!formData.isEqualSplit}
-                                                    onChange={(e) => setFormData(prev => ({
-                                                        ...prev,
-                                                        isEqualSplit: false
-                                                    }))}
-                                                    className="mr-2"
-                                                />
-                                                Chia theo trọng số
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    {/* Weight Management for Weighted Split */}
-                                    {!formData.isEqualSplit && (
-                                        <div className="space-y-3">
-                                            <Label>Quản lý trọng số</Label>
-                                            <div className="space-y-1 sm:space-y-2">
-                                                {members.map((member) => (
-                                                    <div key={member.id} className="flex items-center gap-2">
-                                                        <span className="text-sm text-gray-600 min-w-0 flex-1">
-                                                            {member.name || member.ghostName || 'Unknown'}
-                                                        </span>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            step="0.1"
-                                                            value={formData.weightMap?.find(w => w.memberId === member.id)?.weight || 1}
-                                                            onChange={(e) => {
-                                                                const weight = parseFloat(e.target.value) || 0;
-                                                                setFormData(prev => ({
-                                                                    ...prev,
-                                                                    weightMap: prev.weightMap?.map(w =>
-                                                                        w.memberId === member.id ? { ...w, weight } : w
-                                                                    ) || []
-                                                                }));
-                                                            }}
-                                                            className="w-20 text-center"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => setShowAddForm(false)}
-                                        >
-                                            Hủy
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            disabled={submitting}
-                                            className="bg-green-600 hover:bg-green-700"
-                                        >
-                                            {submitting ? 'Đang thêm...' : 'Thêm chi phí'}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </DialogContent>
-                        </Dialog>
+                            <Button 
+                                onClick={() => setShowAddForm(true)}
+                                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Thêm chi phí
+                            </Button>
                         )}
 
                         {activeTab === 'advances' && (
@@ -959,212 +766,215 @@ export default function ExpensesInline({
             </div>
 
 
+            {/* Add Expense Modal - Shared for Desktop and Mobile */}
+            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+                <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
+                    <DialogHeader>
+                        <DialogTitle>Thêm chi phí mới</DialogTitle>
+                        <DialogDescription>
+                            Thêm chi phí cho chuyến đi với đầy đủ thông tin và cách chia tiền
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="space-y-1 sm:space-y-2">
+                                <Label htmlFor="amount">Số tiền *</Label>
+                                <Input
+                                    id="amount"
+                                    type="text"
+                                    value={formData.amount}
+                                    onChange={(e) => {
+                                        // Remove all non-numeric characters
+                                        let value = e.target.value.replace(/[^\d]/g, '');
+                                        
+                                        // Add thousand separators for display
+                                        if (value.length > 0) {
+                                            value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+                                        }
+                                        
+                                        setFormData({ ...formData, amount: value });
+                                    }}
+                                    placeholder="Nhập số tiền (VD: 500.000 hoặc 500000)..."
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1 sm:space-y-2">
+                                <Label htmlFor="paidBy">Người chi *</Label>
+                                <select
+                                    id="paidBy"
+                                    value={formData.paidBy}
+                                    onChange={(e) => setFormData({ ...formData, paidBy: e.target.value })}
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                                    required
+                                >
+                                    <option value="">Chọn người chi</option>
+                                    {members.map((member) => (
+                                        <option key={member.id} value={member.id}>
+                                            {member.name || member.ghostName || 'Unknown'}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-1 sm:space-y-2">
+                                <Label htmlFor="createdAt">Ngày tạo *</Label>
+                                <Input
+                                    id="createdAt"
+                                    name="createdAt"
+                                    type="date"
+                                    value={formData.createdAt}
+                                    onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="space-y-1 sm:space-y-2">
+                                <Label htmlFor="category">Danh mục</Label>
+                                <select
+                                    id="category"
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                                >
+                                    <option value="">Chọn danh mục</option>
+                                    <option value="food">Ăn uống</option>
+                                    <option value="transport">Di chuyển</option>
+                                    <option value="accommodation">Lưu trú</option>
+                                    <option value="entertainment">Giải trí</option>
+                                    <option value="shopping">Mua sắm</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-1 sm:space-y-2">
+                            <Label htmlFor="description">Mô tả</Label>
+                            <Input
+                                id="description"
+                                type="text"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Mô tả chi phí..."
+                            />
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-medium">Trọng số cho từng thành viên</Label>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isEqualSplit"
+                                        checked={formData.isEqualSplit}
+                                        onChange={(e) => {
+                                            const isEqual = e.target.checked;
+                                            let newWeights = { ...formData.weights };
+                                            
+                                            if (isEqual) {
+                                                // Set all members to weight 1 for equal split
+                                                members.forEach(member => {
+                                                    newWeights[member.id] = 1;
+                                                });
+                                            }
+                                            
+                                            setFormData({
+                                                ...formData,
+                                                isEqualSplit: isEqual,
+                                                weights: newWeights
+                                            });
+                                        }}
+                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <Label htmlFor="isEqualSplit" className="text-sm font-medium text-blue-600">
+                                        Chia đều
+                                    </Label>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                {members.map((member) => (
+                                    <div key={member.id} className="flex items-center justify-between py-1">
+                                        <span className="text-sm font-medium truncate flex-1 mr-2">{member.name || member.ghostName}</span>
+                                        <div className="flex items-center space-x-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                step="1"
+                                                value={formData.weights[member.id] ?? 0}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    weights: {
+                                                        ...formData.weights,
+                                                        [member.id]: parseInt(e.target.value) || 0
+                                                    }
+                                                })}
+                                                className="w-16 h-8 text-sm"
+                                                disabled={formData.isEqualSplit}
+                                            />
+                                            {!formData.isEqualSplit && (
+                                                <span className="text-xs text-gray-500">(0 = loại trừ)</span>
+                                            )}
+                                            {formData.isEqualSplit && (
+                                                <span className="text-xs text-blue-500">(tự động)</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <p className="text-xs text-gray-500">
+                                {formData.isEqualSplit 
+                                    ? '💡 Chia đều: Tất cả thành viên đều trả số tiền bằng nhau'
+                                    : '💡 Theo trọng số: Đặt trọng số = 0 để loại trừ thành viên khỏi chi phí này'
+                                }
+                            </p>
+                        </div>
+
+                        <div className="flex gap-2 pt-4">
+                            <Button type="submit" disabled={submitting} className="flex-1">
+                                {submitting ? 'Đang thêm...' : 'Thêm chi phí'}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setShowAddForm(false);
+                                    setFormData({
+                                        amount: '',
+                                        description: '',
+                                        paidBy: '',
+                                        splitMethod: 'weight',
+                                        isEqualSplit: false,
+                                        category: '',
+                                        weights: {},
+                                        createdAt: new Date().toISOString().split('T')[0],
+                                    });
+                                }}
+                                disabled={submitting}
+                                className="flex-1"
+                            >
+                                Hủy
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             {/* Expenses Tab */}
             {activeTab === 'expenses' && (
                 <div className="space-y-3 sm:space-y-4">
                     {/* Add Expense Button - Mobile Only */}
                     {showAddButton && !isTripClosed && members.length > 0 && (
                         <div className="md:hidden">
-                            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                                <DialogTrigger asChild>
-                                    <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Thêm chi phí mới
-                                    </Button>
-                                </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
-                                <DialogHeader>
-                                    <DialogTitle>Thêm chi phí mới</DialogTitle>
-                                    <DialogDescription>
-                                        Thêm chi phí cho chuyến đi với đầy đủ thông tin và cách chia tiền
-                                    </DialogDescription>
-                                </DialogHeader>
-                                
-                                <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="amount">Số tiền *</Label>
-                                            <Input
-                                                id="amount"
-                                                type="text"
-                                                value={formData.amount}
-                                                onChange={(e) => {
-                                                    // Remove all non-numeric characters
-                                                    let value = e.target.value.replace(/[^\d]/g, '');
-                                                    
-                                                    // Add thousand separators for display
-                                                    if (value.length > 0) {
-                                                        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                                                    }
-                                                    
-                                                    setFormData({ ...formData, amount: value });
-                                                }}
-                                                placeholder="Nhập số tiền (VD: 500.000 hoặc 500000)..."
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="paidBy">Người chi *</Label>
-                                            <select
-                                                id="paidBy"
-                                                value={formData.paidBy}
-                                                onChange={(e) => setFormData({ ...formData, paidBy: e.target.value })}
-                                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
-                                                required
-                                            >
-                                                <option value="">Chọn người chi</option>
-                                                {members.map((member) => (
-                                                    <option key={member.id} value={member.id}>
-                                                        {member.name || member.ghostName || 'Unknown'}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="createdAt">Ngày tạo *</Label>
-                                            <Input
-                                                id="createdAt"
-                                                name="createdAt"
-                                                type="date"
-                                                value={formData.createdAt}
-                                                onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
-                                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                required
-                                                disabled={submitting}
-                                            />
-                                        </div>
-                                        <div className="space-y-1 sm:space-y-2">
-                                            <Label htmlFor="category">Danh mục</Label>
-                                            <select
-                                                id="category"
-                                                value={formData.category}
-                                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
-                                            >
-                                                <option value="">Chọn danh mục</option>
-                                                <option value="food">Ăn uống</option>
-                                                <option value="transport">Di chuyển</option>
-                                                <option value="accommodation">Lưu trú</option>
-                                                <option value="entertainment">Giải trí</option>
-                                                <option value="shopping">Mua sắm</option>
-                                                <option value="other">Khác</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1 sm:space-y-2">
-                                        <Label htmlFor="description">Mô tả</Label>
-                                        <Input
-                                            id="description"
-                                            type="text"
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="Mô tả chi phí..."
-                                        />
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium">Trọng số cho từng thành viên</Label>
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    id="isEqualSplit"
-                                                    checked={formData.isEqualSplit}
-                                                    onChange={(e) => {
-                                                        const isEqual = e.target.checked;
-                                                        let newWeights = { ...formData.weights };
-                                                        
-                                                        if (isEqual) {
-                                                            // Set all members to weight 1 for equal split
-                                                            members.forEach(member => {
-                                                                newWeights[member.id] = 1;
-                                                            });
-                                                        }
-                                                        
-                                                        setFormData({
-                                                            ...formData,
-                                                            isEqualSplit: isEqual,
-                                                            weights: newWeights
-                                                        });
-                                                    }}
-                                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                                />
-                                                <Label htmlFor="isEqualSplit" className="text-sm font-medium text-blue-600">
-                                                    Chia đều
-                                                </Label>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="space-y-2 max-h-40 overflow-y-auto">
-                                            {members.map((member) => (
-                                                <div key={member.id} className="flex items-center justify-between py-1">
-                                                    <span className="text-sm font-medium truncate flex-1 mr-2">{member.name || member.ghostName}</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            max="10"
-                                                            step="1"
-                                                            value={formData.weights[member.id] ?? 0}
-                                                            onChange={(e) => setFormData({
-                                                                ...formData,
-                                                                weights: {
-                                                                    ...formData.weights,
-                                                                    [member.id]: parseInt(e.target.value) || 0
-                                                                }
-                                                            })}
-                                                            className="w-16 h-8 text-sm"
-                                                            disabled={formData.isEqualSplit}
-                                                        />
-                                                        {!formData.isEqualSplit && (
-                                                            <span className="text-xs text-gray-500">(0 = loại trừ)</span>
-                                                        )}
-                                                        {formData.isEqualSplit && (
-                                                            <span className="text-xs text-blue-500">(tự động)</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        
-                                        <p className="text-xs text-gray-500">
-                                            {formData.isEqualSplit 
-                                                ? '💡 Chia đều: Tất cả thành viên đều trả số tiền bằng nhau'
-                                                : '💡 Theo trọng số: Đặt trọng số = 0 để loại trừ thành viên khỏi chi phí này'
-                                            }
-                                        </p>
-                                    </div>
-
-                                    <div className="flex gap-2 pt-4">
-                                        <Button type="submit" disabled={submitting} className="flex-1">
-                                            {submitting ? 'Đang thêm...' : 'Thêm chi phí'}
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => {
-                                                setShowAddForm(false);
-                                                setFormData({
-                                                    amount: '',
-                                                    description: '',
-                                                    paidBy: '',
-                                                    splitMethod: 'weight',
-                                                    isEqualSplit: false,
-                                                    category: '',
-                                                    weights: {},
-                                                    createdAt: new Date().toISOString().split('T')[0],
-                                                });
-                                            }}
-                                            disabled={submitting}
-                                            className="flex-1"
-                                        >
-                                            Hủy
-                                        </Button>
-                                    </div>
-                                </form>
-                            </DialogContent>
-                        </Dialog>
+                            <Button 
+                                onClick={() => setShowAddForm(true)}
+                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Thêm chi phí mới
+                            </Button>
                         </div>
                     )}
 
