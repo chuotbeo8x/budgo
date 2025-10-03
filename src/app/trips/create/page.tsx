@@ -10,8 +10,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { MapPin } from 'lucide-react';
 import LoginPrompt from '@/components/auth/LoginPrompt';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function CreateTripPage() {
   const router = useRouter();

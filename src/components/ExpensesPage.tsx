@@ -701,7 +701,7 @@ export default function ExpensesPage({
                                                     checked={formData.isEqualSplit}
                                                     onChange={(e) => {
                                                         const isEqual = e.target.checked;
-                                                        let newWeights = { ...formData.weights };
+                                                        const newWeights = { ...formData.weights };
                                                         
                                                         if (isEqual) {
                                                             // Set all members to weight 1 for equal split

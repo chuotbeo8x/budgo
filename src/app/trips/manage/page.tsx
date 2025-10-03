@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
 import LoadingPage from '@/components/ui/loading-page';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { getUserTrips } from '@/lib/actions/trips';
 import { getUserGroups } from '@/lib/actions/groups';
 import { Trip, Group } from '@/lib/types';
-import { formatDate, formatDateTime } from '@/lib/utils/date';
+import { formatDate } from '@/lib/utils/date';
 import { toast } from 'sonner';
 import LoginPrompt from '@/components/auth/LoginPrompt';
 import Link from 'next/link';
@@ -22,14 +22,10 @@ import {
   Users, 
   Calendar, 
   DollarSign, 
-  TrendingUp,
   Search,
   Filter,
-  MoreVertical,
-  ExternalLink,
   Settings,
   Eye,
-  BarChart3,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -203,7 +199,6 @@ export default function TripsManagePage() {
   const groupTrips = trips.filter(t => t.groupId).length;
   const activeTrips = trips.filter(t => t.status === 'active').length;
   const totalExpense = trips.reduce((sum, trip) => sum + (trip.statsCache?.totalExpense || 0), 0);
-  const averageExpense = totalTrips > 0 ? totalExpense / totalTrips : 0;
 
   if (loading) {
     return <LoadingPage message="Đang tải thông tin chuyến đi..." />;
@@ -260,7 +255,7 @@ export default function TripsManagePage() {
                   </Button>
                 }
                 groups={groups}
-                onSuccess={(tripId, groupId, tripSlug) => {
+                onSuccess={(_tripId, _groupId, _tripSlug) => {
                   toast.success('Chuyến đi đã được tạo thành công!');
                   loadTrips();
                 }}
@@ -396,7 +391,7 @@ export default function TripsManagePage() {
                     </Button>
                   }
                   groups={groups} // Load actual groups
-                  onSuccess={(tripId, groupId, tripSlug) => {
+                  onSuccess={(_tripId, _groupId, _tripSlug) => {
                     toast.success('Chuyến đi đã được tạo thành công!');
                     loadTrips();
                   }}

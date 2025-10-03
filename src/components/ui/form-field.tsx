@@ -33,14 +33,15 @@ export function FormField({
   className,
   id,
 }: FormFieldProps) {
-  const fieldId = id || React.useId();
+  const fieldId = React.useId();
+  const finalFieldId = id || fieldId;
   const hintId = `${fieldId}-hint`;
   const errorId = `${fieldId}-error`;
 
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <Label htmlFor={fieldId} required={required}>
+        <Label htmlFor={finalFieldId} required={required}>
           {label}
         </Label>
       )}
@@ -48,11 +49,11 @@ export function FormField({
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
-            id: fieldId,
+            id: finalFieldId,
             "aria-describedby": hint ? hintId : error ? errorId : undefined,
             "aria-invalid": error ? true : undefined,
             error: error ? true : undefined,
-          } as any);
+          } as Record<string, unknown>);
         }
         return child;
       })}

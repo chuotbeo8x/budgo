@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { User, LogIn } from 'lucide-react';
+import { User } from 'lucide-react';
 import { signInWithGoogle } from '@/lib/auth';
 import { toast } from 'sonner';
 

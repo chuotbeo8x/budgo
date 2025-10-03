@@ -4,6 +4,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
+import MobileHeader from '@/components/MobileHeader';
 import LoadingPage from '@/components/ui/loading-page';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -181,6 +182,9 @@ export default function DashboardPage() {
         <meta name="twitter:description" content="Quản lý chuyến đi và nhóm của bạn một cách thông minh" />
         <link rel="canonical" href="https://budgo.app/dashboard" />
       </Head>
+      
+      {/* Mobile Header */}
+      <MobileHeader />
       
       {/* Design System: Mobile-first layout */}
       {/* Padding: mobile 1rem (16px), desktop 2rem (32px) */}

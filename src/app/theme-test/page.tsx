@@ -9,9 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import ThemeToggle from '@/components/ThemeToggle';
 import ThemeToggleDropdown from '@/components/ThemeToggleDropdown';
 import { 
-  Sun, 
-  Moon, 
-  Monitor, 
   Palette, 
   CheckCircle, 
   AlertTriangle, 

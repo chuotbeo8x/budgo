@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 
 export default function Footer() {
   const [copyright, setCopyright] = useState<string>('© 2025 Budgo');
-  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
-  const [siteName, setSiteName] = useState<string>('Budgo');
 
   useEffect(() => {
     const load = async () => {
@@ -13,9 +11,7 @@ export default function Footer() {
         const res = await fetch('/api/admin/settings', { cache: 'no-store' });
         const data = await res.json();
         if (data?.success && data.data) {
-          setLogoUrl(data.data.logoUrl || undefined);
           if (data.data.copyright) setCopyright(data.data.copyright);
-          if (data.data.siteName) setSiteName(data.data.siteName);
         }
       } catch {}
     };

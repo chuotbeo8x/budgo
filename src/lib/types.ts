@@ -194,7 +194,7 @@ export interface Notification {
     requestId?: string;
     isBroadcast?: boolean;
     sentBy?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
   };
   isRead: boolean;
   createdAt: Date;

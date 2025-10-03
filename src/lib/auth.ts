@@ -1,6 +1,5 @@
 import { 
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
   signOut, 
   onAuthStateChanged, 
@@ -16,25 +15,26 @@ export const signInWithGoogle = async (): Promise<UserCredential | void> => {
     const result = await signInWithPopup(auth, googleProvider);
     console.log('signInWithGoogle: Popup success!', result.user.uid);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error signing in with Google:', error);
     
     // Handle specific Firebase Auth errors
-    if (error.code === 'auth/popup-closed-by-user') {
+    const firebaseError = error as { code?: string };
+    if (firebaseError.code === 'auth/popup-closed-by-user') {
       throw new Error('Đăng nhập bị hủy. Vui lòng thử lại.');
-    } else if (error.code === 'auth/popup-blocked') {
+    } else if (firebaseError.code === 'auth/popup-blocked') {
       throw new Error('Popup bị chặn. Vui lòng cho phép popup và thử lại.');
-    } else if (error.code === 'auth/cancelled-popup-request') {
+    } else if (firebaseError.code === 'auth/cancelled-popup-request') {
       // Don't show error for cancelled popup - just ignore
       console.log('signInWithGoogle: Popup request cancelled, ignoring...');
       return;
-    } else if (error.code === 'auth/network-request-failed') {
+    } else if (firebaseError.code === 'auth/network-request-failed') {
       throw new Error('Lỗi kết nối. Vui lòng kiểm tra internet và thử lại.');
-    } else if (error.code === 'auth/too-many-requests') {
+    } else if (firebaseError.code === 'auth/too-many-requests') {
       throw new Error('Quá nhiều yêu cầu. Vui lòng thử lại sau.');
-    } else if (error.code === 'auth/operation-not-allowed') {
+    } else if (firebaseError.code === 'auth/operation-not-allowed') {
       throw new Error('Đăng nhập Google chưa được bật. Vui lòng liên hệ quản trị viên.');
-    } else if (error.code === 'auth/unauthorized-domain') {
+    } else if (firebaseError.code === 'auth/unauthorized-domain') {
       throw new Error('Domain không được phép. Vui lòng liên hệ quản trị viên.');
     } else {
       throw new Error('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
@@ -50,7 +50,7 @@ export const handleGoogleRedirect = async (): Promise<UserCredential | null> => 
       console.log('handleGoogleRedirect: Success!', result.user.uid);
     }
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error handling Google redirect:', error);
     throw error;
   }
